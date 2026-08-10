@@ -77,16 +77,17 @@ a:focus-visible {
 }
 
 .brand-mark {
-  display: grid;
+  display: block;
   width: 31px;
   height: 31px;
-  place-items: center;
-  border: 1px solid rgba(212, 199, 255, 0.32);
-  border-radius: 11px 11px 14px 14px;
-  color: #e9e0ff;
-  background: linear-gradient(145deg, #8e6cef, #5f4ca6);
-  box-shadow: 0 8px 25px rgba(116, 83, 208, 0.28);
-  font-size: 15px;
+  flex: 0 0 31px;
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .topbar-actions {

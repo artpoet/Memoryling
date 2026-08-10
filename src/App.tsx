@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
+import memorylingIcon from "./assets/memoryling-icon.png";
 import FirstMemoryFlow from "./FirstMemoryFlow";
 import {
   emptyMemoryState,
@@ -146,7 +147,7 @@ export function App({ memoryClient = nativeMemoryClient }: AppProps) {
       <header className="topbar">
         <a className="brand" href="#top" aria-label={t.brandHome}>
           <span className="brand-mark" aria-hidden="true">
-            M
+            <img src={memorylingIcon} alt="" />
           </span>
           <span>Memoryling</span>
         </a>

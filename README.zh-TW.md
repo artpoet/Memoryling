@@ -2,7 +2,7 @@
 
 **讓你的 Agent 記憶，長成一個生命。**
 
-[English](README.md) · [產品願景](docs/zh-TW/PRODUCT_VISION.md) · [架構](docs/ARCHITECTURE.md) · [路線圖](docs/ROADMAP.md)
+[English](README.md) · [Windows 測試指南](docs/zh-TW/USER_GUIDE.md) · [產品願景](docs/zh-TW/PRODUCT_VISION.md) · [架構](docs/ARCHITECTURE.md) · [路線圖](docs/ROADMAP.md)
 
 Memoryling 是一個開源、local-first 的桌面生命。牠會從 AI Agent 的持久記憶中成長；外觀、對話、連續事件與偶爾出現的重要提醒，都應該有可以追溯的原因。
 
@@ -38,6 +38,12 @@ Memoryling 是一個開源、local-first 的桌面生命。牠會從 AI Agent �
 
 瀏覽器預覽不能執行這條流程。這項試行不能掃描任意路徑、讀取使用者的 Codex 檔案，也不能寫入 Agent 記憶庫，而且不會發出網路請求。
 
+## Windows x64 fixture-only 測試版
+
+測試使用者的正式入口是目前使用者（current-user）NSIS 安裝程式 `Memoryling_0.1.0_x64-setup.exe`。這是本機產出的未簽章 Windows x64 artifact，尚未達到公開發布品質；真實 Codex 記憶存取仍維持關閉。
+
+安裝前請先閱讀 [Windows x64 測試指南](docs/zh-TW/USER_GUIDE.md)。指南包含完整 fixture 操作流程、WebView2 前置下載、Windows 安全警告、解除安裝時的 App data 保留行為，以及 raw release exe 為何不是 portable 發布包。
+
 在本機啟動：
 
     npm install
@@ -68,7 +74,7 @@ Memoryling 不是通用 AI 助理、套著吉祥物的待辦工具，也不是�
 
 ## 專案狀態
 
-Memoryling 目前是 **fixture-backed 開發階段（v0.1.0）**。視覺體驗與 SQLite／來源鏈 v1 基礎已能在本機針對打包的合成紀錄運作；真實記憶 connector、系統通知與正式安裝包仍在路線圖上。
+Memoryling 目前是 **fixture-backed 開發階段（v0.1.0）**。視覺體驗、SQLite／來源鏈 v1 基礎，以及本機產出的未簽章 Windows x64 NSIS 測試 artifact 已可使用；真實記憶 connector、系統通知、程式碼簽章與可公開發布的正式安裝包仍在路線圖上。
 
 第一個工程里程碑的 fixture 基礎已實作，但 Phase 1 的 exit condition 尚未達成：目前沒有選取或匯入任何使用者擁有的 Codex 記憶。下一步 connector 工作必須先驗證真實 Codex 格式，並維持使用者明確選取、唯讀、先預覽再同意的邊界。
 

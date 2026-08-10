@@ -26,7 +26,13 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis"],
+    "publisher": "Yupo Huang",
+    "homepage": "https://github.com/artpoet/Memoryling",
+    "copyright": "Copyright © 2026 Yupo Huang and Memoryling contributors",
+    "shortDescription": "A local-first creature shaped by explainable agent memory.",
+    "longDescription": "Memoryling is a bilingual local-first desktop creature whose supported changes retain inspectable source lineage.",
+    "licenseFile": "../LICENSE",
     "resources": ["fixtures/codex-first-memory-v1.json"],
     "icon": [
       "icons/32x32.png",
@@ -34,6 +40,19 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "allowDowngrades": false,
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "installMode": "currentUser",
+        "languages": ["English", "TradChinese"]
+      }
+    }
   }
 }

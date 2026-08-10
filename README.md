@@ -2,7 +2,7 @@
 
 **Your agent memories, alive.**
 
-[繁體中文](README.zh-TW.md) · [Product vision](docs/PRODUCT_VISION.md) · [Architecture](docs/ARCHITECTURE.md) · [Roadmap](docs/ROADMAP.md)
+[繁體中文](README.zh-TW.md) · [Windows test guide](docs/USER_GUIDE.md) · [Product vision](docs/PRODUCT_VISION.md) · [Architecture](docs/ARCHITECTURE.md) · [Roadmap](docs/ROADMAP.md)
 
 [![CI](https://github.com/artpoet/Memoryling/actions/workflows/ci.yml/badge.svg)](https://github.com/artpoet/Memoryling/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-7c63d9.svg)](LICENSE)
@@ -41,6 +41,12 @@ In the Tauri desktop runtime, the fixture pilot exercises a narrow local path en
 
 The browser preview cannot run this pipeline. The pilot cannot scan arbitrary paths, read user-owned Codex files, or write to an agent's memory store, and it makes no network request.
 
+## Windows x64 fixture-only test build
+
+The supported tester entry is the current-user NSIS installer named `Memoryling_0.1.0_x64-setup.exe`. This local Windows x64 artifact is unsigned and not a public release-ready package. Real Codex memory access remains off.
+
+Read the [Windows x64 test guide](docs/USER_GUIDE.md) before installing. It covers the full fixture tour, WebView2 prerequisite download, Windows security warnings, app-data retention during uninstall, and why the raw release executable is not a portable distribution.
+
 Run it locally:
 
     npm install
@@ -71,7 +77,7 @@ Raw memory files, credentials, prompts, and private work must never be committed
 
 ## Project status
 
-Memoryling is at a **fixture-backed development stage (v0.1.0)**. The visual experience and the v1 SQLite/lineage foundation are runnable locally for the bundled synthetic record. Real memory connectors, notification delivery, and packaged releases remain roadmap work.
+Memoryling is at a **fixture-backed development stage (v0.1.0)**. The visual experience, v1 SQLite/lineage foundation, and a local unsigned Windows x64 NSIS test artifact are available. Real memory connectors, notification delivery, code signing, and a public release-ready package remain roadmap work.
 
 The fixture foundation for the first engineering milestone is implemented, but the Phase 1 exit is not met: no user-owned Codex memory has been selected or imported. The next connector work must validate a real Codex format and remain explicitly selected, read-only, previewed, and consented.
 

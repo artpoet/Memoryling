@@ -4,19 +4,19 @@ AS_OF: 2026-08-10 (Asia/Taipei)
 
 ## Current milestone
 
-Complete the fixture-only “First real memory” vertical slice without touching private agent memory.
+Provide an honest Windows x64 current-user test installer for the completed fixture-only memory slice, then close its remaining installer UAT and artifact-evidence gaps.
 
 ## Overall state
 
-- Stage: v0.1.0 with a complete fixture-only first-memory pipeline
+- Stage: v0.1.0 with a complete fixture-only first-memory pipeline and a local Windows x64 NSIS test artifact
 - Product surface: bilingual desktop and browser-safe experience implemented locally
 - Synthetic Codex-shaped source pipeline: implemented end to end
 - User-owned Codex memory access: not implemented
 - Local store: SQLite schema v1 under Tauri app-local data
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: local checks and this bundle's GitHub Actions run are passing
-- Release: no packaged release
+- CI: the first-memory implementation checks and GitHub Actions run are passing; current packaging and icon changes still need final local and remote closeout
+- Release: unsigned local Windows x64 test installer produced; no signed or public packaged release
 
 ## Completed in this bundle
 
@@ -37,6 +37,20 @@ Complete the fixture-only “First real memory” vertical slice without touchin
 
 The local pipeline is real and persistent, but its only permitted input is a fictional resource bundled with the app. Memoryling does not scan or read the user's Codex tool-home, arbitrary files, credentials, prompts, or private memory. Browser preview keeps memory access off; after fixture approval the desktop still says real memory access is off.
 
+## Windows x64 test-build status
+
+- the supported tester entry is the current-user NSIS installer `Memoryling_0.1.0_x64-setup.exe`
+- the local artifact exists at `src-tauri/target/release/bundle/nsis/Memoryling_0.1.0_x64-setup.exe`; build output remains untracked
+- `npm run build:windows` is the documented developer build command
+- the installer is bilingual and can download Microsoft's WebView2 bootstrapper when WebView2 is missing; that prerequisite download is separate from the network-free fixture memory path
+- the raw `src-tauri/target/release/memoryling.exe` depends on `src-tauri/target/release/fixtures/codex-first-memory-v1.json` and is not a portable distribution
+- app state is under `%LOCALAPPDATA%\app.memoryling.desktop`; uninstall can retain it unless the delete-app-data option is explicitly selected
+- the new icon and in-app brand asset were generated with Codex's built-in ImageGen; alpha-channel and transparent-pixel checks passed for the source and generated PNG path
+- installer generation and configuration inspection passed, but full human install → open → fixture flow → uninstall click-through, including the delete-app-data option, is not yet claimed as passed UAT
+- the installer is unsigned and may show Unknown publisher or SmartScreen warnings; it is not public release-ready
+- the finalized local installer is 2,759,655 bytes with SHA-256 `62FE4E5D87E4F221174F120F84A94303345C3694CA57090353438037F271D79B`; regenerate the checksum after any rebuild
+- a fresh CI run for the packaging/icon source bundle remains pending closeout
+
 ## Verification evidence
 
 - PASS — 5 frontend interaction tests covering off → preview → approve → mark → lineage → forget, restart restore, bilingual browser boundary, invalid-timestamp rendering defense, and failed-forget state integrity
@@ -51,6 +65,10 @@ The local pipeline is real and persistent, but its only permitted input is a fic
 - PASS — English and Traditional Chinese browser smoke at desktop width plus a 390 × 844 viewport, with no horizontal overflow
 - PASS — browser console contained no errors or warnings and the page linked no external runtime resources
 - PASS — restrictive CSP and `core:default` capability remain unchanged
+- PASS — `npm run build:windows` produced the Windows x64 current-user NSIS installer and bundled `memoryling.exe` plus the synthetic fixture resource
+- PASS — raw release-app smoke opened the bilingual Tauri window; both the Windows title bar and in-app header showed the generated Memoryling icon
+- PASS — installer-launch smoke reached the Traditional Chinese `Memoryling 安裝` window with the generated icon, then closed without installing
+- PASS — generated ICO contains 16／24／32／48／64／256 px layers; the 1,254 × 1,254 RGBA source has transparent pixels
 
 The Windows desktop-control helper could read the native UI but failed at input injection after recovery. Native click-through is therefore supported by Rust product-path tests plus frontend interaction tests, not claimed as completed human UAT.
 
@@ -65,21 +83,25 @@ Remote evidence:
 
 ## Known gaps
 
-- scaffold icons have not been replaced with final Memoryling artwork
+- the scaffold icons were replaced with generated test artwork, but the new artwork has not received public-release signoff
 - accessibility requires a dedicated keyboard and screen-reader audit
 - the adapter supports only the bundled synthetic v1 fixture; no user-owned Codex memory format is accepted
 - a Rust-owned native picker, strict external-file validation, and preview redaction remain future work
 - conversation model strategy remains intentionally open
-- there are no packaged installers or releases
+- Windows installer and uninstaller click-through, WebView2-missing behavior, and app-data deletion still need human UAT
+- code signing, fresh packaging CI evidence, and public distribution remain incomplete; the recorded local checksum changes after any rebuild
 
 ## Next bundle
 
-Prepare a first user-selected Codex-source pilot as described in AI-WAKEUP.md. Do not treat private `MEMORY.md` files as a public format specification or begin real-data UAT without explicit source selection and authorization.
+Close the Windows x64 test-build gate before returning to a real-source pilot: complete current-user install, launch, fixture tour, uninstall, and app-data deletion UAT; attach fresh CI evidence and recheck the recorded installer checksum; then decide signing and distribution readiness. After that gate, prepare the first user-selected Codex-source pilot described in AI-WAKEUP.md without treating private `MEMORY.md` files as a public format specification.
 
 ## Do not redo
 
 - do not replace the Tauri + React foundation without new evidence
 - do not rebuild the completed fixture → pending preview → SQLite → lineage → recompute path
+- do not distribute the raw release executable as a portable app without its generated fixture sidecar
+- do not describe the unsigned NSIS test artifact or generated test icon as public release-ready
+- do not recommend bypassing SmartScreen or weakening Windows security controls
 - do not add open-ended AI chat before the memory lineage path exists
 - do not describe the fixture pilot as access to the user's real Codex memories
 - do not add cloud sync, telemetry, or remote memory processing by assumption

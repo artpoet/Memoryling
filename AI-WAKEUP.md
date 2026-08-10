@@ -10,15 +10,16 @@
 4. docs/ARCHITECTURE.md
 5. docs/PRIVACY_PRINCIPLES.md
 6. docs/ROADMAP.md
-7. AGENTS.md
-8. Relevant ADRs under docs/adr/
+7. docs/USER_GUIDE.md
+8. AGENTS.md
+9. Relevant ADRs under docs/adr/
 
 ## Project identity
 
 - Product: Memoryling｜記憶獸
 - Tagline: Your agent memories, alive.
 - Chinese tagline: 讓你的 Agent 記憶，長成一個生命。
-- Stage: fixture-backed first-memory vertical slice, v0.1.0
+- Stage: fixture-only first-memory vertical slice with a local Windows x64 NSIS test build, v0.1.0
 - Repository: https://github.com/artpoet/Memoryling
 - Primary public language: English
 - First-class personal language: Traditional Chinese
@@ -42,7 +43,10 @@ Implemented now:
 - deterministic completion signal and explainable completion-star world effect
 - transactional source forgetting followed by deterministic recomputation
 - visible real-memory access remains off; fixture approval is reported separately as a local synthetic pilot
-- no telemetry and no external font or runtime content dependency
+- current-user Windows x64 NSIS test-build configuration with English／Traditional Chinese installer languages
+- WebView2 download-bootstrapper support when that Windows prerequisite is missing
+- generated Memoryling test icon and in-app brand asset with PNG transparency checked
+- no telemetry and no external font or runtime content dependency in the fixture memory path
 
 Not implemented:
 
@@ -52,7 +56,8 @@ Not implemented:
 - derivations beyond the deterministic completion-star rule
 - real conversation model
 - native reminder delivery
-- packaged public releases
+- completed human installer/uninstaller click-through UAT
+- code signing or a public release-ready package
 
 Do not describe roadmap items as working features.
 
@@ -78,7 +83,12 @@ The current code implements this path end to end for exactly one bundled synthet
 - src-tauri/src/memory/ — strict adapter, pending preview, SQLite store, derivation, and forgetting
 - src-tauri/migrations/0001_first_memory.sql — local schema v1
 - src-tauri/fixtures/codex-first-memory-v1.json — fictional test-only source
+- src-tauri/icons/icon-source.png — built-in ImageGen test-art source; not public release-approved
 - src-tauri/ — native Tauri shell and minimal capabilities
+- package.json — frontend, validation, and Windows NSIS build commands
+- src-tauri/tauri.conf.json — current-user NSIS, WebView2 prerequisite, resource, and icon configuration
+- docs/USER_GUIDE.md — English Windows x64 fixture-only installation and use guide
+- docs/zh-TW/USER_GUIDE.md — Traditional Chinese user guide
 - docs/PRODUCT_VISION.md — product intent
 - docs/zh-TW/PRODUCT_VISION.md — Traditional Chinese product intent
 - docs/ARCHITECTURE.md — intended system and connector contract
@@ -105,6 +115,10 @@ The current code implements this path end to end for exactly one bundled synthet
 - Approved normalized text is stored in app-local SQLite. Never print, stage, commit, attach, or screenshot a real local database.
 - “Complete forgetting” is scoped to Memoryling's local imported copy and supported downstream graph; it never modifies the source and is not a physical secure-erasure guarantee.
 - Browser preview has no native memory runtime. Do not add mock persistence or present planned behavior as live.
+- The supported tester entry is the unsigned current-user NSIS installer. The raw release exe requires its generated fixture sidecar and is not portable.
+- Uninstall may retain `%LOCALAPPDATA%\app.memoryling.desktop` unless the delete-app-data option is explicitly selected; that click-through still needs human UAT.
+- A missing WebView2 prerequisite may cause installer network access to Microsoft. Do not confuse this with the network-free fixture memory pipeline.
+- Generated test artwork and transparent PNGs are not evidence of signing, store review, or public release readiness.
 
 ## Working conventions
 
@@ -134,17 +148,25 @@ Validation:
     npm run check
     cargo fmt --manifest-path src-tauri/Cargo.toml --check
 
+Windows x64 current-user NSIS test build:
+
+    npm run build:windows
+
+Expected local artifact:
+
+    src-tauri/target/release/bundle/nsis/Memoryling_0.1.0_x64-setup.exe
+
 ## Current coherent next bundle
 
-Prepare the first user-selected Codex-source pilot without weakening the proven fixture path:
+Close the Windows x64 fixture-only test-build gate:
 
-1. verify and document a stable public Codex durable-memory format instead of treating private `MEMORY.md` content as a specification;
-2. add a Rust-owned native file picker with regular-file, size, UTF-8, canonicalization, and strict-format checks;
-3. keep preview data in RAM and bind approval to its pending token;
-4. add redaction and invalid-input tests before any signed-in or private-data UAT;
-5. run real-data UAT only with an explicitly selected source and explicit user authorization.
+1. complete a human current-user NSIS install → open → fixture preview／approve／explain／forget → uninstall click-through on Windows x64;
+2. verify the uninstall delete-app-data option and inspect `%LOCALAPPDATA%\app.memoryling.desktop` after both retention and deletion choices;
+3. exercise the WebView2-missing installer path when a safe clean Windows environment is available;
+4. retain the recorded SHA-256 checksum for this local artifact, regenerate it after every rebuild, and add fresh CI evidence for the packaging/icon source bundle;
+5. decide code-signing and distribution readiness without describing the current test art or unsigned installer as a public release.
 
-Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.
+After that gate, resume the first user-selected Codex-source pilot: validate a stable supported format, add a Rust-owned narrow picker and redacted preview, and require explicit authorization before private-data UAT. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.
 
 ## Closeout checklist
 

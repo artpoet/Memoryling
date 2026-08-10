@@ -13,11 +13,15 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - Deterministic completion-star derivation with persisted source → event → signal → effect lineage
 - “Why did this happen?” inspector plus transactional local-source forgetting and recomputation
 - Bilingual desktop UI and automated Rust and React coverage for the supported synthetic path
+- Current-user Windows x64 NSIS test-build configuration and `npm run build:windows` command
+- English and Traditional Chinese Windows test guides covering installation, fixture use, local data, uninstall limits, and raw-executable sidecars
+- Test-build Memoryling icon and in-app brand artwork generated with Codex's built-in ImageGen; PNG transparency was checked for the test-build assets
 
 ### Changed
 
 - Creature marks now depend on persisted Rust state; remaining event and reminder examples are explicitly labeled as concept or planned UI
 - Real-memory access remains visibly off during the fixture pilot and in browser preview
+- Windows bundling now targets an unsigned bilingual NSIS test installer and can download Microsoft's WebView2 bootstrapper when the prerequisite is missing
 
 ### Planned
 

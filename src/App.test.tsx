@@ -101,6 +101,9 @@ describe("First real memory vertical slice", () => {
     const { client, approveImport, forgetSource } = createClient();
     render(<App memoryClient={client} />);
 
+    expect(
+      screen.getByRole("link", { name: "Memoryling home" }).querySelector("img"),
+    ).toHaveAttribute("src", expect.stringContaining("memoryling-icon"));
     expect(screen.queryByTestId("derived-memory-mark")).not.toBeInTheDocument();
     expect(
       screen.getByText("Memory access is off · no approved sources"),
