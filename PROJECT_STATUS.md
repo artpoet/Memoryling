@@ -11,8 +11,9 @@ Establish a public, bilingual, runnable open-source concept repository for Memor
 - Stage: v0.1.0 concept shell
 - Product surface: implemented locally
 - Real memory access: not implemented
-- GitHub repository: pending creation
-- CI: defined, pending first remote run
+- GitHub repository: public at https://github.com/artpoet/Memoryling
+- Default branch: main
+- CI: passing on GitHub Actions
 - Release: no packaged release
 
 ## Completed in this bundle
@@ -39,6 +40,15 @@ The current interface uses sample content only. It does not locate, read, normal
 - PASS — runtime source scan found no Google Fonts or remote CSS imports
 - PASS — local Vite smoke returned HTTP 200
 - PASS — English and Traditional Chinese 1400 × 1100 screenshots were visually inspected
+- PASS — GitHub CI run 31373607683 completed successfully on commit fe9f4e1
+
+Remote evidence:
+
+- repository visibility is PUBLIC and default branch is main
+- GitHub recognizes the MIT license
+- discovery topics include agent-memory, desktop-pet, local-first, Tauri, React, and TypeScript
+- private vulnerability reporting is enabled
+- CI evidence: https://github.com/artpoet/Memoryling/actions/runs/31373607683
 
 ## Known gaps
 
