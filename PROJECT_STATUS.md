@@ -15,7 +15,7 @@ Provide an honest Windows x64 current-user test installer for the completed fixt
 - Local store: SQLite schema v1 under Tauri app-local data
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: the first-memory implementation checks and GitHub Actions run are passing; current packaging and icon changes still need final local and remote closeout
+- CI: the first-memory implementation and current packaging／icon source bundle both pass local checks and GitHub Actions
 - Release: unsigned local Windows x64 test installer produced; no signed or public packaged release
 
 ## Completed in this bundle
@@ -49,7 +49,7 @@ The local pipeline is real and persistent, but its only permitted input is a fic
 - installer generation and configuration inspection passed, but full human install → open → fixture flow → uninstall click-through, including the delete-app-data option, is not yet claimed as passed UAT
 - the installer is unsigned and may show Unknown publisher or SmartScreen warnings; it is not public release-ready
 - the finalized local installer is 2,759,655 bytes with SHA-256 `62FE4E5D87E4F221174F120F84A94303345C3694CA57090353438037F271D79B`; regenerate the checksum after any rebuild
-- a fresh CI run for the packaging/icon source bundle remains pending closeout
+- packaging/icon source commit `2aead61` passed fresh Windows CI run `31394540587`
 
 ## Verification evidence
 
@@ -80,6 +80,8 @@ Remote evidence:
 - private vulnerability reporting is enabled
 - implementation commit: [`979bf7e`](https://github.com/artpoet/Memoryling/commit/979bf7eb19f31b1b3931b4c8824df1d94689408d)
 - PASS — Windows CI for that implementation commit: https://github.com/artpoet/Memoryling/actions/runs/31380474307
+- packaging/icon commit: [`2aead61`](https://github.com/artpoet/Memoryling/commit/2aead6133d31578239ea49e04c9a95509c05911a)
+- PASS — Windows CI for the packaging/icon source bundle: https://github.com/artpoet/Memoryling/actions/runs/31394540587
 
 ## Known gaps
 
@@ -89,11 +91,11 @@ Remote evidence:
 - a Rust-owned native picker, strict external-file validation, and preview redaction remain future work
 - conversation model strategy remains intentionally open
 - Windows installer and uninstaller click-through, WebView2-missing behavior, and app-data deletion still need human UAT
-- code signing, fresh packaging CI evidence, and public distribution remain incomplete; the recorded local checksum changes after any rebuild
+- code signing and public distribution remain incomplete; the recorded local checksum changes after any rebuild
 
 ## Next bundle
 
-Close the Windows x64 test-build gate before returning to a real-source pilot: complete current-user install, launch, fixture tour, uninstall, and app-data deletion UAT; attach fresh CI evidence and recheck the recorded installer checksum; then decide signing and distribution readiness. After that gate, prepare the first user-selected Codex-source pilot described in AI-WAKEUP.md without treating private `MEMORY.md` files as a public format specification.
+Close the Windows x64 test-build gate before returning to a real-source pilot: complete current-user install, launch, fixture tour, uninstall, and app-data deletion UAT; recheck the recorded installer checksum after any rebuild; then decide signing and distribution readiness. After that gate, prepare the first user-selected Codex-source pilot described in AI-WAKEUP.md without treating private `MEMORY.md` files as a public format specification.
 
 ## Do not redo
 

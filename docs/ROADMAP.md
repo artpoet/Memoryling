@@ -11,7 +11,8 @@ This roadmap describes intent, not a delivery promise.
 - [x] replace scaffold icons with generated Memoryling test artwork; public-release visual signoff remains separate
 - [x] generate a local current-user Windows x64 NSIS fixture-only test artifact and bilingual user guide
 - [ ] complete human installer, WebView2 prerequisite, uninstaller, and delete-app-data click-through UAT
-- [ ] complete code signing, finalized artifact checksum／CI evidence, and public-distribution review
+- [x] record the finalized local test-artifact checksum and fresh Windows CI evidence
+- [ ] complete code signing and public-distribution review
 - [ ] keyboard and screen-reader audit
 
 ## Phase 1 — First real memory

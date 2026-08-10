@@ -163,7 +163,7 @@ Close the Windows x64 fixture-only test-build gate:
 1. complete a human current-user NSIS install → open → fixture preview／approve／explain／forget → uninstall click-through on Windows x64;
 2. verify the uninstall delete-app-data option and inspect `%LOCALAPPDATA%\app.memoryling.desktop` after both retention and deletion choices;
 3. exercise the WebView2-missing installer path when a safe clean Windows environment is available;
-4. retain the recorded SHA-256 checksum for this local artifact, regenerate it after every rebuild, and add fresh CI evidence for the packaging/icon source bundle;
+4. retain the recorded SHA-256 checksum and Windows CI evidence for commit `2aead61`, and regenerate the checksum after every rebuild;
 5. decide code-signing and distribution readiness without describing the current test art or unsigned installer as a public release.
 
 After that gate, resume the first user-selected Codex-source pilot: validate a stable supported format, add a Rust-owned narrow picker and redacted preview, and require explicit authorization before private-data UAT. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.

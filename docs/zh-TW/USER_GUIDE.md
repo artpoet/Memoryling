@@ -35,7 +35,7 @@ Memoryling v0.1.0 目前是**僅使用 fixture 的 Windows x64 測試版**。它
 - 目前測試安裝程式沒有程式碼簽章。Windows 可能顯示 **Unknown publisher（未知的發行者）** 或 Microsoft Defender SmartScreen 警告。
 - 不要為了 Memoryling 關閉 SmartScreen、防毒軟體或其他 Windows 防護；也不要只因為看過這份指南就略過安全警告。
 - 只安裝從你信任的專案管道取得的 artifact。若無法確認檔案來源或身分，請取消安裝。
-- 2026-08-10 完成的本機測試安裝器大小為 2,759,655 bytes，SHA-256 是 `62FE4E5D87E4F221174F120F84A94303345C3694CA57090353438037F271D79B`。每次重建後都必須重新核對 hash；這次包裝與 icon bundle 的新 CI run 仍待完成。
+- 2026-08-10 完成的本機測試安裝器大小為 2,759,655 bytes，SHA-256 是 `62FE4E5D87E4F221174F120F84A94303345C3694CA57090353438037F271D79B`。每次重建後都必須重新核對 hash；這次包裝與 icon source bundle 已通過 [Windows CI run 31394540587](https://github.com/artpoet/Memoryling/actions/runs/31394540587)。
 - 此 artifact 針對 Windows x64 建置；本測試包不涵蓋其他 Windows 架構。
 
 ## 安裝與開啟

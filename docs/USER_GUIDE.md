@@ -35,7 +35,7 @@ Moving or sharing only `memoryling.exe` can leave the fixture unavailable. Use t
 - This test installer is currently unsigned. Windows may show **Unknown publisher** or a Microsoft Defender SmartScreen warning.
 - Do not disable SmartScreen, antivirus, or other Windows protections for Memoryling. Do not bypass a warning merely because this guide exists.
 - Install only an artifact obtained through a project channel you trust. If the file's origin or identity is unclear, cancel installation.
-- The finalized local test installer built on 2026-08-10 is 2,759,655 bytes with SHA-256 `62FE4E5D87E4F221174F120F84A94303345C3694CA57090353438037F271D79B`. Recheck the hash after any rebuild; a fresh CI run for this packaging and icon bundle is still pending.
+- The finalized local test installer built on 2026-08-10 is 2,759,655 bytes with SHA-256 `62FE4E5D87E4F221174F120F84A94303345C3694CA57090353438037F271D79B`. Recheck the hash after any rebuild. The packaging and icon source bundle passed [Windows CI run 31394540587](https://github.com/artpoet/Memoryling/actions/runs/31394540587).
 - The package is built for Windows x64. Other Windows architectures are not covered by this test artifact.
 
 ## Install and open
