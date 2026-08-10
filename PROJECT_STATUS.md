@@ -15,7 +15,7 @@ Complete the fixture-only “First real memory” vertical slice without touchin
 - Local store: SQLite schema v1 under Tauri app-local data
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: local checks passing; this bundle's GitHub Actions run is pending push
+- CI: local checks and this bundle's GitHub Actions run are passing
 - Release: no packaged release
 
 ## Completed in this bundle
@@ -60,8 +60,8 @@ Remote evidence:
 - GitHub recognizes the MIT license
 - discovery topics include agent-memory, desktop-pet, local-first, Tauri, React, and TypeScript
 - private vulnerability reporting is enabled
-- previous baseline CI evidence: https://github.com/artpoet/Memoryling/actions/runs/31373607683
-- this bundle's commit and CI evidence will replace the baseline after push
+- implementation commit: [`979bf7e`](https://github.com/artpoet/Memoryling/commit/979bf7eb19f31b1b3931b4c8824df1d94689408d)
+- PASS — Windows CI for that implementation commit: https://github.com/artpoet/Memoryling/actions/runs/31380474307
 
 ## Known gaps
 
