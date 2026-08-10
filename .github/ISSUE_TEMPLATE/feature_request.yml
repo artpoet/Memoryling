@@ -1,0 +1,35 @@
+name: Feature request
+description: Propose a focused improvement to Memoryling.
+title: "[Idea]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: What should become easier, safer, more useful, or more alive?
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: Desired experience
+      description: Describe the visible user experience, not only the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: trust
+    attributes:
+      label: Memory and privacy impact
+      description: What data would be read, derived, stored, transmitted, corrected, or deleted?
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundary check
+      options:
+        - label: This proposal does not require real private data in the issue.
+          required: true
+        - label: I understand that network memory features require explicit consent and an ADR.
+          required: true
