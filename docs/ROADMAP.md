@@ -13,14 +13,25 @@ This roadmap describes intent, not a delivery promise.
 
 ## Phase 1 — First real memory
 
-- [ ] versioned normalized memory-event schema
-- [ ] read-only Codex durable-memory adapter
-- [ ] explicit source picker, scope explanation, and import preview
-- [ ] local SQLite store with migrations
-- [ ] source lineage and “Why did this happen?” inspector
-- [ ] complete source deletion and derivation recomputation
+Fixture foundation completed:
+
+- [x] versioned memory-event schema v1 for one synthetic `completion` record
+- [x] fixed-path, read-only adapter for one bundled fictional Codex-shaped fixture
+- [x] fixture selection, scope explanation, record preview, explicit consent, and cancel flow
+- [x] local SQLite schema v1 with migration 0001
+- [x] deterministic completion star, source lineage, and “Why did this happen?” inspector
+- [x] application-level deletion and deterministic recomputation for the supported fixture path
+
+Real-source work required for the phase exit:
+
+- [ ] validate and document a supported user-owned Codex durable-memory format
+- [ ] read only an exact external source explicitly selected by the user, without tool-home scanning
+- [ ] add real-source scope disclosure, redacted preview behavior, consent, and invalid-input coverage
+- [ ] complete explicitly authorized private-data UAT without exposing source content in git, logs, CI, or screenshots
 
 Exit condition: one approved Codex memory can create one explainable, removable creature change without any network request.
+
+**Exit status: not met.** The bundled synthetic fixture proves the local pipeline, but it is not a user-owned Codex memory or a production connector.
 
 ## Phase 2 — A life that continues
 

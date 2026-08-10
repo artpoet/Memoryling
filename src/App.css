@@ -348,23 +348,21 @@ h1 {
 
 .memory-mark {
   position: absolute;
-  border-radius: 50%;
-  background: #b9ffe6;
-  box-shadow: 0 0 12px rgba(132, 255, 217, 0.92);
-}
-
-.memory-mark-one {
-  top: 27px;
-  right: 24px;
-  width: 7px;
-  height: 7px;
-}
-
-.memory-mark-two {
-  right: 16px;
-  bottom: 35px;
-  width: 5px;
-  height: 5px;
+  top: 22px;
+  right: 17px;
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 1px solid rgba(224, 255, 244, 0.78);
+  border-radius: 10px;
+  color: #e7fff6;
+  background: rgba(85, 191, 158, 0.88);
+  box-shadow:
+    0 0 11px rgba(132, 255, 217, 0.9),
+    inset 0 0 8px rgba(255, 255, 255, 0.32);
+  font-size: 13px;
+  animation: mark-arrive 520ms ease-out both;
 }
 
 .creature-caption {
@@ -490,6 +488,17 @@ h1 {
   letter-spacing: 0.1em;
 }
 
+.planned-dot {
+  margin-left: auto;
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: #88cdb8;
+  background: rgba(130, 231, 197, 0.07);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
 .panel h2 {
   margin-bottom: 8px;
   font-family: Inter, "Segoe UI", system-ui, sans-serif;
@@ -576,6 +585,27 @@ h1 {
 .signal-3 {
   background: #ffc56b;
   box-shadow: 0 0 13px rgba(255, 197, 107, 0.45);
+}
+
+.empty-signal-state {
+  padding: 16px;
+  border: 1px dashed rgba(156, 124, 255, 0.2);
+  border-radius: 13px;
+  background: rgba(156, 124, 255, 0.035);
+}
+
+.empty-signal-state strong {
+  display: block;
+  margin-bottom: 7px;
+  color: #d3c8eb;
+  font-size: 12px;
+}
+
+.empty-signal-state p {
+  margin: 0;
+  color: #8b8298;
+  font-size: 11px;
+  line-height: 1.55;
 }
 
 .text-button {
@@ -701,6 +731,17 @@ h1 {
   }
 }
 
+@keyframes mark-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.35) rotate(-24deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
@@ -726,8 +767,23 @@ h1 {
     padding-top: 12px;
   }
 
+  .topbar {
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    gap: 6px;
+    align-items: flex-end;
+    flex-direction: column-reverse;
+  }
+
   .prototype-pill {
-    display: none;
+    display: block;
+    max-width: 175px;
+    padding: 5px 8px;
+    text-align: center;
+    font-size: 9px;
   }
 
   .hero {

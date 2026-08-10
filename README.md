@@ -9,27 +9,37 @@
 
 Memoryling is an open-source, local-first desktop creature that grows from the durable memories of your AI agents. Its appearance, conversations, recurring story events, and occasional reminders should change for reasons you can inspect.
 
-This repository currently contains a bilingual interactive concept shell. It does **not** read real agent memories yet.
+This repository currently contains a bilingual interactive concept shell plus a fixture-only desktop memory pipeline. It does **not** read real agent memories or connect to a user's Codex tool-home.
 
 ## Why it is different
 
 Most desktop pets are decorative companions. Memoryling is designed around memory causality:
 
 - **Memory becomes consequence.** Repeated ideas, completed work, unresolved promises, and protected values can shape the creature and its world.
-- **Every meaningful change is explainable.** A future “Why did this happen?” view will trace changes back to source memories and confidence.
+- **Every meaningful change is explainable.** The fixture pilot includes a “Why did this happen?” lineage view; the same standard applies to every future real-memory effect.
 - **Conflicts become stories.** Contradictory memories from different agents can become visible events instead of being silently flattened.
 - **Initiative has limits.** Quiet hours, daily nudge budgets, and user-controlled sensitivity keep the companion useful without making it noisy.
 - **Forgetting is a full chain.** Removing a source should also remove or recompute the effects derived from it.
 
-## Concept shell
+## Concept shell and fixture pilot
 
-The current Tauri + React prototype demonstrates:
+The current Tauri + React app demonstrates:
 
 - English and Traditional Chinese UI with a remembered language preference
 - a living desktop-creature direction built with CSS
-- inspectable sample memory signals
+- one inspectable completion signal and creature mark derived from persisted Rust state
 - a continuing pet event and bounded reminder controls
-- explicit “memory access is off” and local-first privacy states
+- explicit labels separating the fixture pilot from planned features and real memory access
+
+In the Tauri desktop runtime, the fixture pilot exercises a narrow local path end to end:
+
+1. Select the only approved source: one fictional Codex-shaped JSON record bundled with the app.
+2. Review its exact scope, preview, record selection, and consent before source content is persisted.
+3. Store the approved normalized record and lineage in Memoryling's app-local SQLite database.
+4. Derive one deterministic completion star and inspect why it appeared.
+5. Forget the local imported copy and remove or recompute its supported downstream effects.
+
+The browser preview cannot run this pipeline. The pilot cannot scan arbitrary paths, read user-owned Codex files, or write to an agent's memory store, and it makes no network request.
 
 Run it locally:
 
@@ -61,9 +71,9 @@ Raw memory files, credentials, prompts, and private work must never be committed
 
 ## Project status
 
-Memoryling is at **concept-shell stage (v0.1.0)**. The visual experience is runnable; real memory connectors, the local derived-memory store, notification delivery, and packaged releases are roadmap work.
+Memoryling is at a **fixture-backed development stage (v0.1.0)**. The visual experience and the v1 SQLite/lineage foundation are runnable locally for the bundled synthetic record. Real memory connectors, notification delivery, and packaged releases remain roadmap work.
 
-The first engineering milestone is a read-only Codex memory connector with a local import preview and explicit consent gate.
+The fixture foundation for the first engineering milestone is implemented, but the Phase 1 exit is not met: no user-owned Codex memory has been selected or imported. The next connector work must validate a real Codex format and remain explicitly selected, read-only, previewed, and consented.
 
 ## Contributing
 

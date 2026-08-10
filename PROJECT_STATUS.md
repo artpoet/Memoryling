@@ -4,43 +4,55 @@ AS_OF: 2026-08-10 (Asia/Taipei)
 
 ## Current milestone
 
-Establish a public, bilingual, runnable open-source concept repository for Memoryling.
+Complete the fixture-only “First real memory” vertical slice without touching private agent memory.
 
 ## Overall state
 
-- Stage: v0.1.0 concept shell
-- Product surface: implemented locally
-- Real memory access: not implemented
+- Stage: v0.1.0 with a complete fixture-only first-memory pipeline
+- Product surface: bilingual desktop and browser-safe experience implemented locally
+- Synthetic Codex-shaped source pipeline: implemented end to end
+- User-owned Codex memory access: not implemented
+- Local store: SQLite schema v1 under Tauri app-local data
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: passing on GitHub Actions
+- CI: local checks passing; this bundle's GitHub Actions run is pending push
 - Release: no packaged release
 
 ## Completed in this bundle
 
-- scaffolded Tauri 2 + React 19 + TypeScript + Vite
-- replaced the starter UI with a responsive English／Traditional Chinese concept experience
-- added a CSS Memoryling creature, continuing-event panel, sample signals, explanation state, and bounded initiative
-- removed unnecessary runtime network dependencies
-- minimized Tauri capabilities and added a restrictive CSP
-- documented product vision, architecture, privacy principles, roadmap, and initial ADR
-- added open-source contribution, conduct, security, and agent-entry documents
-- added Windows CI definition and GitHub templates
+- added a strict Codex-shaped adapter v1 for one fictional bundled JSON fixture
+- added explicit fixture selection, exact scope disclosure, preview, record selection, cancel, and consent
+- bound approval to an in-memory pending-preview token instead of trusting content from the WebView
+- added normalized memory-event schema v1 and SQLite migration 0001
+- stored adapter version, source and record hashes, timestamps, normalized text, and machine-readable lineage
+- added one deterministic completion signal and one persisted completion-star world effect
+- added a “Why did this happen?” chain from source record through event and signal to mark
+- implemented transactional local-source forgetting, derived-state cleanup, and deterministic recomputation
+- made the creature mark conditional on persisted Rust state; removed fake always-visible marks
+- relabeled the remaining sample event and initiative UI as CONCEPT／PLANNED in both languages
+- added Vitest／Testing Library UI coverage and Rust adapter／migration／persistence／forgetting tests
+- kept Tauri capabilities and CSP unchanged; added no telemetry, network client, or arbitrary filesystem permission
 
 ## Product truth
 
-The current interface uses sample content only. It does not locate, read, normalize, store, transmit, or derive anything from real agent memories. The UI must continue to say this until a real connector and consent gate are verified.
+The local pipeline is real and persistent, but its only permitted input is a fictional resource bundled with the app. Memoryling does not scan or read the user's Codex tool-home, arbitrary files, credentials, prompts, or private memory. Browser preview keeps memory access off; after fixture approval the desktop still says real memory access is off.
 
 ## Verification evidence
 
-- PASS — npm run check (TypeScript, Vite production build, and cargo check)
+- PASS — 5 frontend interaction tests covering off → preview → approve → mark → lineage → forget, restart restore, bilingual browser boundary, invalid-timestamp rendering defense, and failed-forget state integrity
+- PASS — 7 Rust tests covering strict parsing and RFC 3339 validation, unknown-version fail-closed, preview zero-persistence, pending-token binding and failed-approval retry, migration and future-schema rejection, restart persistence, idempotent approval, lineage, fixture immutability, and complete supported-chain forgetting
+- PASS — npm run check (frontend tests, TypeScript, Vite production build, Rust tests, and cargo check)
 - PASS — cargo fmt --manifest-path src-tauri/Cargo.toml --check
+- PASS — cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 - PASS — npm audit reported 0 vulnerabilities
-- PASS — high-confidence secret scan found no hits
-- PASS — runtime source scan found no Google Fonts or remote CSS imports
-- PASS — local Vite smoke returned HTTP 200
-- PASS — English and Traditional Chinese 1400 × 1100 screenshots were visually inspected
-- PASS — GitHub CI run 31373607683 completed successfully on commit fe9f4e1
+- PASS — Tauri desktop launched and exposed the bundled source, exact access scope, and empty app-local store through its native accessibility tree
+- PASS — app-local SQLite was created outside the repository
+- PASS — the bundled runtime resource exists and its SHA-256 matches the committed synthetic fixture
+- PASS — English and Traditional Chinese browser smoke at desktop width plus a 390 × 844 viewport, with no horizontal overflow
+- PASS — browser console contained no errors or warnings and the page linked no external runtime resources
+- PASS — restrictive CSP and `core:default` capability remain unchanged
+
+The Windows desktop-control helper could read the native UI but failed at input injection after recovery. Native click-through is therefore supported by Rust product-path tests plus frontend interaction tests, not claimed as completed human UAT.
 
 Remote evidence:
 
@@ -48,24 +60,26 @@ Remote evidence:
 - GitHub recognizes the MIT license
 - discovery topics include agent-memory, desktop-pet, local-first, Tauri, React, and TypeScript
 - private vulnerability reporting is enabled
-- CI evidence: https://github.com/artpoet/Memoryling/actions/runs/31373607683
+- previous baseline CI evidence: https://github.com/artpoet/Memoryling/actions/runs/31373607683
+- this bundle's commit and CI evidence will replace the baseline after push
 
 ## Known gaps
 
 - scaffold icons have not been replaced with final Memoryling artwork
 - accessibility requires a dedicated keyboard and screen-reader audit
-- memory schema and database are undecided
-- Codex source format must be handled through a narrow, versioned adapter
+- the adapter supports only the bundled synthetic v1 fixture; no user-owned Codex memory format is accepted
+- a Rust-owned native picker, strict external-file validation, and preview redaction remain future work
 - conversation model strategy remains intentionally open
 - there are no packaged installers or releases
 
 ## Next bundle
 
-Implement the “first real memory” vertical slice described in AI-WAKEUP.md. The slice ends only when one synthetic Codex memory can be previewed, approved, stored locally, turned into one explainable creature mark, and fully forgotten.
+Prepare a first user-selected Codex-source pilot as described in AI-WAKEUP.md. Do not treat private `MEMORY.md` files as a public format specification or begin real-data UAT without explicit source selection and authorization.
 
 ## Do not redo
 
 - do not replace the Tauri + React foundation without new evidence
+- do not rebuild the completed fixture → pending preview → SQLite → lineage → recompute path
 - do not add open-ended AI chat before the memory lineage path exists
-- do not weaken the visible prototype boundary
+- do not describe the fixture pilot as access to the user's real Codex memories
 - do not add cloud sync, telemetry, or remote memory processing by assumption

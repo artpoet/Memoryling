@@ -1,0 +1,17 @@
+{
+  "format": "codex-durable-memory",
+  "version": 1,
+  "source": {
+    "id": "codex.synthetic.first-memory",
+    "label": "Codex · First memory fixture",
+    "locator": "resource://fixtures/codex-first-memory-v1.json"
+  },
+  "memories": [
+    {
+      "id": "synthetic-memory-001",
+      "createdAt": "2026-08-10T08:15:00Z",
+      "kind": "completion",
+      "text": "Shipped a local-first creature whose changes can always explain their source."
+    }
+  ]
+}

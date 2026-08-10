@@ -2,7 +2,7 @@
 
 ## Status
 
-This document describes the intended architecture. As of 2026-08-10, only the Tauri desktop shell and React concept UI are implemented.
+This document separates the intended product architecture from the subset implemented as of 2026-08-10. The implemented local pipeline runs end to end for exactly one fictional Codex-shaped resource bundled with the desktop app. No user-owned Codex file, tool-home, or other external source is connected.
 
 ## System shape
 
@@ -15,46 +15,54 @@ This document describes the intended architecture. As of 2026-08-10, only the Ta
         → creature state, stories, conversations, reminders
         → bilingual Tauri UI
 
+The v1 fixture slice follows this shape but replaces the external source with a fixed bundled resource and produces only one deterministic completion-star effect. It is test infrastructure and a product-flow proof, not a production Codex connector.
+
 ## Layers
 
 | Layer | Responsibility | Current state |
 |---|---|---|
-| Desktop shell | Native window, lifecycle, notifications | Tauri 2 shell exists; notifications not implemented |
-| Experience UI | Creature, habitat, stories, controls, explanations | Interactive concept shell |
-| Source adapters | Read selected durable-memory formats without mutating them | Not implemented |
-| Import gate | Preview scope, explain access, obtain consent | Not implemented |
-| Normalizer | Convert source records into a versioned local event schema | Not implemented |
-| Derivation engine | Produce traits, tensions, story hooks, reminder candidates | Not implemented |
-| Local store | Persist normalized events, derived effects, lineage, and settings | Not implemented |
+| Desktop shell | Native window, lifecycle, notifications | Tauri 2 shell and memory IPC commands exist; notifications are not implemented |
+| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual concept UI plus fixture selection, preview, consent, lineage, and forgetting; fixture state is separate and visible real-memory access remains off in desktop and browser |
+| Source adapters | Read selected durable-memory formats without mutating them | Fixture adapter v1 reads one fixed bundled JSON resource; no external path or Codex tool-home access |
+| Import gate | Preview scope, explain access, obtain consent | Implemented for the fixture, with pending preview state held in Rust memory; no real-source picker |
+| Normalizer | Convert source records into a versioned local event schema | Schema v1 supports the fixture's `completion` record only |
+| Derivation engine | Produce traits, tensions, story hooks, reminder candidates | One deterministic `completion` signal and `completion-star` world effect only |
+| Local store | Persist normalized events, derived effects, lineage, and settings | SQLite schema v1 stores approved fixture records and lineage under Tauri app-local data; general settings are not included |
 | Conversation layer | Ground dialogue in approved local context | Not implemented; provider decision open |
 | Reminder policy | Enforce quiet hours, budget, urgency, and snooze state | UI concept only |
 
-## Proposed core records
+## Implemented v1 records and future shape
 
-### SourceMemory
+### Source import and memory event
 
-- stable source adapter ID
-- opaque source record ID
-- source path or locator retained locally
-- observed timestamp and source timestamp
-- user-approved normalized text or structured fields
-- content hash
+- `source_imports` retains the adapter ID and version, display label, fixed locator, and source-content hash.
+- `memory_events` retains schema version 1, an opaque source-record ID, source and observed timestamps, the approved normalized text, and its content hash.
+- The current schema accepts only `completion`; future record kinds require explicit schema and derivation work.
 
 ### DerivedSignal
 
-- type: completion, recurrence, promise, value, conflict, preference, or relationship
-- confidence and derivation version
-- one or more SourceMemory references
-- creation and invalidation timestamps
+- The implemented type is `completion`, with confidence and derivation version 1.
+- `derived_signal_sources` links every signal to its memory event.
+- Recurrence, promise, value, conflict, preference, and relationship signals remain future work.
 
 ### WorldEffect
 
-- type: trait, visual mark, habitat change, story event, dialogue fact, or reminder candidate
-- state and lifecycle
-- DerivedSignal references
-- explanation payload
+- The implemented type is one active `visual-mark` with style `completion-star`.
+- `world_effect_signals` links the mark to its signal, and an explanation key supports the lineage inspector.
+- Traits, habitat changes, story events, dialogue facts, and reminder candidates remain future work.
 
-This graph allows deletion to flow from a source record through every dependent effect.
+The complete source → event → signal → effect graph is queried back from SQLite for the “Why did this happen?” view.
+
+## Fixture lifecycle and persistence
+
+1. Tauri resolves one bundled resource path; the WebView cannot submit an arbitrary file path.
+2. The adapter enforces a size limit, UTF-8 JSON, source identity, format version, and the supported record kind. Unknown input fails closed.
+3. A preview token binds approval to the records prepared in Rust memory. Previewing or canceling does not persist source content, although desktop startup may initialize an empty SQLite schema.
+4. Explicit approval writes the selected normalized record, source contract, hashes, signal, effect, and lineage in local transactions.
+5. The database lives at Tauri's app-local data directory as `memoryling.sqlite3`. Migration 0001 sets `PRAGMA user_version = 1`; unknown future versions fail closed.
+6. Forgetting clears derived state, deletes the selected local source and its cascading events, then re-runs deterministic derivation over supported records that remain, all in one transaction. The current adapter exposes only one source.
+
+SQLite foreign keys and `secure_delete` are enabled for each connection. This supports application-level deletion; it is not a promise of cryptographic or physically irrecoverable erasure from storage media or backups.
 
 ## Connector contract
 
@@ -68,21 +76,23 @@ A connector must:
 6. fail closed when a format is unknown;
 7. never collect credentials from source files.
 
-The first planned adapter targets approved Codex durable-memory files. It will not scan arbitrary home directories.
+The current fixture adapter satisfies this contract only for its fixed synthetic resource. It does not establish the format, discovery path, or permission UX for user-owned Codex memory. A future production adapter must validate a real supported format and accept only a source explicitly selected by the user; it must not scan arbitrary home directories.
 
 ## Trust boundaries
 
-- **External source files:** user-owned, untrusted input, read-only.
-- **Local Memoryling store:** user-owned derived state, never committed.
+- **Bundled fixture:** fictional, repository-visible, fixed-path, read-only test input. It is not user memory.
+- **Future external source files:** user-owned, untrusted input, and read-only; none are connected today.
+- **Pending preview:** source content prepared in Rust process memory and bound to a preview token until approved or discarded.
+- **Local Memoryling store:** contains approved normalized text, hashes, lineage, and derived state; never print or commit the database.
 - **UI:** displays explanations but must not render source content as trusted HTML.
 - **Future model provider:** optional boundary requiring a separate ADR and explicit consent before any memory-derived context leaves the device.
 
 ## Open decisions
 
 - embedded local model versus optional remote conversation provider;
-- SQLite schema and migration strategy;
-- adapter discovery and permission UX;
+- validated Codex durable-memory format, native source selection, and permission UX;
+- migration strategy after SQLite schema v1;
 - Windows resident-app lifecycle and notification integration;
-- deterministic versus model-assisted derivation boundaries.
+- derivations beyond the deterministic completion-star boundary.
 
-Major decisions are recorded in [docs/adr](adr/INDEX.md).
+Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-only SQLite v1 boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md).
