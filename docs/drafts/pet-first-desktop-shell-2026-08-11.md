@@ -55,7 +55,7 @@ Memoryling 應採用「兩個表面、一個生命」：平常只顯示一隻安
 
 在 real connector 完成前，這個 pet surface 內含一個 compact `Memory access off` honesty badge；它不構成第二個產品面板。
 
-尺寸需在選定寵物視覺後量測，初始 prototype 可從約 220–260 logical px 的緊密工作區開始，不把此數字視為最終規格。透明 window 仍會以整個矩形攔截滑鼠；Tauri 的 click-through 是整窗切換，不會依透明像素自動穿透，因此縮小 hit box 是 P0 正確性要求，不只是視覺 polish。
+尺寸需在選定寵物視覺後量測，初始 prototype 可從約 220–260 logical px 的緊密工作區開始，不把此數字視為最終規格。透明 window 仍會以整個矩形攔截滑鼠；Tauri 的 click-through 是整窗切換，不會依透明像素自動穿透，因此縮小 hit box 是 P0 正確性要求，不只是視覺 polish。Phase 0.5 shell 只以 route-agnostic 的 compact／wide／tall／long synthetic envelope fixtures 驗證 bounds，不等待或假裝已鎖定 Phase 2 taxonomy。若採固定 envelope，不能為巨大弧線、光環或尾端粒子留下大面積透明攔截區；若 render state 需要動態 resize，尺寸變更必須由 Rust 管理，完成後重新 clamp，而不是讓 pet WebView 任意改窗。
 
 ### B. Detail window — `main`
 
@@ -180,6 +180,7 @@ P0 不承諾尚未設計的 in-process WebView crash reconstruction；若整個 
 - 初次位置放在 primary monitor work area 右下角，保留安全邊距，不蓋住 taskbar。
 - 儲存 logical／DIP position、monitor identity 與 work-area normalized position，不只存 physical pixels。
 - 至少在 launch、pet show／recovery、drag end、scale-factor change 與 single-instance callback 時重新驗證位置。Tauri 沒有完整的 monitor-topology／taskbar-change WindowEvent；若要求變更當下即時處理，實作 slice 必須選擇並驗證 Windows `WM_DISPLAYCHANGE`／`WM_SETTINGCHANGE` hook 或受控 polling，而不是假設 framework 已自動通知。
+- 任何 render-state transition 若改變 pet logical bounds，Rust 必須先計算安全尺寸、保留可見 anchor、套用 resize，再依目前 monitor work area clamp；失敗時保留上一個可操作 bounds，不可讓唯一入口消失。
 - 若原 monitor 不存在，移到 primary work area 的安全位置。
 - 至少保留足夠可點擊／可拖曳區域在畫面內，禁止整隻落在螢幕外。
 - 驗收 100%、125%、150%、200% 與混合 DPI 多螢幕。
@@ -214,7 +215,7 @@ P0 不承諾尚未設計的 in-process WebView crash reconstruction；若整個 
 | always on top | true by default | false |
 | skip taskbar | true | false |
 | initial focus | false | only when explicitly opened |
-| size | tight fixed pet bounds | current 1180 × 780 constraints |
+| size | tight fixed bounds proven with P0 compact／wide／tall／long envelope fixtures, or Rust-owned resize＋re-clamp | current 1180 × 780 constraints |
 
 Tauri 官方 configuration 支援 `transparent`、`decorations`、`alwaysOnTop`、`skipTaskbar` 與多個 unique window labels。`pet` 應明確設 `shadow: false`；Windows 透明視窗仍需實測白色 flash，`noRedirectionBitmap` 只是可評估的 workaround，不應未驗證就宣稱必要。`visibleOnAllWorkspaces` 不支援 Windows，因此產品不可承諾跨所有虛擬桌面永遠顯示。
 
@@ -265,7 +266,7 @@ Rust／SQLite 仍是唯一 canonical state。現有完整 `MemoryState` 的 line
 2. approve、forget 或未來 genome revision commit 成功後，Rust 發送只含 opaque revision／counts 的 `creature-state-changed` event；
 3. 兩個 surfaces 收到事件後分別重新讀取其 scope 允許的 typed state；
 4. event 不攜帶 normalized text、source path 或 memory payload；
-5. pet renderer 只取得 render-safe marks／genome，不取得來源細節。
+5. pet renderer 只取得最終 render-safe mark IDs、visual-module IDs、受限 geometry／motion parameters 與 opaque revision，不取得 route profile ID／權重、來源細節、原始 activity labels 或人格摘要。
 
 detail 以 X／Alt+F4 關閉時，Rust close-request path 必須先在 backend 明確取消 pending preview，再 hide；`hide(main)` 不會 unmount WebView，不能依賴 React cleanup。Minimize 不取消 preview。若取消或後續 hide 失敗，回傳狀態必須維持一致並保留 tray recovery。
 
@@ -309,6 +310,7 @@ locale、always-on-top、onboarding completion 與 pet position 屬本機 UI set
 - launch／show／drag-end／scale-change clamp 與 Windows display／taskbar-change trigger spike；
 - Rust revision event + pet refetch；
 - approve／forget 後 pet mark 即時同步；
+- 以 route-agnostic 的 compact／wide／tall／long synthetic envelope states 驗證固定 envelope 或 Rust-owned resize，並在每次 bounds 變更後重新 clamp；實際 route matrix 留到 Phase 2；
 - restart persistence；WebView process-failure recovery remains a separately tested P1。
 
 ### Slice D — Detail information architecture
@@ -340,6 +342,7 @@ locale、always-on-top、onboarding completion 與 pet position 屬本機 UI set
 - 再次啟動不產生第二個 process、pet 或 SQLite writer。
 - 從 `pet` 逐一 invoke 既有 memory list／preview／cancel／state／approve／forget commands 全部 fail closed；只檢查正常 DTO 不算通過。
 - pet window 的外框不得在 visible pet＋honesty badge 的聯集外多出超過 12 DIP 的透明 margin；packaged smoke 要點擊外框四周相鄰桌面，確認沒有更大的隱形攔截區。
+- route-agnostic 的 compact／wide／tall／long envelope fixtures 都要在 100–200% DPI 驗證 bounds、拖曳、右鍵 menu anchor 與 work-area clamp；不得只測最緊湊的 baseline。實際 route／hybrid matrix 由 Phase 2 acceptance 負責。
 - 混合 DPI、monitor removal 與 taskbar relocation 後 pet 仍可見可操作。
 - fixture approve／forget 後 pet mark 與 detail explanation 一致；失敗交易不改 UI。
 - pet IPC／events 不含核准記憶文字、來源 locator、路徑或 lineage explanation。

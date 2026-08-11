@@ -19,6 +19,7 @@ Memoryling 不是每次啟動時重新生成的一張寵物圖片，而是一個
 4. **變化自動套用。**記憶已經通過來源核准後，使用者不必逐項批准每次外觀改變；每項變化仍必須可以解釋與撤銷來源。
 5. **允許大幅進化，以相鄰階段維持聯繫。**第一階與最後一階不必一眼看出是同一種外型；但每次 `stage N → N+1` 都必須能看懂哪些特徵被保留、成長、分裂、合併、移位或退場，形成不跳接的演化鏈。
 6. **成長核心不依賴 runtime AI API。**AI 或 Skill 可以協助開發期的造型探索；實際執行時使用本機規則、本機狀態與隨 EXE 打包的資產。未來即使加入對話模型，其輸出也不能直接回寫永久 genome、stage 或 lineage。
+7. **共享視覺 DNA，多條內容衍生路線。**所有路線共用有生命的眼神、有機形態，以及節制、神聖但不宗教化的高級材質語言；永久形態不鎖成單一五階直線，而是由核准記憶形成的版本化 signals 確定性塑造。路線不得直接由原始文字、敏感人格標籤、runtime 模型或未保存亂數決定。
 
 ## 3. 產品承諾
 
@@ -43,7 +44,8 @@ Memoryling 不是每次啟動時重新生成的一張寵物圖片，而是一個
 ```text
 approved MemoryEvent
     → versioned DerivedSignal
-        ├─→ GrowthContribution → deterministic CreatureGenome → stage snapshots + EvolutionBridge
+        ├─→ PathContribution → deterministic EvolutionPathProfile ─┐
+        ├─→ GrowthContribution → structural genome axes ──────────┴─→ CreatureGenome → stage snapshots + EvolutionBridge
         └─→ WorldEffect → marks / habitat / story projections
 
 IdentityCore + current stage snapshot + active WorldEffects + EphemeralState
@@ -53,7 +55,9 @@ IdentityCore + current stage snapshot + active WorldEffects + EphemeralState
 
 SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可以重新產生的衍生快照，不可取代事件與 lineage。
 
-`GrowthContribution` 與既有 `WorldEffect` 是同一個 `DerivedSignal` 的平行投影：前者只處理結構性 genome 軸，後者延續現有 completion-star 並處理印記、棲地、故事等離散效果。兩者共同組合成 `CreatureState`，不可形成 `WorldEffect → Genome → WorldEffect` 的循環依賴。
+`PathContribution`、`GrowthContribution` 與既有 `WorldEffect` 是同一個 `DerivedSignal` 的平行投影：第一個只形成有限的路線權重，第二個只處理其他結構性 genome 軸，第三個延續現有 completion-star 並處理印記、棲地、故事等離散效果。三者共同組合成 `CreatureState`，不可形成 `WorldEffect → Genome → WorldEffect` 的循環依賴；路線 accent 也不能冒充具獨立 lineage 的 memory mark。
+
+`EvolutionPathProfile` 是有限、版本化且可重算的路線權重，不是把使用者永久分成某種人格或職業。它只接受具 lineage 的安全活動 signals；primary 權重影響主要 morphology，secondary 權重只影響受上限約束的材質或動作。具來源意義的可見印記仍只能來自 `WorldEffect`。忘記來源後，profile、genome 與相關 bridge 必須一起重算。
 
 ### 四種狀態必須分離
 
@@ -81,6 +85,21 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 
 不可把原始記憶文字或可識別內容直接塞進渲染層。
 
+### PathContribution
+
+每一項路線貢獻至少包含：
+
+- opaque contribution ID；
+- derivation ID／version 與 path-mapping version；
+- 一個或多個來源 signal ID；
+- 有限枚舉的 path axis ID；
+- 整數 support units、confidence bucket 與 per-group cap；
+- tag provenance（例如 connector-declared 或 user-confirmed）；
+- canonical group key 與 deterministic merge rule；
+- forgetting 時的重算行為。
+
+`PathContribution` 不得攜帶原始文字，不得直接產生 memory mark，也不得和其他 genome axis 共用未版本化的自由字串。
+
 ### CreatureGenome
 
 建議先使用少量、可測試的軸，而不是無限制自由生成：
@@ -94,7 +113,7 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 | memory marks | 星點、符號、飾物、疤紋式故事印記 | 每一項都要有 effect lineage 與可見數量上限 |
 | habitat affinity | 與棲地物件、光線、植物或收藏的關係 | 屬後續 slice，不阻擋核心寵物渲染 |
 
-## 5. 生命階段與大幅進化
+## 5. 生命階段、內容路線與大幅進化
 
 以下五段是供 prototype 驗證的**提案**，不是已核准 schema；名稱與段數可在視覺測試後調整。若採用，資料層應使用穩定 enum：
 
@@ -107,6 +126,49 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 | `legacy` | 守憶 | 高度個人化但不雜亂，重要印記形成有秩序的整體設計 |
 
 階段門檻由版本化規則判定，考慮去重後訊號的意義、受上限約束的證據強度、語義多樣性與穩定度。來源數量本身不得提供加成；單純連接更多來源或匯入大量相似紀錄不能快速升階。
+
+### 共享視覺 DNA 與內容路線
+
+目前已確認的高層視覺方向是：具有眼神與生命感的有機角色，結合神聖、精緻但不宗教化的高級折面／材質語言。用來驗證這個方向的 proposed family grammar 是：
+
+- 幼體以有虹膜深度、眼瞼重量與穩定眨眼節奏的生物眼建立生命感；遠端階段可以轉換眼部形態，但相鄰 bridge 必須保留或承接視線／眨眼／感知節奏，而不是突然改成第三眼或無關符號；
+- 薄荷色 memory seed 是初期候選 anchor，可被保留、成長、分裂、合併、移位或由明確 successor 承接，不是永遠固定在同一解剖位置的 schema 欄位；
+- 會呼吸、收縮與舒展的有機膜／葉片結構；
+- 以珍珠母、瓷質折面、內嵌光縫與克制金屬邊表達高級感，不使用宗教符號、巨大光環、皇冠或神諭式文案；
+- 紫丁香、薄荷與深靛藍 ancestry，但任何路線都不能只靠顏色識別。
+
+路線採 **branch-and-blend**，不是一次選定後永遠鎖死的職業。P0 可用的安全 activity axes 仍是提案，初始候選為 `craft`（製作／交付）、`inquiry`（學習／研究）、`stewardship`（修復／整理／維護）與 `exchange`（協作／教學／分享）。這些軸只能描述核准內容中可觀察的活動，不得推論「你是創造者／智者／守護者」、情緒、醫療、心理、政治、宗教或其他敏感人格特徵。
+
+P0 的 signal 來源優先順序是 connector 提供的明確結構化標籤，其次是 import preview 中由使用者確認的有限枚舉標籤。沒有可信標籤的事件仍可留下受上限約束的 mark，但不能改變 morphology。自由文字分類、embedding、sentiment branch、本機 LLM 與遠端模型都不屬 P0。
+
+每個 canonical memory group 的 path contribution 有上限；同內容跨來源先去重但保留多來源 lineage。P0 提案使用 `canonical_group_key = SHA-256(event_schema_version || event_kind || canonical_content_hash)`。同 group 只貢獻一次並保存所有支持 event／signal IDs、tag provenance 與 mapping version；相同 tag 可合併 lineage，不同有效 tag 衝突時 morphology 必須 fail closed，待使用者在 detail 內解決，不能依來源順序挑一個。忘記部分支持來源時 group 保留並更新 lineage；最後一個支持來源消失時才移除 contribution 並重算 profile。
+
+### Proposed PathMappingV1 for synthetic prototyping
+
+以下數字是可實作的 synthetic prototype contract，仍需測試與使用者 signoff 才能成為 Accepted schema：
+
+- path axes 固定為 `craft`、`inquiry`、`stewardship`、`exchange`；未知 tag fail closed；
+- 每個 canonical group 對一個 axis 產生整數 support units，不使用浮點；相同 tag 的多個 supports 取最高 bucket、保留全部 lineage，但 group 仍只貢獻一次；單 group 上限 `1000`；
+- 每個 axis 聚合上限 `3000`；先依 canonical group key 排序、去重、cap，再評估 profile；
+- morphology 只有在 maturity 至少 `growing`、有效 canonical groups 至少 `3`、最高 axis 至少 `1500` 時啟用，確保一筆記憶不能選定 body route；
+- 若至少三個 axes 都達 `1500` 且最高與最低差不超過 `500`，mode 為 `balanced-confluence`；
+- 否則若前兩軸都達 `1500` 且差小於 `750`，mode 為雙軸 hybrid；
+- 其餘情況以最高軸為 dominant；第二軸達 `1000` 時最多提供一個不含 lineage mark 的材質／動作 accent；
+- 同分只用明文 axis ID 排序決定輸出順序，不把同分硬解讀成單一勝者。
+
+PathMappingV1 的 support table：
+
+| Tag provenance／confidence | Support units | 規則 |
+|---|---:|---|
+| `user-confirmed` | 1000 | 使用者在 import preview 明確選定有限枚舉 tag |
+| `connector-declared`, confidence `9000–10000` bps | 750 | connector 必須提供版本化結構化 tag 與 confidence |
+| `connector-declared`, confidence `7500–8999` bps | 500 | 同上 |
+| `connector-declared`, confidence `6000–7499` bps | 250 | 同上 |
+| missing confidence or below `6000` bps | 0 | 不形成 path contribution；可在 detail 提示使用者確認 |
+
+本機 lexicon 只能提出候選；候選在使用者確認前是 `0`，確認後走 `user-confirmed = 1000`。同一 canonical group 若出現不同有效 tags，即使 confidence 不同也整組 fail closed，不能用高分蓋掉衝突。
+
+這讓相同 stage 可以出現不同剪影，也允許來源改變後確定性改道，而不造成無限組合或一筆記憶瞬間換物種。正式 mapping 表、bucket 分配與 axis 名稱仍可在 ADR-0004 接受前調整；任何調整都要提升 mapping version 並重跑 fixtures。
 
 ### 相鄰階段 EvolutionBridge
 
@@ -121,6 +183,8 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 可用來建立橋接的元素包括臉部節奏、核心記憶種、色彩、高光、剪影、附肢、材質、移動方式與招牌動作。遠距階段並排時不一定能直接認出來；但沿著相鄰階段查看時，不能出現沒有 lineage 或形態轉換說明的「瞬間換物種」。
 
 `EvolutionBridge` 由前後兩個 deterministic stage snapshot 與版本化規則計算，不是另一個不可回算的歷史真相。Growth Journal 保存可理解的演化路徑；忘記來源而改道或退階時，相關 bridge 也必須由剩餘事件重算。reduced-motion 模式以 before／after 圖與文字列出轉換，不強迫播放 morph 動畫。
+
+路線改變同樣必須產生 bridge。生命感可以由視線、眨眼、呼吸或感知動作中的至少一項承接，不要求永遠保留同一雙眼；memory seed 與既有護殼、翼片、感知帆或披膜都可 `preserved`／`grown`／`split`／`merged`／`relocated`／`retired`，但退場時必須記錄可理解的 successor。產品不可在兩個成熟支系間瞬間換皮，也不可把改道描述成受傷、退化或人格改變。
 
 ## 6. 永久、持續與暫時狀態
 
@@ -146,11 +210,13 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 5. Growth Journal 增加一筆不含原始私密文字的摘要；
 6. 使用者可從寵物或日誌開啟「Why did this happen?」。
 
+若 revision 改變 `EvolutionPathProfile`，揭露摘要只能描述「哪些核准活動 signals 讓形態重新形成」，不能宣稱使用者屬於某種人格、命運或價值階級。
+
 解釋最少要顯示：
 
 - 發生了什麼變化；
 - 哪一類核准訊號造成；
-- 支援它的來源紀錄數與來源名稱；
+- 預設只顯示非敏感的 aggregate 支持數與 signal 類別；來源名稱只有在未來另行設計並驗證的本機 source-detail unlock gate 內才可顯示；
 - derivation version；
 - 刪除哪個 Memoryling 本機匯入來源會重新計算它。
 
@@ -161,7 +227,7 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 遺忘不能只把印記從畫面隱藏。正確流程是：
 
 1. 在單一本機 transaction 中移除或失效指定 source／record／event；
-2. 清除其相依 signals、effects 與 genome snapshot；
+2. 清除其相依 signals、effects、path profile 與 genome snapshot；
 3. 從仍存在的核准事件重新推導全部永久狀態；
 4. 產生新的 genome revision；
 5. commit 後才更新 UI；
@@ -188,8 +254,10 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 
 ```text
 MemorylingCreature
-├─ BodyMorphLayer
 ├─ SignatureLayer
+├─ BodyMorphLayer
+├─ EvolutionPathMorphLayer
+├─ EvolutionPathAccentLayer
 ├─ SurfacePatternLayer
 ├─ MemoryMarkLayer
 ├─ ExpressionLayer
@@ -207,6 +275,8 @@ MemorylingCreature
 
 renderer 只接收 `CreatureRenderState`，不接收原始記憶內容、來源路徑或自由文字。相同 genome revision 與 renderer version 必須得到相同的結構與外觀參數。
 
+`SignatureLayer` 保存目前 stage snapshot 已經算好的家族視覺文法與生命節奏，不要求遠端階段共享固定器官。path ID、權重與 activity labels 留在 Rust／detail explanation boundary；pet renderer 只接收最終 visual-module IDs、受限 geometry／motion parameters 與 revision。`EvolutionPathAccentLayer` 最多呈現一個不帶 memory-mark 語意的 secondary accent。renderer 不接收用來推導路線的原始文字、人物／專案名稱或人格摘要。
+
 ### 後續選項
 
 - **Rive：**若角色骨架與形變品質超過 SVG 動畫的維護能力，可用本機 `.riv`、本機 WASM 與 data binding 接同一份 `CreatureRenderState`。採用前需確認 runtime export 授權、CSP、離線載入、二進位資產 review 與測試策略。
@@ -218,7 +288,7 @@ renderer 只接收 `CreatureRenderState`，不接收原始記憶內容、來源�
 Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 
 - OpenAI 官方 `hatch-pet` 可協助製作固定 8 × 9 動畫圖集，但其核心仍是開發期 ImageGen，且固定 atlas 無法自行承擔連續 genome evolution。
-- Product Design／ImageGen 可探索三種以上視覺家族，選定方向後再轉成可維護的本機 SVG 元件或資產。
+- Product Design／ImageGen 可探索已選定的融合基準、相鄰 transition 與多路線 variants；通過人工 signoff 後再轉成可維護的本機 SVG 元件或資產。
 - 動畫設計 Skill 可協助 timing、easing、anticipation 與 reduced motion，但不能替代 lineage、genome 與 forgetting engine。
 - 第三方 SVG／Pixi Skill 在安裝前必須檢查來源、license、程式碼與網路行為；目前設計不需要先安裝任何第三方 Skill 才能開始。
 
@@ -250,22 +320,23 @@ Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 - memory-event schema version；
 - adapter version；
 - derivation version；
+- evolution-path mapping version；
 - creature-genome version；
 - renderer version。
 
 升級 derivation 或 genome 時，應能從核准事件重新建立結果。未知的 future version 必須 fail closed，不可以靜默用舊 renderer 猜測。
 
-相同核准事件集合、identity seed 與所有 derivation／genome 版本必須產生相同 genome，且不受匯入順序、來源列舉順序或重啟影響。一般 presentation settings 不得成為 genome 輸入；未來若有會改變成長的設定，必須建模成明確、版本化且可追溯的 `LocalGrowthOverride`。
+相同核准事件集合、identity seed 與所有 derivation／path-mapping／genome 版本必須產生相同 path profile 與 genome，且不受匯入順序、來源列舉順序或重啟影響。一般 presentation settings 不得成為 genome 輸入；未來若有會改變成長的設定，必須建模成明確、版本化且可追溯的 `LocalGrowthOverride`。
 
-分支同分時使用明文規格化的 stable tie-break，分數先經穩定量化與 confidence floor，避免微小浮點差異造成抖動。同一事件集合必須回到同一 stage，不使用會造成匯入順序差異的隱藏 hysteresis；若使用者反覆匯入／遺忘使 canonical stage 確實改變，presentation layer 可以合併揭露或避免重播動畫，但不能拒絕更新 canonical state。
+路線分數依 PathMappingV1 support table 轉成整數並套用 `6000` bps eligibility floor，避免浮點差異造成抖動；接近同分依明文規格形成 hybrid 或 `balanced-confluence`，只有受視覺 slot 上限約束時才使用 stable ID tie-break。同一事件集合必須回到同一 stage 與 profile，不使用會造成匯入順序差異的隱藏 hysteresis；若使用者反覆匯入／遺忘使 canonical state 確實改變，presentation layer 可以合併揭露或避免重播動畫，但不能拒絕更新 canonical state。
 
 規則更新不可在背景靜默讓寵物變身，必須 pin 舊版或經明示 migration 產生新的 revision 與可查看說明。若新版 derivation 把既有記憶用於原核准範圍之外的新用途，必須先重新說明用途並取得同意，不能只靠 app update 自動擴張 consent。
 
 ## 15. 建議交付切片
 
-本設計屬 Phase 2 方向，不取代目前尚未完成的 installer gate 與 real-source Phase 1：
+本設計屬 Phase 2 方向，不取代目前既定的 installer gate → pet-first synthetic shell → real-source Phase 1 順序：
 
-1. **Visual contract prototype** — 僅用 synthetic genome，製作三個跨五階段的角色家族，驗證每組相鄰階段都有可理解的 EvolutionBridge，並允許第一階與最後一階大幅不同。
+1. **Visual contract prototype** — 僅用 synthetic profiles，先鎖定融合後的共享 family DNA，再以數條內容路線各自加入相鄰 transition silhouette，驗證同一幼體能形成明顯不同但仍有 bridge 的成熟形態。當前 ImageGen 合併稿只屬方向探索，不是 production asset 或完成驗收。
 2. **Genome foundation** — Rust 純函式推導、schema／migration、revision、forget／rederive 測試，不先做漂亮動畫。
 3. **SVG vertical slice** — 一個 synthetic signal 從 genome axis 造成 stage 內形變與一個 lineage mark，含 explain／forget UI。
 4. **Major evolution slice** — 至少兩個 stage、可略過轉場、重啟一致、reduced-motion 與雙語摘要。
@@ -281,6 +352,7 @@ Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 
 - 使用者逐對查看相鄰階段時，能指出至少一條明確的保留或轉換關係；從第一階到最後一階則能透過完整演化鏈理解它們的關聯，不要求單看兩端就立即認出。
 - 大幅進化有驚喜，但不依賴看不懂的隨機造型。
+- 相同 identity 與 stage 在不同 synthetic activity profiles 下能形成可辨識的不同路線；各路線仍呈現可沿相鄰 bridge 追蹤的生命感、有機節奏與節制的神聖高級語言，不要求固定器官永遠存在。
 - 使用者能在兩步操作內找到永久變化的原因。
 - 忘記來源後，相關外觀與日誌結果一致，不出現幽靈印記。
 - 不匯入更多資料也不會遭到懲罰或情緒施壓。
@@ -288,25 +360,28 @@ Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 ### Technical
 
 - 同一組核准事件、identity seed、版本與明示 `LocalGrowthOverride` 得到相同 genome revision；一般 presentation settings 不影響結果。
+- dominant／hybrid／balanced profiles 與 optional secondary accent 都有固定輸出；忘記來源後可確定性改道，並重算 bridge、journal 與 explanation。
 - renderer 無網路請求，不需要 API key。
 - preview／derivation／render logs 不含 source content。
 - stage、marks 與 forget／rederive 有 Rust 與 UI 自動測試。
 - 重啟後外觀與解釋一致；交易失敗時 UI 不宣稱變化已完成。
 - reduced-motion、鍵盤、螢幕閱讀摘要與英／繁中語義通過驗收。
 - 多來源共同支持一項效果時，移除部分支持會正確更新 confidence／explanation；歸零才移除效果。
+- PathMappingV1 的 `5999／6000／7499／7500／8999／9000` bps 邊界、user-confirmed bucket、tag conflict fail-closed、partial-source 與 last-source forgetting 都有固定 fixtures。
 - 1,000 筆同類 synthetic records 仍只形成受控 composite trait，不突破 visual slots 或重複升階。
 - DST、時區切換、手動倒轉時鐘與離線數月後重開只改變 ephemeral state。
 
 ## 17. 尚未鎖定但不阻擋架構的事項
 
-- EvolutionBridge 可使用的形態文法、轉換類型與視覺表達；
+- 共通視覺語言已確認；精確融合造型、正式 SVG、支系數量與每支 transition silhouette 仍待 synthetic prototype signoff；
+- EvolutionBridge 可使用的完整形態文法、轉換類型與視覺表達；
 - 五階段的正式英文／繁中名稱；
-- 每個未來 memory signal 對 genome axis 的正式 mapping；
+- 正式 evolution-path taxonomy、每個 memory signal 的 mapping、混合門檻與 visual module 上限；
 - hero mark slot 是否維持 5 個；
 - 何時需要 Motion 套件、Rive 或 PixiJS；
 - 手動修正、presentation controls 與 screenshot privacy mode 的詳細 UX。
 
-這些事項應以 synthetic fixtures、三方向視覺比較與人工 signoff 決定，不應在資料模型中硬編未經驗證的美術假設。
+這些事項應以融合後的共享視覺基準、多組 synthetic route matrix 與人工 signoff 決定，不應在資料模型中硬編未經驗證的美術假設。
 
 ## 18. 訪談收斂紀錄
 
@@ -314,8 +389,10 @@ Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 |---|---|
 | Goal | 從資料驅動的一次性印記，擴張為可持續、可大幅進化的生命 |
 | Constraints | local-first、無 runtime AI API、lineage、forget/rederive、no time-based permanent growth |
-| Success | 相鄰階段有清楚聯繫、遙遠階段可大幅分化、自動變化仍可理解、刪除後不留幽靈效果 |
-| Remaining ambiguity | 約 15%；集中在美術方向與各 signal mapping，適合用 prototype 而非繼續口頭抽象討論 |
+| Visual DNA | 生物眼神與有機生命感，結合節制、神聖但不宗教化的高級折面／材質語言 |
+| Path model | 同一 identity 依核准 signals 形成版本化、多路線且可混合的 `EvolutionPathProfile` |
+| Success | 相鄰階段與改道都有清楚聯繫、遙遠形態可大幅分化、自動變化仍可理解、刪除後不留幽靈效果 |
+| Remaining ambiguity | 集中在正式路線 taxonomy、signal mapping、混合門檻與 production SVG；適合用 synthetic prototype 驗證 |
 
 ## 19. 研究來源
 

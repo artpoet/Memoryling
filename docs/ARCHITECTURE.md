@@ -78,7 +78,8 @@ The complete source → event → signal → effect graph is queried back from S
 The user-confirmed, not-yet-implemented product direction has the following proposed deterministic shape:
 
     approved events → derived signals
-        ├─→ growth contributions with lineage → recomputable CreatureGenome → stage snapshots + EvolutionBridge
+        ├─→ path contributions with lineage → deterministic EvolutionPathProfile ─┐
+        ├─→ structural growth contributions ─────────────────────────────────────┴─→ recomputable CreatureGenome → stage snapshots + EvolutionBridge
         └─→ WorldEffects → marks / habitat / story projections
 
     IdentityCore + current stage snapshot + active WorldEffects + EphemeralState
@@ -86,7 +87,9 @@ The user-confirmed, not-yet-implemented product direction has the following prop
 
 Permanent growth may substantially change morphology. Distant stages do not need to remain immediately recognizable as the same form, but every adjacent stage transition must produce a versioned `EvolutionBridge` describing preserved, grown, split, merged, relocated, or retired traits. Growth is driven only by approved memories and local derivations; raw record count and calendar time are not XP. Time supplies reversible day, season, anniversary, expression, and activity state only.
 
-Growth contributions and the existing WorldEffects are parallel projections from derived signals; the genome does not replace the current effect lineage or form a circular dependency with it. The growth core must not accept runtime LLM or image-generation inference as permanent input. A future model-produced candidate would require a separate product decision, explicit user approval, and machine-readable lineage before entering the graph; a conversation provider cannot directly or indirectly mutate permanent growth by default. The renderer receives no raw memory content, and forgetting must recompute morphology, stages, marks, habitat effects, explanations, and caches from the events that remain. The proposed product and technical details are in the [evolving creature system design draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md); none of that future layer is claimed by the current completion-star fixture.
+The user has confirmed the high-level biological／organic plus restrained sacred-premium direction and the goal of more than one content-responsive route. The proposed architecture realizes that goal with a versioned `EvolutionPathProfile` that can produce different or blended morphology routes from approved, lineage-backed activity signals. It is a recomputable weighted projection, not a personality class, and its exact taxonomy and blending rules remain proposed. Direct raw-text classification, sensitive inference, sentiment branches, runtime model output, and unsaved randomness are forbidden route inputs.
+
+Path contributions, other structural growth contributions, and existing WorldEffects are parallel projections from derived signals. Path contributions form route weights; structural contributions affect other genome axes; WorldEffects remain the only source of lineage-bearing marks. The genome does not replace current effect lineage or form a circular dependency with it. The growth core must not accept runtime LLM or image-generation inference as permanent input. A future model-produced candidate would require a separate product decision, explicit user approval, and machine-readable lineage before entering the graph; a conversation provider cannot directly or indirectly mutate permanent growth by default. Path IDs, weights, and activity labels remain inside Rust and the authorized detail explanation boundary. The pet renderer receives only final visual-module IDs, bounded geometry／motion parameters, stage, revision, and mark IDs—not raw memory content or profile semantics. Forgetting must recompute the path profile, morphology, stages, bridges, marks, habitat effects, explanations, and caches from the events that remain. The proposed product and technical details are in the [evolving creature system design draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) and proposed [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md); none of that future layer is claimed by the current completion-star fixture.
 
 ## Fixture lifecycle and persistence
 
@@ -129,6 +132,7 @@ The current fixture adapter satisfies this contract only for its fixed synthetic
 - migration strategy after SQLite schema v1;
 - Windows resident-app lifecycle and notification integration;
 - derivations and signal-to-genome mappings beyond the deterministic completion-star boundary;
-- final EvolutionBridge grammar, stage names, and renderer implementation after synthetic visual prototyping.
+- evolution-path taxonomy, signal-to-path mapping, dominant／secondary blending rules, and mapping-version migration;
+- final EvolutionBridge grammar for stage and route changes, stage names, and renderer implementation after synthetic visual prototyping.
 
-Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-only SQLite v1 boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md).
+Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-only SQLite v1 boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md), the proposed pet-first shell in [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md), and the proposed content-derived route model in [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md).

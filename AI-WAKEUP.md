@@ -54,7 +54,7 @@ Not implemented:
 - arbitrary path scanning or a user file picker
 - a production connector for an externally selected durable-memory file
 - derivations beyond the deterministic completion-star rule
-- the designed identity core, creature genome, adjacent-stage EvolutionBridges, large-form evolution stages, layered renderer, and growth journal
+- the designed identity core, content-derived `EvolutionPathProfile`, creature genome, adjacent-stage／reroute EvolutionBridges, large-form evolution stages, layered renderer, and growth journal
 - the user-confirmed pet-first desktop shell: transparent pet window, hidden detail window, native context menu, tray, single-instance recovery, safe position restore, and narrow render-state IPC
 - real conversation model
 - native reminder delivery
@@ -98,6 +98,7 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md — user-confirmed growth direction with proposed implementation details; design only, not implemented
 - docs/drafts/pet-first-desktop-shell-2026-08-11.md — user-confirmed pet-only presence plus proposed Windows lifecycle and acceptance plan; design only, not implemented
 - docs/adr/0003-pet-first-two-window-desktop-shell.md — proposed two-window, Rust-owned resident-shell decision
+- docs/adr/0004-deterministic-content-derived-evolution-paths.md — proposed local, lineage-aware multi-route growth decision
 - docs/ARCHITECTURE.md — intended system and connector contract
 - docs/PRIVACY_PRINCIPLES.md — non-negotiable trust model
 - docs/ROADMAP.md — staged delivery
@@ -127,6 +128,7 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - A missing WebView2 prerequisite may cause installer network access to Microsoft. Do not confuse this with the network-free fixture memory pipeline.
 - Generated test artwork and transparent PNGs are not evidence of signing, store review, or public release readiness.
 - The evolving-creature design draft is not a live procedural renderer, genome engine, or completed Phase 2 slice.
+- The branching concept art is not a production pet or evidence of content-driven personalization. The current runtime has no path profile, activity taxonomy, branch renderer, or real-memory signal mapping.
 - The pet-first design draft is not a transparent window, native menu, tray, single-instance process, or completed desktop shell. Do not fake those native behaviors in browser mode or expose full memory state to a future pet surface.
 - Tauri `invoke_handler` app commands are callable by every window by default. A future `pet` must receive generated app-command permissions plus caller-label denial tests; a narrow DTO alone does not protect full memory／approve／forget commands.
 
@@ -136,6 +138,7 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - Prefer small vertical slices that finish UI, logic, tests, privacy behavior, and documentation together.
 - Use synthetic fixtures only.
 - Record architectural decisions as ADRs.
+- Treat route labels as observable approved activity signals, never as sensitive personality or sentiment classifications.
 - Update PROJECT_STATUS.md after a meaningful change.
 - Avoid widening Tauri capabilities without a demonstrated need.
 

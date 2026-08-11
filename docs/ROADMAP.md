@@ -58,10 +58,11 @@ Exit condition: one approved Codex memory can create one explainable, removable 
 
 ## Phase 2 — A life that continues
 
-Design foundation recorded: the [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) defines a deterministic, lineage-aware creature that may evolve substantially. Distant stages may diverge, while each adjacent stage retains a versioned, understandable evolution bridge. Permanent growth comes only from approved memory-derived data; time supplies reversible presentation state. This is design evidence, not implemented Phase 2 functionality.
+Design foundation recorded: the user confirmed the biological／organic plus restrained sacred-premium direction and the goal of content-responsive routes. The [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) and proposed [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md) propose a deterministic, lineage-aware branch-and-blend implementation. Distant stages and routes may diverge, while each adjacent stage or reroute retains a versioned, understandable evolution bridge. Permanent growth comes only from approved memory-derived data; time supplies reversible presentation state. This is design evidence, not implemented Phase 2 functionality or an accepted route schema.
 
 - [ ] persistent creature traits and visual marks
 - [ ] versioned identity core, growth contributions, recomputable creature genome, and evolution stages
+- [ ] versioned, lineage-aware `EvolutionPathProfile` with multiple content-derived routes, bounded blending, and deterministic rerouting
 - [ ] deterministic EvolutionBridge records and adjacent-stage continuity acceptance
 - [ ] layered local renderer with no runtime image-generation dependency
 - [ ] multi-day story event state machine
@@ -72,7 +73,7 @@ Design foundation recorded: the [evolving creature system draft](drafts/deep-int
 - [ ] screenshot／streaming privacy mode and neutral growth-summary behavior before public testing
 - [ ] a local source-detail unlock gate for Growth Journal explanations before exposing private record details
 
-Exit condition: the creature demonstrates continuity across restarts and can explain every persistent change.
+Exit condition: the creature demonstrates continuity across restarts, explains every persistent change, and produces different but understandable routes from different synthetic approved-memory profiles; forgetting support recomputes or removes the route without ghost modules or runtime model calls.
 
 ## Phase 3 — Useful initiative
 
