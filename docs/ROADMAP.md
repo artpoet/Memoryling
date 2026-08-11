@@ -15,6 +15,25 @@ This roadmap describes intent, not a delivery promise.
 - [ ] complete code signing and public-distribution review
 - [ ] keyboard and screen-reader audit
 
+## Phase 0.5 — Pet-first desktop presence
+
+Design foundation recorded: the user-confirmed [pet-first desktop shell draft](drafts/pet-first-desktop-shell-2026-08-11.md) and proposed [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md) define “two surfaces, one life.” Normal presence is one transparent floating pet; right-click is the primary detail entry, while `Win+B` tray, Start Menu, and packaged installed-shortcut paths provide recovery. Focused-pet keyboard actions open the same menu. This is design evidence, not implemented desktop behavior.
+
+- [x] confirm the pet-only default surface and on-demand detail direction
+- [x] document native lifecycle, privacy, accessibility, DPI, and recovery requirements
+- [ ] add pre-created `pet` and hidden `main` surfaces with Rust-owned show／hide／focus and close／minimize／restore lifecycle
+- [ ] add native pet context menu, focused keyboard equivalent, tray Show／Hide／Open／Quit, and single-instance relaunch
+- [ ] generate per-window app-command permissions, deny all sensitive memory commands from `pet`, and test caller-label defense
+- [ ] add a content-minimized `CreatureRenderState` boundary and cross-surface revision synchronization
+- [ ] persist and clamp pet position across restart, work-area changes, mixed DPI, and monitor removal
+- [ ] keep the visible real-memory-off state, one-time onboarding, reduced-motion behavior, and bilingual parity
+- [ ] prove approve／restart／explain／forget consistency through packaged native desktop smoke
+- [ ] pass keyboard, Narrator／NVDA, 100–200% DPI, multi-monitor, shortcut, tray, and NSIS lifecycle UAT
+
+Exit condition: launching the packaged app shows exactly one recoverable floating pet; every supported entry opens exactly one detail window; pet attempts to invoke sensitive commands fail closed; both surfaces stay privacy-safe and state-consistent; browser mode remains honest; and no network boundary is added.
+
+**Exit status: not met.** The product direction and implementation contract are recorded, but the current app still opens one standard window and has no pet window, tray, or two-window lifecycle.
+
 ## Phase 1 — First real memory
 
 Fixture foundation completed:

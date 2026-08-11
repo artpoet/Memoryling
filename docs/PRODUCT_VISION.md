@@ -19,6 +19,14 @@ The user meets a quiet creature with little history. As approved memory sources 
 
 The creature should feel continuous, not randomly generated. If it changes, the user can ask why.
 
+## Desktop presence contract
+
+Memoryling's default desktop presence should be the creature itself, not an always-open dashboard. The user-confirmed direction is one small transparent floating pet; right-click is the primary way to open a native menu, and Open Memoryling reveals the standard detail window for memories, growth, lineage, habitat, privacy, and settings.
+
+Right-click is not the only recovery path. The `Win+B` system tray, Start Menu, and any installed app shortcut proven by packaged UAT must be able to recover a hidden or off-screen pet and focus the one detail window. When the pet already has focus, Enter／Space／Menu key／`Shift+F10` opens the same menu. Opening or restoring details temporarily hides or docks the floating pet so the user never sees two separate creatures; closing or minimizing details restores the pet. Hiding, closing details, forgetting a source, and quitting remain distinct actions.
+
+This pet-first two-window shell is a recorded product and architecture direction, not implemented behavior. Until a real connector exists, the pet surface must keep a visible “memory access is off” state. The complete proposal is in the [pet-first desktop shell design draft](drafts/pet-first-desktop-shell-2026-08-11.md).
+
 ## Creature growth contract
 
 Memoryling may evolve substantially as approved memories create stable, versioned growth signals. Its proportions, silhouette, appendages, movement, surface, and relationship with its habitat may all change. Distant stages do not need to look immediately recognizable as the same form; each adjacent transition must preserve an understandable visual or behavioral relationship, creating a traceable evolution chain rather than an unexplained replacement.

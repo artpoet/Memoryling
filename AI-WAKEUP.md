@@ -55,6 +55,7 @@ Not implemented:
 - a production connector for an externally selected durable-memory file
 - derivations beyond the deterministic completion-star rule
 - the designed identity core, creature genome, adjacent-stage EvolutionBridges, large-form evolution stages, layered renderer, and growth journal
+- the user-confirmed pet-first desktop shell: transparent pet window, hidden detail window, native context menu, tray, single-instance recovery, safe position restore, and narrow render-state IPC
 - real conversation model
 - native reminder delivery
 - completed human installer/uninstaller click-through UAT
@@ -75,6 +76,8 @@ Do not describe roadmap items as working features.
 
 The current code implements this path end to end for exactly one bundled synthetic Codex-shaped resource. It does not read a user's Codex tool-home or other external files.
 
+The user-confirmed future interaction direction is “two surfaces, one life”: a floating `pet` is normally visible, while the standard `main` detail window opens on demand. The two-window／Rust lifecycle remains a proposed technical design. Right-click is the primary entry; `Win+B` tray, Start Menu, and packaged installed shortcuts provide recovery. This lifecycle is documented but not implemented—the current app still opens one standard 1180 × 780 window.
+
 ## Key paths
 
 - src/App.tsx — bilingual concept behavior and copy
@@ -93,6 +96,8 @@ The current code implements this path end to end for exactly one bundled synthet
 - docs/PRODUCT_VISION.md — product intent
 - docs/zh-TW/PRODUCT_VISION.md — Traditional Chinese product intent
 - docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md — user-confirmed growth direction with proposed implementation details; design only, not implemented
+- docs/drafts/pet-first-desktop-shell-2026-08-11.md — user-confirmed pet-only presence plus proposed Windows lifecycle and acceptance plan; design only, not implemented
+- docs/adr/0003-pet-first-two-window-desktop-shell.md — proposed two-window, Rust-owned resident-shell decision
 - docs/ARCHITECTURE.md — intended system and connector contract
 - docs/PRIVACY_PRINCIPLES.md — non-negotiable trust model
 - docs/ROADMAP.md — staged delivery
@@ -122,6 +127,8 @@ The current code implements this path end to end for exactly one bundled synthet
 - A missing WebView2 prerequisite may cause installer network access to Microsoft. Do not confuse this with the network-free fixture memory pipeline.
 - Generated test artwork and transparent PNGs are not evidence of signing, store review, or public release readiness.
 - The evolving-creature design draft is not a live procedural renderer, genome engine, or completed Phase 2 slice.
+- The pet-first design draft is not a transparent window, native menu, tray, single-instance process, or completed desktop shell. Do not fake those native behaviors in browser mode or expose full memory state to a future pet surface.
+- Tauri `invoke_handler` app commands are callable by every window by default. A future `pet` must receive generated app-command permissions plus caller-label denial tests; a narrow DTO alone does not protect full memory／approve／forget commands.
 
 ## Working conventions
 
@@ -169,7 +176,9 @@ Close the Windows x64 fixture-only test-build gate:
 4. retain the recorded SHA-256 checksum and Windows CI evidence for commit `2aead61`, and regenerate the checksum after every rebuild;
 5. decide code-signing and distribution readiness without describing the current test art or unsigned installer as a public release.
 
-After that gate, resume the first user-selected Codex-source pilot: validate a stable supported format, add a Rust-owned narrow picker and redacted preview, and require explicit authorization before private-data UAT. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.
+After that gate, complete the pet-first shell against synthetic state before widening source access: pre-created `pet`／`main` surfaces, Rust-owned menu／tray／single-instance lifecycle, per-window app-command permissions with pet-denial tests, content-minimized `CreatureRenderState`, close／minimize／restore behavior, position／DPI recovery, approve／forget synchronization, bilingual accessibility, and packaged native smoke. Do not stop at window connectors or a browser mock.
+
+Only after that shell passes should the first user-selected Codex-source pilot resume: validate a stable supported format, add a Rust-owned narrow picker and redacted preview, and require explicit authorization before private-data UAT. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.
 
 ## Closeout checklist
 

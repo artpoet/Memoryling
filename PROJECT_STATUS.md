@@ -4,7 +4,7 @@ AS_OF: 2026-08-11 (Asia/Taipei)
 
 ## Current milestone
 
-Provide an honest Windows x64 current-user test installer for the completed fixture-only memory slice, then close its remaining installer UAT and artifact-evidence gaps.
+Close the remaining Windows x64 test-installer UAT gate, then deliver the user-confirmed pet-first direction through the proposed two-window shell as a complete synthetic-data vertical slice before widening the product to a real memory source.
 
 ## Overall state
 
@@ -18,6 +18,7 @@ Provide an honest Windows x64 current-user test installer for the completed fixt
 - CI: the first-memory implementation and current packaging／icon source bundle both pass local checks and GitHub Actions
 - Release: unsigned local Windows x64 test installer produced; no signed or public packaged release
 - Creature growth design: deterministic large-form evolution direction recorded; genome, stages, renderer, and growth journal are not implemented
+- Desktop presence design: pet-only default surface with on-demand detail, native recovery paths, and a Rust-owned two-window lifecycle recorded; none of that shell is implemented
 
 ## Completed in this bundle
 
@@ -33,12 +34,15 @@ Provide an honest Windows x64 current-user test installer for the completed fixt
 - relabeled the remaining sample event and initiative UI as CONCEPT／PLANNED in both languages
 - added Vitest／Testing Library UI coverage and Rust adapter／migration／persistence／forgetting tests
 - kept Tauri capabilities and CSP unchanged; added no telemetry, network client, or arbitrary filesystem permission
+- recorded the user-confirmed pet-first desktop direction, a detailed implementation contract, and proposed ADR-0003 without presenting the current one-window app as complete
 
 ## Product truth
 
 The local pipeline is real and persistent, but its only permitted input is a fictional resource bundled with the app. Memoryling does not scan or read the user's Codex tool-home, arbitrary files, credentials, prompts, or private memory. Browser preview keeps memory access off; after fixture approval the desktop still says real memory access is off.
 
 The user-confirmed future growth direction allows the creature to evolve substantially. Distant stages do not have to remain immediately recognizable as the same form, but every adjacent transition must retain an understandable, versioned evolution bridge. Permanent growth will come only from approved memory-derived data; calendar time will affect reversible presentation state only. Changes will apply automatically after source approval but remain lineage-explainable and recomputable. The detailed stages, bridge grammar, schema, renderer, and visual-slot limits remain proposed. This is documented design intent, not a claim about the current CSS creature or completion-star fixture.
+
+The user-confirmed desktop direction is now pet-first: normal presence is one transparent floating creature; right-click is the primary entry to an on-demand standard detail window, with `Win+B` tray, Start Menu, and packaged installed-shortcut recovery. The proposed implementation uses pre-created `pet`／`main` windows, Rust-owned lifecycle, per-window app-command permissions, and a content-minimized render-state boundary. The current packaged app still opens one 1180 × 780 standard window and has no floating pet, tray, or single-instance two-window lifecycle.
 
 ## Windows x64 test-build status
 
@@ -94,14 +98,18 @@ Remote evidence:
 - a Rust-owned native picker, strict external-file validation, and preview redaction remain future work
 - conversation model strategy remains intentionally open
 - the evolving-creature system has a product and architecture draft, but its identity core, genome schema, multi-source growth graph, evolution renderer, privacy mode, and accessibility acceptance remain unimplemented
+- the pet-first shell is design-only: transparent pet window, hidden detail window, native context menu, tray, single-instance recovery, safe position restore, and narrow render DTO remain unimplemented
+- current custom memory commands are not yet permission-separated by window; a future pet surface must be denied list／preview／cancel／full-state／approve／forget commands, not merely avoid calling them in normal UI
 - Windows installer and uninstaller click-through, WebView2-missing behavior, and app-data deletion still need human UAT
 - code signing and public distribution remain incomplete; the recorded local checksum changes after any rebuild
 
 ## Next bundle
 
-Close the Windows x64 test-build gate before returning to a real-source pilot: complete current-user install, launch, fixture tour, uninstall, and app-data deletion UAT; recheck the recorded installer checksum after any rebuild; then decide signing and distribution readiness. After that gate, prepare the first user-selected Codex-source pilot described in AI-WAKEUP.md without treating private `MEMORY.md` files as a public format specification.
+Close the Windows x64 test-build gate first: complete current-user install, launch, fixture tour, uninstall, and app-data deletion UAT; recheck the recorded installer checksum after any rebuild; then decide signing and distribution readiness.
 
-The future Phase 2 growth direction is recorded in `docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md`; it does not supersede the installer and real-source gates above.
+After that gate, implement the proposed pet-first shell against synthetic state as one vertical slice: `pet`／`main` surfaces, native menu and tray, single-instance recovery, generated per-window app-command permissions plus pet-denial tests, close／minimize／restore behavior, position／DPI handling, narrow render DTO, approve／forget synchronization, bilingual accessibility, and packaged desktop smoke. Only after that shell is proven should the first user-selected Codex-source pilot resume; do not treat private `MEMORY.md` files as a public format specification.
+
+The future Phase 2 growth direction is recorded in `docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md`; it does not supersede the installer, pet-shell, and real-source gates above.
 
 ## Do not redo
 
@@ -113,3 +121,4 @@ The future Phase 2 growth direction is recorded in `docs/drafts/deep-interview-e
 - do not add open-ended AI chat before the memory lineage path exists
 - do not describe the fixture pilot as access to the user's real Codex memories
 - do not add cloud sync, telemetry, or remote memory processing by assumption
+- do not implement the floating pet as a second independent creature state, expose full memory text to its surface, or treat a browser mock as native two-window verification

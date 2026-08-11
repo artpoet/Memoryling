@@ -17,6 +17,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - English and Traditional Chinese Windows test guides covering installation, fixture use, local data, uninstall limits, and raw-executable sidecars
 - Test-build Memoryling icon and in-app brand artwork generated with Codex's built-in ImageGen; PNG transparency was checked for the test-build assets
 - Product and technical design draft for deterministic, lineage-aware creature growth with large-form evolution, adjacent-stage EvolutionBridges, reversible time states, local rendering, and no runtime image-generation dependency
+- User-confirmed pet-first desktop-shell design, proposed ADR-0003, and a staged native acceptance plan for one floating pet, on-demand detail, right-click menu, tray recovery, single-instance lifecycle, and content-minimized render state
 
 ### Changed
 

@@ -21,7 +21,7 @@ The v1 fixture slice follows this shape but replaces the external source with a 
 
 | Layer | Responsibility | Current state |
 |---|---|---|
-| Desktop shell | Native window, lifecycle, notifications | Tauri 2 shell and memory IPC commands exist; notifications are not implemented |
+| Desktop shell | Native window, lifecycle, notifications | One standard Tauri window and memory IPC commands exist; the proposed pet-first two-window resident shell, tray, and single-instance lifecycle are not implemented |
 | Experience UI | Creature, habitat, stories, controls, explanations | Bilingual concept UI plus fixture selection, preview, consent, lineage, and forgetting; fixture state is separate and visible real-memory access remains off in desktop and browser |
 | Source adapters | Read selected durable-memory formats without mutating them | Fixture adapter v1 reads one fixed bundled JSON resource; no external path or Codex tool-home access |
 | Import gate | Preview scope, explain access, obtain consent | Implemented for the fixture, with pending preview state held in Rust memory; no real-source picker |
@@ -30,6 +30,26 @@ The v1 fixture slice follows this shape but replaces the external source with a 
 | Local store | Persist normalized events, derived effects, lineage, and settings | SQLite schema v1 stores approved fixture records and lineage under Tauri app-local data; general settings are not included |
 | Conversation layer | Ground dialogue in approved local context | Not implemented; provider decision open |
 | Reminder policy | Enforce quiet hours, budget, urgency, and snooze state | UI concept only |
+
+## Proposed pet-first desktop shell
+
+The user-confirmed product direction is “two surfaces, one life,” recorded in proposed [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md) and the detailed [pet-first desktop shell draft](drafts/pet-first-desktop-shell-2026-08-11.md). This section describes intended architecture, not the current runtime.
+
+```text
+one Tauri process
+  ├─ pet window: transparent, undecorated, render-safe creature state only
+  ├─ main window: hidden until requested, full detail and lineage controls
+  ├─ native context menu + tray + single-instance recovery
+  └─ Rust lifecycle + canonical SQLite state
+```
+
+The `main` WebView should be created at startup but remain hidden, because Tauri documents a Windows deadlock risk when a WebView window is created inside a synchronous command or event handler. Rust should own show, hide, focus, `main` CloseRequested interception, native menu, tray, position recovery, and explicit quit without blocking Windows session shutdown. Pet frontend core capability should remain narrow—normally only window dragging and render-state event listening—rather than receiving cross-window creation, focus, menu, or tray permissions. `main` also needs an explicit reviewed permission set instead of inheriting the current broad `core:default`.
+
+The pet surface must not call the existing full memory-state API because its lineage contains approved normalized text. A safe DTO alone is insufficient: Tauri app commands registered through `invoke_handler` are available to every window by default. The build must use `tauri_build::AppManifest::commands` to generate command permissions, assign all list／preview／cancel／full-state／approve／forget permissions only to `main`, give `pet` only a separate `CreatureRenderState` command plus necessary interactions, and also reject non-`main` callers inside sensitive commands. Negative tests must invoke each sensitive command from `pet` and prove fail-closed behavior.
+
+`CreatureRenderState` contains only appearance parameters, neutral state, and an opaque revision. Approve, forget, or future genome commits emit a content-free revision event; each surface then refetches only the typed state allowed for that surface. No memory text, path, locator, or explanation payload belongs in pet IPC, native menu labels, tray labels, window titles, or operating-system notifications. Closing details must cancel any pending preview in Rust before hiding because hiding a WebView does not unmount it; minimizing preserves the preview.
+
+Right-click is the primary entry. When `pet` has focus, Enter／Space／Menu key／`Shift+F10` opens the same native menu at a fixed pet anchor; reliable no-focus keyboard recovery is `Win+B` system tray, Start Menu, or a packaged UAT-confirmed installed shortcut. Opening or restoring `main` hides or docks `pet`; closing or minimizing `main` restores it, and only an explicit Quit ends the process. Pet position is restored in logical coordinates and clamped at launch, show／recovery, drag end, scale change, and single-instance callbacks; immediate topology／taskbar handling needs a verified Windows hook or polling strategy. Browser mode continues to show the detail preview and must not imitate native floating-window behavior.
 
 ## Implemented v1 records and future shape
 

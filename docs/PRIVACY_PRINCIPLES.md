@@ -53,6 +53,18 @@ The implemented first-memory pipeline has a deliberately narrower boundary than 
 
 No user-owned agent memory has been imported or used for real-data UAT. The visible real-memory access state must remain off until a real connector and consent flow are verified.
 
+## Proposed pet-surface display boundary
+
+The user-confirmed floating-pet shell is not implemented, but its privacy contract is already fixed:
+
+- The resident pet surface receives a dedicated render-safe state, not the full memory or lineage DTO. It must not receive normalized memory text, source paths or locators, private explanation content, or arbitrary record payloads.
+- A safe DTO is not sufficient by itself. Per-window app-command permissions and caller-label checks must deny list／preview／cancel／full-state／approve／forget commands from the pet surface, with negative invoke tests.
+- Pet reactions, native menu items, tray labels, window titles, onboarding, and operating-system surfaces must remain neutral; they cannot reveal names, projects, traits, or source summaries.
+- Cross-window events carry only opaque revisions or non-sensitive counts. Each surface refetches a typed state limited to its purpose.
+- Closing the detail window, hiding the pet, quitting the app, and forgetting a source are distinct operations and must never be described as equivalent deletion.
+- The visible real-memory-off status remains on the pet surface until a real connector is verified. Browser mode must not imitate native persistence or resident-window behavior.
+- A screenshot／screen-sharing privacy mode and neutral growth-summary review are required before public testing with real memory-derived state.
+
 ## Before any network feature
 
 Any feature that transmits memory-derived content must receive:
