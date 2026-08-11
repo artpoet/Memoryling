@@ -39,11 +39,18 @@ Exit condition: one approved Codex memory can create one explainable, removable 
 
 ## Phase 2 — A life that continues
 
+Design foundation recorded: the [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) defines a deterministic, lineage-aware creature that may evolve substantially while retaining recognizable identity anchors. Permanent growth comes only from approved memory-derived data; time supplies reversible presentation state. This is design evidence, not implemented Phase 2 functionality.
+
 - [ ] persistent creature traits and visual marks
+- [ ] versioned identity core, growth contributions, recomputable creature genome, and evolution stages
+- [ ] layered local renderer with no runtime image-generation dependency
 - [ ] multi-day story event state machine
 - [ ] habitat changes linked to completions and recurring themes
 - [ ] contradiction events across approved sources
 - [ ] event history and manual correction controls
+- [ ] reduced-motion, keyboard, screen-reader, high-contrast, and 200% zoom acceptance for automatic evolution
+- [ ] screenshot／streaming privacy mode and neutral growth-summary behavior before public testing
+- [ ] a local source-detail unlock gate for Growth Journal explanations before exposing private record details
 
 Exit condition: the creature demonstrates continuity across restarts and can explain every persistent change.
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-This document separates the intended product architecture from the subset implemented as of 2026-08-10. The implemented local pipeline runs end to end for exactly one fictional Codex-shaped resource bundled with the desktop app. No user-owned Codex file, tool-home, or other external source is connected.
+This document separates the intended product architecture from the subset implemented as of 2026-08-11. The implemented local pipeline runs end to end for exactly one fictional Codex-shaped resource bundled with the desktop app. No user-owned Codex file, tool-home, or other external source is connected.
 
 ## System shape
 
@@ -53,6 +53,21 @@ The v1 fixture slice follows this shape but replaces the external source with a 
 
 The complete source → event → signal → effect graph is queried back from SQLite for the “Why did this happen?” view.
 
+## Future creature-growth boundary
+
+The user-confirmed, not-yet-implemented product direction has the following proposed deterministic shape:
+
+    approved events → derived signals
+        ├─→ growth contributions with lineage → recomputable CreatureGenome
+        └─→ WorldEffects → marks / habitat / story projections
+
+    IdentityCore + CreatureGenome + active WorldEffects + EphemeralState
+        → render-safe CreatureState → local layered renderer
+
+Permanent growth may substantially change morphology while retaining a small set of identity anchors. It is driven only by approved memories and local derivations; raw record count and calendar time are not XP. Time supplies reversible day, season, anniversary, expression, and activity state only.
+
+Growth contributions and the existing WorldEffects are parallel projections from derived signals; the genome does not replace the current effect lineage or form a circular dependency with it. The growth core must not accept runtime LLM or image-generation inference as permanent input. A future model-produced candidate would require a separate product decision, explicit user approval, and machine-readable lineage before entering the graph; a conversation provider cannot directly or indirectly mutate permanent growth by default. The renderer receives no raw memory content, and forgetting must recompute morphology, stages, marks, habitat effects, explanations, and caches from the events that remain. The proposed product and technical details are in the [evolving creature system design draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md); none of that future layer is claimed by the current completion-star fixture.
+
 ## Fixture lifecycle and persistence
 
 1. Tauri resolves one bundled resource path; the WebView cannot submit an arbitrary file path.
@@ -93,6 +108,7 @@ The current fixture adapter satisfies this contract only for its fixed synthetic
 - validated Codex durable-memory format, native source selection, and permission UX;
 - migration strategy after SQLite schema v1;
 - Windows resident-app lifecycle and notification integration;
-- derivations beyond the deterministic completion-star boundary.
+- derivations and signal-to-genome mappings beyond the deterministic completion-star boundary;
+- final visual identity anchors, stage names, and renderer implementation after synthetic visual prototyping.
 
 Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-only SQLite v1 boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md).

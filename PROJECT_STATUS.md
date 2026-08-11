@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Memoryling
 
-AS_OF: 2026-08-10 (Asia/Taipei)
+AS_OF: 2026-08-11 (Asia/Taipei)
 
 ## Current milestone
 
@@ -17,6 +17,7 @@ Provide an honest Windows x64 current-user test installer for the completed fixt
 - Default branch: main
 - CI: the first-memory implementation and current packaging／icon source bundle both pass local checks and GitHub Actions
 - Release: unsigned local Windows x64 test installer produced; no signed or public packaged release
+- Creature growth design: deterministic large-form evolution direction recorded; genome, stages, renderer, and growth journal are not implemented
 
 ## Completed in this bundle
 
@@ -36,6 +37,8 @@ Provide an honest Windows x64 current-user test installer for the completed fixt
 ## Product truth
 
 The local pipeline is real and persistent, but its only permitted input is a fictional resource bundled with the app. Memoryling does not scan or read the user's Codex tool-home, arbitrary files, credentials, prompts, or private memory. Browser preview keeps memory access off; after fixture approval the desktop still says real memory access is off.
+
+The user-confirmed future growth direction allows the creature to evolve substantially while retaining recognizable identity anchors. Permanent growth will come only from approved memory-derived data; calendar time will affect reversible presentation state only. Changes will apply automatically after source approval but remain lineage-explainable and recomputable. The detailed stages, schema, anchor count, renderer, and visual-slot limits remain proposed. This is documented design intent, not a claim about the current CSS creature or completion-star fixture.
 
 ## Windows x64 test-build status
 
@@ -90,12 +93,15 @@ Remote evidence:
 - the adapter supports only the bundled synthetic v1 fixture; no user-owned Codex memory format is accepted
 - a Rust-owned native picker, strict external-file validation, and preview redaction remain future work
 - conversation model strategy remains intentionally open
+- the evolving-creature system has a product and architecture draft, but its identity core, genome schema, multi-source growth graph, evolution renderer, privacy mode, and accessibility acceptance remain unimplemented
 - Windows installer and uninstaller click-through, WebView2-missing behavior, and app-data deletion still need human UAT
 - code signing and public distribution remain incomplete; the recorded local checksum changes after any rebuild
 
 ## Next bundle
 
 Close the Windows x64 test-build gate before returning to a real-source pilot: complete current-user install, launch, fixture tour, uninstall, and app-data deletion UAT; recheck the recorded installer checksum after any rebuild; then decide signing and distribution readiness. After that gate, prepare the first user-selected Codex-source pilot described in AI-WAKEUP.md without treating private `MEMORY.md` files as a public format specification.
+
+The future Phase 2 growth direction is recorded in `docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md`; it does not supersede the installer and real-source gates above.
 
 ## Do not redo
 

@@ -16,6 +16,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - Current-user Windows x64 NSIS test-build configuration and `npm run build:windows` command
 - English and Traditional Chinese Windows test guides covering installation, fixture use, local data, uninstall limits, and raw-executable sidecars
 - Test-build Memoryling icon and in-app brand artwork generated with Codex's built-in ImageGen; PNG transparency was checked for the test-build assets
+- Product and technical design draft for deterministic, lineage-aware creature growth with large-form evolution, stable identity anchors, reversible time states, local rendering, and no runtime image-generation dependency
 
 ### Changed
 

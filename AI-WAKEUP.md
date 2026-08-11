@@ -54,6 +54,7 @@ Not implemented:
 - arbitrary path scanning or a user file picker
 - a production connector for an externally selected durable-memory file
 - derivations beyond the deterministic completion-star rule
+- the designed identity core, creature genome, large-form evolution stages, layered renderer, and growth journal
 - real conversation model
 - native reminder delivery
 - completed human installer/uninstaller click-through UAT
@@ -91,6 +92,7 @@ The current code implements this path end to end for exactly one bundled synthet
 - docs/zh-TW/USER_GUIDE.md — Traditional Chinese user guide
 - docs/PRODUCT_VISION.md — product intent
 - docs/zh-TW/PRODUCT_VISION.md — Traditional Chinese product intent
+- docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md — user-confirmed growth direction with proposed implementation details; design only, not implemented
 - docs/ARCHITECTURE.md — intended system and connector contract
 - docs/PRIVACY_PRINCIPLES.md — non-negotiable trust model
 - docs/ROADMAP.md — staged delivery
@@ -119,6 +121,7 @@ The current code implements this path end to end for exactly one bundled synthet
 - Uninstall may retain `%LOCALAPPDATA%\app.memoryling.desktop` unless the delete-app-data option is explicitly selected; that click-through still needs human UAT.
 - A missing WebView2 prerequisite may cause installer network access to Microsoft. Do not confuse this with the network-free fixture memory pipeline.
 - Generated test artwork and transparent PNGs are not evidence of signing, store review, or public release readiness.
+- The evolving-creature design draft is not a live procedural renderer, genome engine, or completed Phase 2 slice.
 
 ## Working conventions
 

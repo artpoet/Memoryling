@@ -19,6 +19,14 @@ The user meets a quiet creature with little history. As approved memory sources 
 
 The creature should feel continuous, not randomly generated. If it changes, the user can ask why.
 
+## Creature growth contract
+
+Memoryling may evolve substantially as approved memories create stable, versioned growth signals. Its proportions, silhouette, appendages, movement, surface, and relationship with its habitat may all change, while a small set of identity anchors keeps every stage recognizably the same creature.
+
+Permanent growth comes only from approved memories and locally derived data—not from calendar time, inactivity pressure, or raw record count. Time may shape reversible day, season, anniversary, expression, and activity states. Derived changes apply automatically after source approval, but every persistent change remains explainable through lineage and must disappear or be recomputed when supporting memories are forgotten.
+
+The growth core is deterministic and does not accept runtime model inference as permanent growth input. Development-time tools may help explore art direction, but shipped assets and rendering remain local. Any future model-produced growth candidate would require a separate product decision, explicit user approval, and source lineage. The detailed, not-yet-implemented proposal is recorded in the [evolving creature system design draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md).
+
 ## The product wedge
 
 Memoryling's defensible center is **source-traceable memory causality**:
