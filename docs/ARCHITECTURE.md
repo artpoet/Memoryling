@@ -58,13 +58,13 @@ The complete source → event → signal → effect graph is queried back from S
 The user-confirmed, not-yet-implemented product direction has the following proposed deterministic shape:
 
     approved events → derived signals
-        ├─→ growth contributions with lineage → recomputable CreatureGenome
+        ├─→ growth contributions with lineage → recomputable CreatureGenome → stage snapshots + EvolutionBridge
         └─→ WorldEffects → marks / habitat / story projections
 
-    IdentityCore + CreatureGenome + active WorldEffects + EphemeralState
+    IdentityCore + current stage snapshot + active WorldEffects + EphemeralState
         → render-safe CreatureState → local layered renderer
 
-Permanent growth may substantially change morphology while retaining a small set of identity anchors. It is driven only by approved memories and local derivations; raw record count and calendar time are not XP. Time supplies reversible day, season, anniversary, expression, and activity state only.
+Permanent growth may substantially change morphology. Distant stages do not need to remain immediately recognizable as the same form, but every adjacent stage transition must produce a versioned `EvolutionBridge` describing preserved, grown, split, merged, relocated, or retired traits. Growth is driven only by approved memories and local derivations; raw record count and calendar time are not XP. Time supplies reversible day, season, anniversary, expression, and activity state only.
 
 Growth contributions and the existing WorldEffects are parallel projections from derived signals; the genome does not replace the current effect lineage or form a circular dependency with it. The growth core must not accept runtime LLM or image-generation inference as permanent input. A future model-produced candidate would require a separate product decision, explicit user approval, and machine-readable lineage before entering the graph; a conversation provider cannot directly or indirectly mutate permanent growth by default. The renderer receives no raw memory content, and forgetting must recompute morphology, stages, marks, habitat effects, explanations, and caches from the events that remain. The proposed product and technical details are in the [evolving creature system design draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md); none of that future layer is claimed by the current completion-star fixture.
 
@@ -109,6 +109,6 @@ The current fixture adapter satisfies this contract only for its fixed synthetic
 - migration strategy after SQLite schema v1;
 - Windows resident-app lifecycle and notification integration;
 - derivations and signal-to-genome mappings beyond the deterministic completion-star boundary;
-- final visual identity anchors, stage names, and renderer implementation after synthetic visual prototyping.
+- final EvolutionBridge grammar, stage names, and renderer implementation after synthetic visual prototyping.
 
 Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-only SQLite v1 boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md).

@@ -39,10 +39,11 @@ Exit condition: one approved Codex memory can create one explainable, removable 
 
 ## Phase 2 — A life that continues
 
-Design foundation recorded: the [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) defines a deterministic, lineage-aware creature that may evolve substantially while retaining recognizable identity anchors. Permanent growth comes only from approved memory-derived data; time supplies reversible presentation state. This is design evidence, not implemented Phase 2 functionality.
+Design foundation recorded: the [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) defines a deterministic, lineage-aware creature that may evolve substantially. Distant stages may diverge, while each adjacent stage retains a versioned, understandable evolution bridge. Permanent growth comes only from approved memory-derived data; time supplies reversible presentation state. This is design evidence, not implemented Phase 2 functionality.
 
 - [ ] persistent creature traits and visual marks
 - [ ] versioned identity core, growth contributions, recomputable creature genome, and evolution stages
+- [ ] deterministic EvolutionBridge records and adjacent-stage continuity acceptance
 - [ ] layered local renderer with no runtime image-generation dependency
 - [ ] multi-day story event state machine
 - [ ] habitat changes linked to completions and recurring themes

@@ -21,7 +21,7 @@ The creature should feel continuous, not randomly generated. If it changes, the 
 
 ## Creature growth contract
 
-Memoryling may evolve substantially as approved memories create stable, versioned growth signals. Its proportions, silhouette, appendages, movement, surface, and relationship with its habitat may all change, while a small set of identity anchors keeps every stage recognizably the same creature.
+Memoryling may evolve substantially as approved memories create stable, versioned growth signals. Its proportions, silhouette, appendages, movement, surface, and relationship with its habitat may all change. Distant stages do not need to look immediately recognizable as the same form; each adjacent transition must preserve an understandable visual or behavioral relationship, creating a traceable evolution chain rather than an unexplained replacement.
 
 Permanent growth comes only from approved memories and locally derived data—not from calendar time, inactivity pressure, or raw record count. Time may shape reversible day, season, anniversary, expression, and activity states. Derived changes apply automatically after source approval, but every persistent change remains explainable through lineage and must disappear or be recomputed when supporting memories are forgotten.
 

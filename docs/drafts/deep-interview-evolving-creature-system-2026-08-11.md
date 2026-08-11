@@ -7,7 +7,7 @@
 
 ## 1. 一句話定義
 
-Memoryling 不是每次啟動時重新生成的一張寵物圖片，而是一個由使用者核准記憶所塑造、能大幅進化、仍保有可辨識身份，並可從來源完整重算的本機生命系統。
+Memoryling 不是每次啟動時重新生成的一張寵物圖片，而是一個由使用者核准記憶所塑造、能大幅進化、讓相鄰階段保持可理解聯繫，並可從來源完整重算的本機生命系統。
 
 ## 2. 已確認的產品決策
 
@@ -17,7 +17,7 @@ Memoryling 不是每次啟動時重新生成的一張寵物圖片，而是一個
 2. **永久成長只由核准記憶與其本機衍生資料驅動。**日曆時間本身不增加等級，也不會讓閒置中的寵物憑空進化。
 3. **時間只驅動可逆狀態。**時間可以影響晝夜、季節、紀念日呈現與當下動作，但不能直接改寫永久基因。
 4. **變化自動套用。**記憶已經通過來源核准後，使用者不必逐項批准每次外觀改變；每項變化仍必須可以解釋與撤銷來源。
-5. **允許大幅進化。**生命階段可以顯著改變體型、比例、附肢、移動方式與棲地互動，但必須保留跨階段可辨識的核心特質。
+5. **允許大幅進化，以相鄰階段維持聯繫。**第一階與最後一階不必一眼看出是同一種外型；但每次 `stage N → N+1` 都必須能看懂哪些特徵被保留、成長、分裂、合併、移位或退場，形成不跳接的演化鏈。
 6. **成長核心不依賴 runtime AI API。**AI 或 Skill 可以協助開發期的造型探索；實際執行時使用本機規則、本機狀態與隨 EXE 打包的資產。未來即使加入對話模型，其輸出也不能直接回寫永久 genome、stage 或 lineage。
 
 ## 3. 產品承諾
@@ -26,7 +26,7 @@ Memoryling 不是每次啟動時重新生成的一張寵物圖片，而是一個
 
 - 這是同一個生命逐步成長，不是每次隨機換皮。
 - 重要記憶會留下看得見、能被理解的影響。
-- 大幅進化帶來驚喜，但不會抹掉原本認得出的個性。
+- 大幅進化帶來驚喜；遙遠階段可以差異很大，但相鄰變化不會像毫無原因地換成另一隻生物。
 - 遺忘來源後，相關變化確實消失或由剩餘記憶重新形成。
 - 幾天沒有開啟 Memoryling 不會受到懲罰，也不會錯過不可逆成長。
 
@@ -43,10 +43,10 @@ Memoryling 不是每次啟動時重新生成的一張寵物圖片，而是一個
 ```text
 approved MemoryEvent
     → versioned DerivedSignal
-        ├─→ GrowthContribution → deterministic CreatureGenome → structural state
+        ├─→ GrowthContribution → deterministic CreatureGenome → stage snapshots + EvolutionBridge
         └─→ WorldEffect → marks / habitat / story projections
 
-IdentityCore + structural state + active WorldEffects + EphemeralState
+IdentityCore + current stage snapshot + active WorldEffects + EphemeralState
     → render-safe CreatureState
     → local renderer + Growth Journal / Why did this happen?
 ```
@@ -59,7 +59,7 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 
 | State | 來源與責任 | 永久狀態規則 |
 |---|---|---|
-| `IdentityCore` | 本機初次建立的 identity seed、穩定名稱與視覺錨點 | 不由記憶決定；刪除全部記憶後仍回到同一 identity baseline |
+| `IdentityCore` | 本機初次建立的 creature ID、identity seed、穩定名稱與演化根節點 | 不由記憶決定；刪除全部記憶後仍回到同一 identity baseline，但不要求所有階段共享固定外觀 |
 | `DerivedGrowth` | 目前核准事件、identity seed 與版本化規則 | 可持續但非不可逆；忘記來源後必須完整重算 |
 | `EphemeralState` | 本機時鐘、季節、當下 UI 狀態 | 不得推動永久成長，也不得成為 genome 的隱藏輸入 |
 | `HistoryAndAudit` | 成長揭露與解釋索引 | 忘記來源後須刪除相依內容；不得殘留可反推出來源的文字、hash 或特徵 |
@@ -88,7 +88,7 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 | Genome axis | 影響 | 邊界 |
 |---|---|---|
 | maturity | 生命階段與整體複雜度 | 由記憶意義與穩定訊號決定，不看日曆天數 |
-| morphology | 體型、比例、附肢、姿態 | 可大幅改變，但必須通過身份錨點規則 |
+| morphology | 體型、比例、附肢、姿態 | 可大幅改變，但每次 stage transition 必須產生可解釋的 EvolutionBridge |
 | surface | 色盤、紋理、發光、材質感 | 顏色不可是唯一資訊載體 |
 | temperament | 呼吸節奏、探索動作、待機姿態 | 只描述可觀察的互動風格，不下敏感人格診斷 |
 | memory marks | 星點、符號、飾物、疤紋式故事印記 | 每一項都要有 effect lineage 與可見數量上限 |
@@ -100,7 +100,7 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 
 | Internal stage | 工作名稱 | 可見變化 |
 |---|---|---|
-| `seed` | 記憶種 | 幾乎沒有歷史，輪廓最簡潔，建立核心身份錨點 |
+| `seed` | 記憶種 | 幾乎沒有歷史，輪廓最簡潔，建立 identity root 與第一組可演化特徵 |
 | `awakened` | 初醒 | 形成第一個完整身體與基礎動作性格 |
 | `growing` | 成形 | 比例、附肢、紋理與移動方式開始分化 |
 | `evolved` | 蛻變 | 允許明顯剪影與能力感變化，棲地開始回應牠 |
@@ -108,17 +108,19 @@ SQLite 中的核准事件與來源鏈是事實來源。`CreatureGenome` 是可�
 
 階段門檻由版本化規則判定，考慮去重後訊號的意義、受上限約束的證據強度、語義多樣性與穩定度。來源數量本身不得提供加成；單純連接更多來源或匯入大量相似紀錄不能快速升階。
 
-### 可辨識身份錨點
+### 相鄰階段 EvolutionBridge
 
-每隻 Memoryling 在 `seed` 階段建立一組 `CreatureSignature`。prototype 可從下列五類選出固定三項，並把其 anchor ID 與核心值寫入 identity baseline；後續所有階段都必須保留**同一組固定錨點**，不能每次換成另外三類來規避身份連續性。具體錨點仍需視覺方向核准：
+身份連續性是一條**演化路徑**，不是要求所有階段永遠掛著同一組眼睛、耳朵或顏色。每次 `stage N → N+1` 都要產生版本化 `EvolutionBridge`，記錄一個或多個可見／可感知特徵如何轉換：
 
-1. 眼睛或臉部節奏；
-2. 核心記憶種／胸口核心；
-3. 代表性色彩或高光；
-4. 一個剪影特徵，例如耳、角、冠、尾或觸鬚；
-5. 一個招牌動作或待機姿勢。
+- `preserved`：保留但比例或細節改變；
+- `grown`：從小型特徵長成主要結構；
+- `split`／`merged`：一個特徵分化，或多個特徵融合；
+- `relocated`：例如胸口光點轉移成尾端星環；
+- `retired`：舊特徵退場，但由新形態或行為承接其功能與原因。
 
-體型、四肢比例、附肢數量、移動方式與材質可以顯著改變，只要仍保留 `CreatureSignature` 指定的固定錨點與通過人工視覺辨識驗收。
+可用來建立橋接的元素包括臉部節奏、核心記憶種、色彩、高光、剪影、附肢、材質、移動方式與招牌動作。遠距階段並排時不一定能直接認出來；但沿著相鄰階段查看時，不能出現沒有 lineage 或形態轉換說明的「瞬間換物種」。
+
+`EvolutionBridge` 由前後兩個 deterministic stage snapshot 與版本化規則計算，不是另一個不可回算的歷史真相。Growth Journal 保存可理解的演化路徑；忘記來源而改道或退階時，相關 bridge 也必須由剩餘事件重算。reduced-motion 模式以 before／after 圖與文字列出轉換，不強迫播放 morph 動畫。
 
 ## 6. 永久、持續與暫時狀態
 
@@ -263,7 +265,7 @@ Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 
 本設計屬 Phase 2 方向，不取代目前尚未完成的 installer gate 與 real-source Phase 1：
 
-1. **Visual contract prototype** — 僅用 synthetic genome，製作三個跨五階段的角色家族，驗證「大幅變化仍認得出來」。
+1. **Visual contract prototype** — 僅用 synthetic genome，製作三個跨五階段的角色家族，驗證每組相鄰階段都有可理解的 EvolutionBridge，並允許第一階與最後一階大幅不同。
 2. **Genome foundation** — Rust 純函式推導、schema／migration、revision、forget／rederive 測試，不先做漂亮動畫。
 3. **SVG vertical slice** — 一個 synthetic signal 從 genome axis 造成 stage 內形變與一個 lineage mark，含 explain／forget UI。
 4. **Major evolution slice** — 至少兩個 stage、可略過轉場、重啟一致、reduced-motion 與雙語摘要。
@@ -277,7 +279,7 @@ Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 
 ### Product
 
-- 使用者看五階段並排圖時，能辨識它們是同一隻 Memoryling。
+- 使用者逐對查看相鄰階段時，能指出至少一條明確的保留或轉換關係；從第一階到最後一階則能透過完整演化鏈理解它們的關聯，不要求單看兩端就立即認出。
 - 大幅進化有驚喜，但不依賴看不懂的隨機造型。
 - 使用者能在兩步操作內找到永久變化的原因。
 - 忘記來源後，相關外觀與日誌結果一致，不出現幽靈印記。
@@ -297,7 +299,7 @@ Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 
 ## 17. 尚未鎖定但不阻擋架構的事項
 
-- 核心身份錨點的具體造型與主色；
+- EvolutionBridge 可使用的形態文法、轉換類型與視覺表達；
 - 五階段的正式英文／繁中名稱；
 - 每個未來 memory signal 對 genome axis 的正式 mapping；
 - hero mark slot 是否維持 5 個；
@@ -312,7 +314,7 @@ Skill 是開發工作流，不是 Memoryling 的 runtime 依賴：
 |---|---|
 | Goal | 從資料驅動的一次性印記，擴張為可持續、可大幅進化的生命 |
 | Constraints | local-first、無 runtime AI API、lineage、forget/rederive、no time-based permanent growth |
-| Success | 大幅變形仍可辨識、自動變化仍可理解、刪除後不留幽靈效果 |
+| Success | 相鄰階段有清楚聯繫、遙遠階段可大幅分化、自動變化仍可理解、刪除後不留幽靈效果 |
 | Remaining ambiguity | 約 15%；集中在美術方向與各 signal mapping，適合用 prototype 而非繼續口頭抽象討論 |
 
 ## 19. 研究來源

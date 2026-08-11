@@ -38,7 +38,7 @@ Provide an honest Windows x64 current-user test installer for the completed fixt
 
 The local pipeline is real and persistent, but its only permitted input is a fictional resource bundled with the app. Memoryling does not scan or read the user's Codex tool-home, arbitrary files, credentials, prompts, or private memory. Browser preview keeps memory access off; after fixture approval the desktop still says real memory access is off.
 
-The user-confirmed future growth direction allows the creature to evolve substantially while retaining recognizable identity anchors. Permanent growth will come only from approved memory-derived data; calendar time will affect reversible presentation state only. Changes will apply automatically after source approval but remain lineage-explainable and recomputable. The detailed stages, schema, anchor count, renderer, and visual-slot limits remain proposed. This is documented design intent, not a claim about the current CSS creature or completion-star fixture.
+The user-confirmed future growth direction allows the creature to evolve substantially. Distant stages do not have to remain immediately recognizable as the same form, but every adjacent transition must retain an understandable, versioned evolution bridge. Permanent growth will come only from approved memory-derived data; calendar time will affect reversible presentation state only. Changes will apply automatically after source approval but remain lineage-explainable and recomputable. The detailed stages, bridge grammar, schema, renderer, and visual-slot limits remain proposed. This is documented design intent, not a claim about the current CSS creature or completion-star fixture.
 
 ## Windows x64 test-build status
 

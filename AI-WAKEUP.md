@@ -54,7 +54,7 @@ Not implemented:
 - arbitrary path scanning or a user file picker
 - a production connector for an externally selected durable-memory file
 - derivations beyond the deterministic completion-star rule
-- the designed identity core, creature genome, large-form evolution stages, layered renderer, and growth journal
+- the designed identity core, creature genome, adjacent-stage EvolutionBridges, large-form evolution stages, layered renderer, and growth journal
 - real conversation model
 - native reminder delivery
 - completed human installer/uninstaller click-through UAT
