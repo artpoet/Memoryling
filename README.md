@@ -77,9 +77,9 @@ Raw memory files, credentials, prompts, and private work must never be committed
 
 ## Project status
 
-Memoryling is at a **fixture-backed development stage (v0.1.0)**. The visual experience, v1 SQLite/lineage foundation, and a local unsigned Windows x64 NSIS test artifact are available. Real memory connectors, notification delivery, code signing, and a public release-ready package remain roadmap work.
+Memoryling is at a **fixture-backed development stage (v0.1.0)**. The visual experience, v1 SQLite/lineage foundation, and a local unsigned Windows x64 NSIS test artifact are available; its current-host native path and both uninstall data choices have passed UAT. The WebView2-missing branch, real memory connectors, notification delivery, code signing, and a public release-ready package remain roadmap work.
 
-The fixture foundation for the first engineering milestone is implemented, but the Phase 1 exit is not met: no user-owned Codex memory has been selected or imported. The next connector work must validate a real Codex format and remain explicitly selected, read-only, previewed, and consented.
+The fixture foundation for the first engineering milestone is implemented, but the Phase 1 exit is not met: no user-owned Codex memory has been selected or imported. The next engineering milestone is the pet-first synthetic shell; only after it passes should connector work validate one real Codex format through an explicitly selected, read-only, previewed, and consented path.
 
 ## Contributing
 

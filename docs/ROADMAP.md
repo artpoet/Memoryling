@@ -10,9 +10,11 @@ This roadmap describes intent, not a delivery promise.
 - [x] initial open-source governance and CI
 - [x] replace scaffold icons with generated Memoryling test artwork; public-release visual signoff remains separate
 - [x] generate a local current-user Windows x64 NSIS fixture-only test artifact and bilingual user guide
-- [ ] complete human installer, WebView2 prerequisite, uninstaller, and delete-app-data click-through UAT
+- [x] complete current-host current-user install／launch／fixture／restart／uninstall UAT, including retention and explicit delete-app-data choices
+- [ ] exercise the WebView2-missing bootstrapper in a safe disposable Windows x64 environment
 - [x] record the finalized local test-artifact checksum and fresh Windows CI evidence
-- [ ] complete code signing and public-distribution review
+- [x] decide that v0.1.0 remains unsigned, local-test-only, and not a public release
+- [ ] complete code signing and public-distribution readiness before any public release
 - [ ] keyboard and screen-reader audit
 
 ## Phase 0.5 — Pet-first desktop presence
@@ -60,7 +62,7 @@ Exit condition: one approved Codex memory can create one explainable, removable 
 
 This track supports a future [Codex for Open Source application](research/2026-08-12_codex-for-open-source-readiness.md). It is not an OpenAI-official checklist and does not replace the Phase 0／0.5／1 product gates.
 
-- [ ] complete public-distribution and signing decisions after Windows installer／uninstaller UAT
+- [ ] close the deferred WebView2 clean-environment check plus signing and public-distribution readiness before beta release
 - [ ] add a strong README hero and a 60–90 second synthetic-data demo with honest `Working now / Next / Vision` labels
 - [ ] publish a verifiable GitHub beta Release with checksums, release notes, installation boundaries, privacy, and security guidance
 - [ ] recruit genuine external testers and record consented feedback plus reproducible release／download evidence

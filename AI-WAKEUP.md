@@ -19,7 +19,7 @@
 - Product: Memoryling｜記憶獸
 - Tagline: Your agent memories, alive.
 - Chinese tagline: 讓你的 Agent 記憶，長成一個生命。
-- Stage: fixture-only first-memory vertical slice with a local Windows x64 NSIS test build, v0.1.0
+- Stage: fixture-only first-memory vertical slice with current-host Windows x64 NSIS UAT, v0.1.0
 - Repository: https://github.com/artpoet/Memoryling
 - Primary public language: English
 - First-class personal language: Traditional Chinese
@@ -44,7 +44,7 @@ Implemented now:
 - transactional source forgetting followed by deterministic recomputation
 - visible real-memory access remains off; fixture approval is reported separately as a local synthetic pilot
 - current-user Windows x64 NSIS test-build configuration with English／Traditional Chinese installer languages
-- WebView2 download-bootstrapper support when that Windows prerequisite is missing
+- configured WebView2 download-bootstrapper support; the missing-runtime branch still needs a safe disposable Windows environment
 - generated Memoryling test icon and in-app brand asset with PNG transparency checked
 - no telemetry and no external font or runtime content dependency in the fixture memory path
 
@@ -58,7 +58,7 @@ Not implemented:
 - the user-confirmed pet-first desktop shell: transparent pet window, hidden detail window, native context menu, tray, single-instance recovery, safe position restore, and narrow render-state IPC
 - real conversation model
 - native reminder delivery
-- completed human installer/uninstaller click-through UAT
+- WebView2-missing installer UAT in a safe disposable Windows environment
 - code signing or a public release-ready package
 
 Do not describe roadmap items as working features.
@@ -126,8 +126,8 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - “Complete forgetting” is scoped to Memoryling's local imported copy and supported downstream graph; it never modifies the source and is not a physical secure-erasure guarantee.
 - Browser preview has no native memory runtime. Do not add mock persistence or present planned behavior as live.
 - The supported tester entry is the unsigned current-user NSIS installer. The raw release exe requires its generated fixture sidecar and is not portable.
-- Uninstall may retain `%LOCALAPPDATA%\app.memoryling.desktop` unless the delete-app-data option is explicitly selected; that click-through still needs human UAT.
-- A missing WebView2 prerequisite may cause installer network access to Microsoft. Do not confuse this with the network-free fixture memory pipeline.
+- Native UAT verified that leaving delete-app-data clear retained the pre-existing `%LOCALAPPDATA%\app.memoryling.desktop` tree and selecting it removed the tree; this is not a physical secure-erasure guarantee.
+- The host already has WebView2 151.0.4129.78 and no safe Windows Sandbox／Hyper-V clean environment. The missing-runtime bootstrapper branch is deferred; never remove the host runtime just to test it. Any prerequisite download is separate from the network-free fixture memory pipeline.
 - Generated test artwork and transparent PNGs are not evidence of signing, store review, or public release readiness.
 - The evolving-creature design draft is not a live procedural renderer, genome engine, or completed Phase 2 slice.
 - The branching concept art is a visual-family and adjacent-transition reference only—not a fixed pre-authored route／pet roster, production sprite set, or one-to-one mapping from an activity axis to a body. The current runtime has no path profile, activity taxonomy, morphology-recipe compiler, or real-memory signal mapping.
@@ -181,21 +181,15 @@ Expected local artifact:
 
 Fresh-session instruction: start with the first unfinished gate in this section and finish that one coherent bundle through verification, SSOT, commit, and push. Do not stop at planning or a native connector skeleton, and do not submit the external application without a new explicit user instruction.
 
-Close the Windows x64 fixture-only test-build gate:
+The Windows x64 current-host gate closed on 2026-08-12: the unchanged checksum-matched artifact passed current-user install, native fixture preview／approve／restart／lineage／forget, both uninstall data choices, and clean post-uninstall checks. The retention run began with pre-existing app data, so it proves retention behavior, not that the installer created that tree. The WebView2-missing branch is deferred to a safe disposable Windows environment. v0.1.0 remains unsigned, local-test-only, and not a public release.
 
-1. complete a human current-user NSIS install → open → fixture preview／approve／explain／forget → uninstall click-through on Windows x64;
-2. verify the uninstall delete-app-data option and inspect `%LOCALAPPDATA%\app.memoryling.desktop` after both retention and deletion choices;
-3. exercise the WebView2-missing installer path when a safe clean Windows environment is available;
-4. retain the recorded SHA-256 checksum and Windows CI evidence for commit `2aead61`, and regenerate the checksum after every rebuild;
-5. decide code-signing and distribution readiness without describing the current test art or unsigned installer as a public release.
-
-After that gate, complete the pet-first shell against synthetic state before widening source access: pre-created `pet`／`main` surfaces, Rust-owned menu／tray／single-instance lifecycle, per-window app-command permissions with pet-denial tests, content-minimized `CreatureRenderState`, close／minimize／restore behavior, position／DPI recovery, approve／forget synchronization, bilingual accessibility, and packaged native smoke. Do not stop at window connectors or a browser mock.
+First unfinished gate: complete the pet-first shell against synthetic state before widening source access—pre-created `pet`／`main` surfaces, Rust-owned menu／tray／single-instance lifecycle, per-window app-command permissions with pet-denial tests, content-minimized `CreatureRenderState`, close／minimize／restore behavior, position／DPI recovery, approve／forget synchronization, bilingual accessibility, and packaged native smoke. Do not stop at window connectors or a browser mock.
 
 Only after that shell passes should the first user-selected Codex-source pilot resume: validate a stable supported format, add a Rust-owned narrow picker and redacted preview, and require explicit authorization before private-data UAT. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.
 
 The later Phase 2 growth implementation must start from the synthetic fixture matrix in `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`; do not implement a fixed sprite route, per-record consent spam, silent scope expansion, or usage-volume leveling.
 
-The Codex for Open Source application is a cross-phase outcome, not the next coding bundle. After installer UAT, the pet-first synthetic slice, and one real-source slice, follow `docs/research/2026-08-12_codex-for-open-source-readiness.md`: publish an honest beta and short synthetic demo, gather genuine external use, complete at least one feedback／issue → fix → follow-up release maintainer loop, refresh dynamic program／GitHub evidence, and only then submit. Never manufacture traction or add runtime private-memory API uploads for the application.
+The Codex for Open Source application is a cross-phase outcome, not the next coding bundle. After the pet-first synthetic slice and one real-source slice, follow `docs/research/2026-08-12_codex-for-open-source-readiness.md`: finish remaining release-environment checks, publish an honest beta and short synthetic demo, gather genuine external use, complete at least one feedback／issue → fix → follow-up release maintainer loop, refresh dynamic program／GitHub evidence, and only then submit. Never manufacture traction or add runtime private-memory API uploads for the application.
 
 ## Closeout checklist
 

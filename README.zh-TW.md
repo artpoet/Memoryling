@@ -74,9 +74,9 @@ Memoryling 不是通用 AI 助理、套著吉祥物的待辦工具，也不是�
 
 ## 專案狀態
 
-Memoryling 目前是 **fixture-backed 開發階段（v0.1.0）**。視覺體驗、SQLite／來源鏈 v1 基礎，以及本機產出的未簽章 Windows x64 NSIS 測試 artifact 已可使用；真實記憶 connector、系統通知、程式碼簽章與可公開發布的正式安裝包仍在路線圖上。
+Memoryling 目前是 **fixture-backed 開發階段（v0.1.0）**。視覺體驗、SQLite／來源鏈 v1 基礎，以及本機產出的未簽章 Windows x64 NSIS 測試 artifact 已可使用；目前主機的原生路徑與兩種解除安裝資料選項已通過 UAT。WebView2 缺失分支、真實記憶 connector、系統通知、程式碼簽章與可公開發布的正式安裝包仍在路線圖上。
 
-第一個工程里程碑的 fixture 基礎已實作，但 Phase 1 的 exit condition 尚未達成：目前沒有選取或匯入任何使用者擁有的 Codex 記憶。下一步 connector 工作必須先驗證真實 Codex 格式，並維持使用者明確選取、唯讀、先預覽再同意的邊界。
+第一個工程里程碑的 fixture 基礎已實作，但 Phase 1 的 exit condition 尚未達成：目前沒有選取或匯入任何使用者擁有的 Codex 記憶。下一個工程里程碑是 pet-first 合成資料外殼；通過後，connector 工作才能開始驗證一種真實 Codex 格式，並維持使用者明確選取、唯讀、先預覽再同意的邊界。
 
 ## 參與開發
 

@@ -48,7 +48,7 @@ Moving or sharing only `memoryling.exe` can leave the fixture unavailable. Use t
 
 The possible WebView2 prerequisite download is part of installation. The fixture memory pipeline itself has no network client and makes no memory-content network request.
 
-The installer has been generated and its configuration inspected, but a complete human install/open/uninstall click-through has not yet been recorded as passed UAT. Treat any unexpected installer behavior as a test finding rather than assuming the flow is release-ready.
+On 2026-08-12, this exact artifact completed native current-user UAT through install, Start Menu launch, fixture preview／approval, restart persistence, lineage, forgetting, restart without ghost state, and both uninstall data choices. The first retention cycle began with pre-existing app data, so it proves retention behavior rather than proving that the installer created that tree. The WebView2-missing branch remains deferred until a safe disposable Windows x64 environment is available; this test evidence does not make the unsigned build release-ready.
 
 ## Run the fixture-only memory tour
 
@@ -102,7 +102,7 @@ The folder can include:
 
 The normal **Forget this source** flow removes imported fixture records and supported downstream effects but may leave an empty database and WebView data directory.
 
-The generated uninstaller includes a **Delete the application data** option. App data may remain unless that checkbox is explicitly selected. The installer's full uninstall click-through and that deletion option have not yet completed human UAT, so do not assume the folder was removed: after uninstalling, inspect `%LOCALAPPDATA%\app.memoryling.desktop` if deletion matters to you.
+The generated uninstaller includes a **Delete the application data** option. Native UAT verified that leaving it clear retained the pre-existing app-data tree, while selecting it during a second same-artifact uninstall removed the whole tree. If deletion matters, still inspect `%LOCALAPPDATA%\app.memoryling.desktop` after uninstall. This is application-level cleanup evidence, not a physical secure-erasure guarantee.
 
 Do not share, attach, print, or commit a real local database. Although the current fixture is fictional, the same location is reserved for future sensitive local state.
 
@@ -125,7 +125,7 @@ The supported installer artifact is generated at:
 
     src-tauri\target\release\bundle\nsis\Memoryling_0.1.0_x64-setup.exe
 
-The command builds the frontend, compiles the Tauri application, bundles the synthetic fixture resource, and creates the current-user NSIS installer. Before sharing any artifact, rerun the project checks, complete installer click-through UAT, and recheck the checksum and CI evidence for that exact file. Do not substitute the raw release executable for the installer.
+The command builds the frontend, compiles the Tauri application, bundles the synthetic fixture resource, and creates the current-user NSIS installer. Before sharing any rebuilt artifact, rerun the project checks and native installer click-through, then recheck the checksum and CI evidence for that exact file. Do not substitute the raw release executable for the installer.
 
 ## Test artwork status
 

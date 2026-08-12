@@ -48,7 +48,7 @@ Memoryling v0.1.0 目前是**僅使用 fixture 的 Windows x64 測試版**。它
 
 可能發生的 WebView2 下載屬於安裝前置需求。fixture 記憶流程本身沒有網路 client，也不會把記憶內容送出網路。
 
-目前已成功產生安裝器並檢查設定，但尚未記錄一輪完整的人工「安裝 → 開啟 → 解除安裝」click-through UAT。若安裝器出現非預期行為，應把它視為測試發現，而不是假設整條流程已達正式發布品質。
+2026-08-12 已用這個完全相同的 artifact 完成原生 current-user UAT：安裝、從開始功能表開啟、fixture 預覽／核准、重啟後保留狀態、來源鏈、遺忘、再次重啟無幽靈狀態，以及兩種解除安裝資料選項。第一輪保留測試開始前已有 App data，因此它證明的是保留行為，不是安裝器建立該資料樹。WebView2 缺失分支仍需安全的拋棄式 Windows x64 環境才能補測；這些證據不代表未簽章版本已達公開發布品質。
 
 ## 執行 fixture-only 記憶流程
 
@@ -102,7 +102,7 @@ Memoryling 的目前使用者 App 資料位於：
 
 一般的 **遺忘這個來源** 流程會移除匯入 fixture 紀錄與目前支援的下游影響，但可能留下空的資料庫與 WebView 資料夾。
 
-產生出的解除安裝程式包含 **刪除應用程式數據（Delete the application data）** 選項。若沒有明確勾選，App data 可能保留。目前尚未完成人工解除安裝 click-through 與這個刪除選項的 UAT；因此若你在意資料是否刪除，解除安裝後仍應檢查 `%LOCALAPPDATA%\app.memoryling.desktop`，不要直接假設資料夾已消失。
+產生出的解除安裝程式包含 **刪除應用程式數據（Delete the application data）** 選項。原生 UAT 已驗證：不勾選時會保留既存 App-data tree；第二次用相同 artifact 解除安裝並勾選時，整個資料樹會被移除。若你在意資料是否刪除，解除安裝後仍應檢查 `%LOCALAPPDATA%\app.memoryling.desktop`。這是應用程式層級的清理證據，不是實體安全抹除保證。
 
 不得分享、附加、印出或 commit 真實本機資料庫。雖然目前 fixture 是虛構資料，同一位置仍是未來敏感本機狀態的保留區。
 
@@ -125,7 +125,7 @@ Memoryling 的目前使用者 App 資料位於：
 
     src-tauri\target\release\bundle\nsis\Memoryling_0.1.0_x64-setup.exe
 
-這個指令會 build 前端、編譯 Tauri App、打包合成 fixture 資源，並建立 current-user NSIS 安裝程式。分享任何 artifact 前，應重新執行專案檢查、完成人工安裝器 click-through UAT，並重新核對該檔案的 checksum 與 CI 證據。不得以 raw release exe 取代安裝器。
+這個指令會 build 前端、編譯 Tauri App、打包合成 fixture 資源，並建立 current-user NSIS 安裝程式。分享任何重新建置的 artifact 前，應重跑專案檢查與原生安裝器 click-through，並重新核對該檔案的 checksum 與 CI 證據。不得以 raw release exe 取代安裝器。
 
 ## 測試版圖像狀態
 
