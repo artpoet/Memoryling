@@ -20,6 +20,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - User-confirmed pet-first desktop-shell design, proposed ADR-0003, and a staged native acceptance plan for one floating pet, on-demand detail, right-click menu, tray recovery, single-instance lifecycle, and content-minimized render state
 - User-confirmed shared biological／organic and restrained sacred-premium creature language, plus proposed ADR-0004 for deterministic, lineage-aware bounded-variant evolution and recomputation after forgetting
 - Five-round PM specification for Agent-memory-linked variants: activity > accumulated journey／outcomes > collaboration, coarse content-domain accents, scoped one-time consent with automatic in-scope local derivation, and outcome-gated durable reshaping after ephemeral recent-use hints
+- Codex for Open Source readiness assessment with official-program truth boundaries, a public-beta／maintainer-evidence track, submission gates, and privacy-safe application drafts
 
 ### Changed
 

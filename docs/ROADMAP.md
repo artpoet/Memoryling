@@ -56,6 +56,23 @@ Exit condition: one approved Codex memory can create one explainable, removable 
 
 **Exit status: not met.** The bundled synthetic fixture proves the local pipeline, but it is not a user-owned Codex memory or a production connector.
 
+## Cross-phase track — Public beta and OSS maintainer evidence
+
+This track supports a future [Codex for Open Source application](research/2026-08-12_codex-for-open-source-readiness.md). It is not an OpenAI-official checklist and does not replace the Phase 0／0.5／1 product gates.
+
+- [ ] complete public-distribution and signing decisions after Windows installer／uninstaller UAT
+- [ ] add a strong README hero and a 60–90 second synthetic-data demo with honest `Working now / Next / Vision` labels
+- [ ] publish a verifiable GitHub beta Release with checksums, release notes, installation boundaries, privacy, and security guidance
+- [ ] recruit genuine external testers and record consented feedback plus reproducible release／download evidence
+- [ ] complete at least one public feedback／issue → maintainer response → fix → follow-up release loop
+- [ ] publish the reusable adapter／event／lineage／forgetting contract and synthetic conformance fixtures at a contributor-ready level
+- [ ] refresh official program terms, GitHub profile, live repository metrics, and all application claims before submission
+- [ ] submit only after the readiness evidence is real and mutually consistent
+
+Exit condition: a public beta proves the core promise through one user-selected real source; external people have tested it; at least one visible maintainer loop is complete; and every application metric can be reproduced from public or consented evidence. There is no invented star, download, or tester threshold.
+
+**Exit status: not met.** Memoryling currently has no public Release, real-source connector, external-user evidence, or issue／fix／follow-up-release loop.
+
 ## Phase 2 — A life that continues
 
 Design foundation recorded: the user confirmed the biological／organic plus restrained sacred-premium direction and a content-responsive space with many variants. The current concept forms are vocabulary and adjacent-bridge references, not a fixed pre-authored pet roster. The [future creature-growth boundary](ARCHITECTURE.md#future-creature-growth-boundary), [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md), [Agent-memory variation rules](drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md), and proposed [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md) describe a deterministic, lineage-aware weighted profile compiled into bounded `MorphologyRecipe` variants. The proposed PM split uses authorized Agent-use behavior for primary morphology, authorized history outcomes for maturity and marks, collaboration mode for local motion, and content domain only for a secondary material accent. This is design evidence, not implemented Phase 2 functionality, an accepted schema, or an extension of the current fixture consent.

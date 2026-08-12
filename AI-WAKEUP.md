@@ -98,6 +98,7 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md — user-confirmed growth direction with proposed implementation details; design only, not implemented
 - docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md — five-round PM specification for scoped Agent-memory derivation, information priority, recent-versus-durable growth, and variant acceptance; design only, not implemented
 - docs/drafts/pet-first-desktop-shell-2026-08-11.md — user-confirmed pet-only presence plus proposed Windows lifecycle and acceptance plan; design only, not implemented
+- docs/research/2026-08-12_codex-for-open-source-readiness.md — official program facts, current public-evidence snapshot, application readiness gates, truthful draft answers, and submission boundaries
 - docs/adr/0003-pet-first-two-window-desktop-shell.md — proposed two-window, Rust-owned resident-shell decision
 - docs/adr/0004-deterministic-content-derived-evolution-paths.md — proposed local, lineage-aware bounded-variant growth decision
 - docs/ARCHITECTURE.md — intended system and connector contract
@@ -132,6 +133,7 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - The branching concept art is a visual-family and adjacent-transition reference only—not a fixed pre-authored route／pet roster, production sprite set, or one-to-one mapping from an activity axis to a body. The current runtime has no path profile, activity taxonomy, morphology-recipe compiler, or real-memory signal mapping.
 - The pet-first design draft is not a transparent window, native menu, tray, single-instance process, or completed desktop shell. Do not fake those native behaviors in browser mode or expose full memory state to a future pet surface.
 - Tauri `invoke_handler` app commands are callable by every window by default. A future `pet` must receive generated app-command permissions plus caller-label denial tests; a narrow DTO alone does not protect full memory／approve／forget commands.
+- Codex for Open Source is a discretionary OSS-maintainer program, not a product contest or guaranteed `$1,200`. Memoryling is eligible in form but not application-ready: it still lacks a public Release, real-source proof, external adoption, and a demonstrated maintainer loop. Do not re-research the settled program basics every session; refresh official terms and live GitHub metrics immediately before submission.
 
 ## Working conventions
 
@@ -177,6 +179,8 @@ Expected local artifact:
 
 ## Current coherent next bundle
 
+Fresh-session instruction: start with the first unfinished gate in this section and finish that one coherent bundle through verification, SSOT, commit, and push. Do not stop at planning or a native connector skeleton, and do not submit the external application without a new explicit user instruction.
+
 Close the Windows x64 fixture-only test-build gate:
 
 1. complete a human current-user NSIS install → open → fixture preview／approve／explain／forget → uninstall click-through on Windows x64;
@@ -190,6 +194,8 @@ After that gate, complete the pet-first shell against synthetic state before wid
 Only after that shell passes should the first user-selected Codex-source pilot resume: validate a stable supported format, add a Rust-owned narrow picker and redacted preview, and require explicit authorization before private-data UAT. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.
 
 The later Phase 2 growth implementation must start from the synthetic fixture matrix in `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`; do not implement a fixed sprite route, per-record consent spam, silent scope expansion, or usage-volume leveling.
+
+The Codex for Open Source application is a cross-phase outcome, not the next coding bundle. After installer UAT, the pet-first synthetic slice, and one real-source slice, follow `docs/research/2026-08-12_codex-for-open-source-readiness.md`: publish an honest beta and short synthetic demo, gather genuine external use, complete at least one feedback／issue → fix → follow-up release maintainer loop, refresh dynamic program／GitHub evidence, and only then submit. Never manufacture traction or add runtime private-memory API uploads for the application.
 
 ## Closeout checklist
 

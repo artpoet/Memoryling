@@ -6,6 +6,8 @@ AS_OF: 2026-08-12 (Asia/Taipei)
 
 Close the remaining Windows x64 test-installer UAT gate, then deliver the user-confirmed pet-first direction through the proposed two-window shell as a complete synthetic-data vertical slice before widening the product to a real memory source.
 
+For a fresh session, the first executable bundle is still the Windows installer UAT below. Do not begin the Codex for Open Source application, pet-shell implementation, or real-source work until the preceding gate is closed or a concrete unavailable-environment dependency is recorded.
+
 ## Overall state
 
 - Stage: v0.1.0 with a complete fixture-only first-memory pipeline and a local Windows x64 NSIS test artifact
@@ -17,6 +19,7 @@ Close the remaining Windows x64 test-installer UAT gate, then deliver the user-c
 - Default branch: main
 - CI: the first-memory implementation and current packaging／icon source bundle both pass local checks and GitHub Actions
 - Release: unsigned local Windows x64 test installer produced; no signed or public packaged release
+- Codex for Open Source readiness: product direction is relevant and the repository meets the basic public／maintainer form, but there is no public release, real-source proof, external adoption, or maintainer loop yet; do not submit until the recorded readiness gates are met
 - Creature growth design: user-confirmed biological／organic plus restrained sacred-premium direction, bounded variants, scoped automatic derivation, and long-term-versus-recent growth rules recorded; concept forms are reference vocabulary rather than a fixed roster, while the consent scope, classifiers, path profile, morphology-recipe compiler, genome, stages, renderer, and growth journal remain proposed and unimplemented
 - Desktop presence design: pet-only default surface with on-demand detail, native recovery paths, and a Rust-owned two-window lifecycle recorded; none of that shell is implemented
 
@@ -92,6 +95,12 @@ Remote evidence:
 - packaging/icon commit: [`2aead61`](https://github.com/artpoet/Memoryling/commit/2aead6133d31578239ea49e04c9a95509c05911a)
 - PASS — Windows CI for the packaging/icon source bundle: https://github.com/artpoet/Memoryling/actions/runs/31394540587
 
+## Codex for Open Source readiness
+
+Memoryling can truthfully apply as a public MIT project maintained by `artpoet`, and its source-traceable／reversible Agent-memory architecture is relevant to the Codex ecosystem. It is not yet a competitive maintainer-program application: the public repository was created on 2026-08-10 and the 2026-08-12 snapshot has 13 commits, one contributor, no public Release, and zero stars, forks, watchers, issues, or pull requests. The implemented product remains synthetic fixture-only.
+
+The internal decision is **do not submit yet**. Finish the existing installer → pet shell → one real source sequence, publish an honest beta and demo, then demonstrate genuine external testing plus at least one public feedback／issue → fix → follow-up release maintainer loop. The complete program facts, dynamic evidence warning, readiness gates, application drafts, and API-credit privacy boundary live in [the Codex for Open Source readiness plan](docs/research/2026-08-12_codex-for-open-source-readiness.md). Suggested tester counts are internal credibility targets, not official OpenAI thresholds.
+
 ## Known gaps
 
 - the scaffold icons were replaced with generated test artwork, but the new artwork has not received public-release signoff
@@ -114,6 +123,8 @@ After that gate, implement the proposed pet-first shell against synthetic state 
 
 The future Phase 2 bounded-variant growth direction is recorded in `docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md`, `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`, and proposed ADR-0004; it does not supersede the installer, pet-shell, and real-source gates above.
 
+After one real-source slice is proven, prepare the public-beta and maintainer-evidence track: README hero and short synthetic demo, verified GitHub Release and checksums, real external testers, honest adoption metrics, and at least one feedback／issue → fix → follow-up release loop. Refresh official terms and live GitHub evidence only when those gates are ready, then complete the application from the recorded drafts. Do not submit the current pre-release fixture-only state.
+
 ## Do not redo
 
 - do not replace the Tauri + React foundation without new evidence
@@ -128,3 +139,7 @@ The future Phase 2 bounded-variant growth direction is recorded in `docs/drafts/
 - do not collapse growth into one fixed evolution line, classify raw text into a personality, or let runtime AI／unsaved randomness choose a permanent route
 - do not turn the reference forms into a fixed sprite roster or let live Agent presence silently accumulate into permanent morphology
 - do not treat one-time consent as permission to scan new locations or add new data categories／purposes; do not promote ephemeral hints or raw usage volume into permanent growth
+- do not describe Codex for Open Source as a contest, guaranteed `$1,200`, cash award, or automatic benefit for any public repository
+- do not invent or inflate stars, downloads, testers, issues, pull requests, releases, testimonials, adoption, or maintainer work
+- do not add runtime cloud AI or upload private memories merely to strengthen the application or request API credits
+- do not submit the application before the readiness gates are met unless the user explicitly changes that decision after reviewing current evidence
