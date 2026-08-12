@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 import { App } from "./App";
+import type { DetailEventClient, DetailShellClient } from "./creatureClient";
 import {
   emptyMemoryState,
   type ImportPreview,
@@ -95,11 +96,50 @@ function createClient(initialState: MemoryState = emptyMemoryState) {
   return { client, approveImport, forgetSource, cancelPreview };
 }
 
+function createDetailEvents() {
+  let revisionListener: (() => void) | undefined;
+  let resetListener: (() => void) | undefined;
+  const client: DetailEventClient = {
+    onRenderRevision: vi.fn(async (listener) => {
+      revisionListener = listener;
+      return vi.fn();
+    }),
+    onDetailReset: vi.fn(async (listener) => {
+      resetListener = listener;
+      return vi.fn();
+    }),
+  };
+  return {
+    client,
+    emitRevision: () => revisionListener?.(),
+    emitReset: () => resetListener?.(),
+  };
+}
+
+const quietDetailEvents: DetailEventClient = {
+  onRenderRevision: vi.fn(async () => vi.fn()),
+  onDetailReset: vi.fn(async () => vi.fn()),
+};
+
+const quietDetailShell: DetailShellClient = {
+  resetOnboarding: vi.fn(async () => ({
+    schemaVersion: 1 as const,
+    onboardingDismissed: false,
+    alwaysOnTop: true,
+  })),
+};
+
 describe("First real memory vertical slice", () => {
   test("moves from off to preview, persisted lineage, and complete forgetting", async () => {
     const user = userEvent.setup();
     const { client, approveImport, forgetSource } = createClient();
-    render(<App memoryClient={client} />);
+    render(
+      <App
+        detailEvents={quietDetailEvents}
+        detailShell={quietDetailShell}
+        memoryClient={client}
+      />,
+    );
 
     expect(
       screen.getByRole("link", { name: "Memoryling home" }).querySelector("img"),
@@ -171,7 +211,13 @@ describe("First real memory vertical slice", () => {
 
   test("restores the persisted mark after a desktop restart", async () => {
     const { client } = createClient(approvedState);
-    render(<App memoryClient={client} />);
+    render(
+      <App
+        detailEvents={quietDetailEvents}
+        detailShell={quietDetailShell}
+        memoryClient={client}
+      />,
+    );
 
     expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
     expect(screen.getByText("One approved memory left a completion star")).toBeInTheDocument();
@@ -188,12 +234,24 @@ describe("First real memory vertical slice", () => {
       approveImport: vi.fn(),
       forgetSource: vi.fn(),
     };
-    render(<App memoryClient={unavailableClient} />);
+    const resetOnboarding = vi.fn();
+    render(
+      <App
+        browserPreview
+        detailEvents={quietDetailEvents}
+        detailShell={{ resetOnboarding }}
+        memoryClient={unavailableClient}
+      />,
+    );
 
     expect(screen.getByText("Desktop runtime required")).toBeInTheDocument();
     expect(
       screen.getByText("Browser preview · memory access is off"),
     ).toBeInTheDocument();
+    expect(screen.getByText("Floating pet is available in the Windows desktop app")).toBeInTheDocument();
+    expect(screen.queryByTestId("pet-surface")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Show pet guide again" })).not.toBeInTheDocument();
+    expect(resetOnboarding).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole("button", { name: "繁中" }));
     expect(screen.getByText("從核准來源，到可解釋的印記")).toBeInTheDocument();
@@ -209,7 +267,13 @@ describe("First real memory vertical slice", () => {
       timeRange: { start: "not-a-date", end: "not-a-date" },
       records: [{ ...preview.records[0], sourceTimestamp: "not-a-date" }],
     }));
-    render(<App memoryClient={client} />);
+    render(
+      <App
+        detailEvents={quietDetailEvents}
+        detailShell={quietDetailShell}
+        memoryClient={client}
+      />,
+    );
 
     await user.click(
       await screen.findByRole("radio", { name: /Codex · First memory fixture/ }),
@@ -223,7 +287,13 @@ describe("First real memory vertical slice", () => {
     const user = userEvent.setup();
     const { client, forgetSource } = createClient(approvedState);
     forgetSource.mockRejectedValueOnce(new Error("private database detail"));
-    render(<App memoryClient={client} />);
+    render(
+      <App
+        detailEvents={quietDetailEvents}
+        detailShell={quietDetailShell}
+        memoryClient={client}
+      />,
+    );
 
     expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Forget this source" }));
@@ -243,5 +313,69 @@ describe("First real memory vertical slice", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.queryByText("private database detail")).not.toBeInTheDocument();
+  });
+
+  test("refetches complete detail state after a safe revision event", async () => {
+    const fixture = createClient();
+    const detailEvents = createDetailEvents();
+    render(
+      <App
+        detailEvents={detailEvents.client}
+        detailShell={quietDetailShell}
+        memoryClient={fixture.client}
+      />,
+    );
+    await waitFor(() => expect(fixture.client.getState).toHaveBeenCalledTimes(1));
+    vi.mocked(fixture.client.getState).mockResolvedValueOnce(approvedState);
+    detailEvents.emitRevision();
+    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
+    expect(fixture.client.getState).toHaveBeenCalledTimes(2);
+  });
+
+  test("resets pending detail UI without confusing close with forgetting", async () => {
+    const user = userEvent.setup();
+    const fixture = createClient();
+    const detailEvents = createDetailEvents();
+    render(
+      <App
+        detailEvents={detailEvents.client}
+        detailShell={quietDetailShell}
+        memoryClient={fixture.client}
+      />,
+    );
+    await user.click(await screen.findByRole("radio", { name: /Codex · First memory fixture/ }));
+    await user.click(screen.getByRole("button", { name: "Preview selected source" }));
+    expect(await screen.findByText(/Shipped a local-first creature/)).toBeInTheDocument();
+    detailEvents.emitReset();
+    await waitFor(() =>
+      expect(screen.queryByText(/Shipped a local-first creature/)).not.toBeInTheDocument(),
+    );
+    expect(fixture.client.forgetSource).not.toHaveBeenCalled();
+  });
+
+  test("lets native detail reset the pet guide with honest error handling", async () => {
+    const user = userEvent.setup();
+    const fixture = createClient();
+    const resetOnboarding = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("private native path"))
+      .mockResolvedValueOnce({
+        schemaVersion: 1,
+        onboardingDismissed: false,
+        alwaysOnTop: true,
+      });
+    render(
+      <App
+        detailEvents={quietDetailEvents}
+        detailShell={{ resetOnboarding }}
+        memoryClient={fixture.client}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Show pet guide again" });
+    await user.click(button);
+    expect(screen.getByText("The local setting did not change. Try again from the desktop app.")).toBeInTheDocument();
+    expect(screen.queryByText(/private native path/)).not.toBeInTheDocument();
+    await user.click(button);
+    expect(screen.getByText("The pet guide will appear the next time the pet is shown.")).toBeInTheDocument();
   });
 });

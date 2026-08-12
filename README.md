@@ -9,7 +9,7 @@
 
 Memoryling is an open-source, local-first desktop creature that grows from the durable memories of your AI agents. Its appearance, conversations, recurring story events, and occasional reminders should change for reasons you can inspect.
 
-This repository currently contains a bilingual interactive concept shell plus a fixture-only desktop memory pipeline. It does **not** read real agent memories or connect to a user's Codex tool-home.
+This repository currently contains a bilingual pet-first Windows desktop shell plus a fixture-only memory pipeline. It does **not** read real agent memories or connect to a user's Codex tool-home.
 
 ## Why it is different
 
@@ -21,14 +21,15 @@ Most desktop pets are decorative companions. Memoryling is designed around memor
 - **Initiative has limits.** Quiet hours, daily nudge budgets, and user-controlled sensitivity keep the companion useful without making it noisy.
 - **Forgetting is a full chain.** Removing a source should also remove or recompute the effects derived from it.
 
-## Concept shell and fixture pilot
+## Pet-first shell and fixture pilot
 
 The current Tauri + React app demonstrates:
 
 - English and Traditional Chinese UI with a remembered language preference
-- a living desktop-creature direction built with CSS
+- a transparent floating pet as the normal native surface, with the full detail window opened only on demand
+- native right-click and focused-keyboard menus, tray recovery, single-instance relaunch, and close／minimize return-to-pet behavior
 - one inspectable completion signal and creature mark derived from persisted Rust state
-- a continuing pet event and bounded reminder controls
+- a content-minimized pet render state, while private lineage and fixture controls remain confined to the detail surface
 - explicit labels separating the fixture pilot from planned features and real memory access
 
 In the Tauri desktop runtime, the fixture pilot exercises a narrow local path end to end:
@@ -39,11 +40,11 @@ In the Tauri desktop runtime, the fixture pilot exercises a narrow local path en
 4. Derive one deterministic completion star and inspect why it appeared.
 5. Forget the local imported copy and remove or recompute its supported downstream effects.
 
-The browser preview cannot run this pipeline. The pilot cannot scan arbitrary paths, read user-owned Codex files, or write to an agent's memory store, and it makes no network request.
+The browser preview cannot run this pipeline and intentionally stays on the honest detail surface; it does not imitate a floating pet, native menu, tray, single-instance lifecycle, or native persistence. The pilot cannot scan arbitrary paths, read user-owned Codex files, or write to an agent's memory store, and it makes no network request.
 
-## Windows x64 fixture-only test build
+## Windows x64 pet-first fixture-only test build
 
-The supported tester entry is the current-user NSIS installer named `Memoryling_0.1.0_x64-setup.exe`. This local Windows x64 artifact is unsigned and not a public release-ready package. Real Codex memory access remains off.
+The supported tester entry is the current-user NSIS installer named `Memoryling_0.2.0_x64-setup.exe`. This local Windows x64 artifact is unsigned and not a public release-ready package. Real Codex memory access remains off.
 
 Read the [Windows x64 test guide](docs/USER_GUIDE.md) before installing. It covers the full fixture tour, WebView2 prerequisite download, Windows security warnings, app-data retention during uninstall, and why the raw release executable is not a portable distribution.
 
@@ -77,9 +78,9 @@ Raw memory files, credentials, prompts, and private work must never be committed
 
 ## Project status
 
-Memoryling is at a **fixture-backed development stage (v0.1.0)**. The visual experience, v1 SQLite/lineage foundation, and a local unsigned Windows x64 NSIS test artifact are available; its current-host native path and both uninstall data choices have passed UAT. The WebView2-missing branch, real memory connectors, notification delivery, code signing, and a public release-ready package remain roadmap work.
+Memoryling is at a **fixture-backed development stage (v0.2.0)**. The pet-first two-surface shell, v1 SQLite／lineage foundation, and a local unsigned Windows x64 NSIS test artifact are available. The exact v0.2.0 artifact passed an Explorer-launched current-user install, installed-shortcut single-instance and pet lifecycle smoke, explicit Quit, and uninstall with application data retained. The WebView2-missing branch, remaining accessibility／DPI／recovery acceptance, real memory connectors, notification delivery, code signing, and a public release-ready package remain roadmap work.
 
-The fixture foundation for the first engineering milestone is implemented, but the Phase 1 exit is not met: no user-owned Codex memory has been selected or imported. The next engineering milestone is the pet-first synthetic shell; only after it passes should connector work validate one real Codex format through an explicitly selected, read-only, previewed, and consented path.
+The fixture foundation and current pet-first synthetic bundle are implemented and normally installed current-host smoke has passed, but the Phase 1 exit is not complete: no user-owned Codex memory has been selected or imported. The next implementation slice can validate one real Codex format through an explicitly selected, read-only, previewed, and consented path. The remaining DPI／accessibility／session-recovery matrix still blocks full shell acceptance and public-release claims.
 
 ## Contributing
 

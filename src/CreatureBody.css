@@ -1,0 +1,166 @@
+.creature-body {
+  position: relative;
+  display: grid;
+  width: 250px;
+  height: 250px;
+  place-items: center;
+}
+
+.orbit {
+  position: absolute;
+  border: 1px solid rgba(203, 186, 255, 0.16);
+  border-radius: 50%;
+}
+
+.orbit-one {
+  width: 230px;
+  height: 120px;
+  transform: rotate(-10deg);
+  animation: orbit-float 7s ease-in-out infinite;
+}
+
+.orbit-two {
+  width: 176px;
+  height: 224px;
+  transform: rotate(18deg);
+  animation: orbit-float 6s ease-in-out -2s infinite reverse;
+}
+
+.memoryling {
+  position: relative;
+  display: block;
+  width: 132px;
+  height: 152px;
+  border: 1px solid rgba(239, 233, 255, 0.36);
+  border-radius: 62% 62% 50% 50% / 58% 58% 42% 42%;
+  background:
+    radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.85) 0 4px, transparent 5px),
+    radial-gradient(circle at 60% 63%, rgba(132, 224, 199, 0.28), transparent 28px),
+    linear-gradient(145deg, #b9a6fa 0%, #8065d5 48%, #5e4ba0 100%);
+  box-shadow:
+    inset -14px -18px 28px rgba(56, 37, 105, 0.36),
+    inset 10px 10px 20px rgba(255, 255, 255, 0.18),
+    0 28px 55px rgba(92, 64, 178, 0.46);
+  animation: breathe 4.8s ease-in-out infinite;
+}
+
+.ear {
+  position: absolute;
+  top: -17px;
+  width: 35px;
+  height: 51px;
+  border: 1px solid rgba(239, 233, 255, 0.32);
+  border-radius: 80% 20% 60% 40%;
+  background: linear-gradient(145deg, #a58eef, #6b52b5);
+  box-shadow: inset 6px 7px 10px rgba(255, 255, 255, 0.1);
+}
+
+.ear-left {
+  left: 13px;
+  transform: rotate(-24deg);
+}
+
+.ear-right {
+  right: 13px;
+  transform: scaleX(-1) rotate(-24deg);
+}
+
+.face {
+  position: absolute;
+  top: 58px;
+  left: 26px;
+  width: 80px;
+  height: 50px;
+}
+
+.eye {
+  position: absolute;
+  top: 2px;
+  width: 11px;
+  height: 17px;
+  border-radius: 50%;
+  background: #1b1530;
+  box-shadow: inset 2px 3px 0 rgba(255, 255, 255, 0.7);
+  animation: blink 6s infinite;
+}
+
+.eye-left { left: 13px; }
+.eye-right { right: 13px; }
+
+.mouth {
+  position: absolute;
+  top: 29px;
+  left: 34px;
+  width: 12px;
+  height: 7px;
+  border-bottom: 2px solid rgba(37, 26, 65, 0.85);
+  border-radius: 50%;
+}
+
+.cheek {
+  position: absolute;
+  top: 27px;
+  width: 13px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 167, 192, 0.34);
+  filter: blur(1px);
+}
+
+.cheek-left { left: 4px; }
+.cheek-right { right: 4px; }
+
+.memory-mark {
+  position: absolute;
+  top: 22px;
+  right: 17px;
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 1px solid rgba(224, 255, 244, 0.78);
+  border-radius: 10px;
+  color: #e7fff6;
+  background: rgba(85, 191, 158, 0.88);
+  box-shadow:
+    0 0 11px rgba(132, 255, 217, 0.9),
+    inset 0 0 8px rgba(255, 255, 255, 0.32);
+  font-size: 13px;
+  animation: mark-arrive 520ms ease-out both;
+}
+
+.creature-body-still .memoryling,
+.creature-body-still .eye,
+.creature-body-still .orbit,
+.creature-body-still .memory-mark {
+  animation: none;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.025); }
+}
+
+@keyframes orbit-float {
+  0%, 100% { transform: rotate(-10deg) translateY(0); }
+  50% { transform: rotate(-5deg) translateY(5px); }
+}
+
+@keyframes blink {
+  0%, 45%, 49%, 100% { transform: scaleY(1); }
+  47% { transform: scaleY(0.08); }
+}
+
+@keyframes mark-arrive {
+  from { opacity: 0; transform: scale(0.35) rotate(-24deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memoryling,
+  .eye,
+  .orbit,
+  .memory-mark {
+    animation: none;
+  }
+}

@@ -1,14 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import memorylingIcon from "./assets/memoryling-icon.png";
+import CreatureBody from "./CreatureBody";
 import FirstMemoryFlow from "./FirstMemoryFlow";
+import {
+  nativeDetailEventClient,
+  nativeDetailShellClient,
+  type DetailEventClient,
+  type DetailShellClient,
+} from "./creatureClient";
+import { useStoredLocale } from "./locale";
 import {
   emptyMemoryState,
   nativeMemoryClient,
   type MemoryClient,
 } from "./memoryClient";
-
-type Locale = "en" | "zh-TW";
 
 const copy = {
   en: {
@@ -56,6 +62,12 @@ const copy = {
     brandHome: "Memoryling home",
     languageLabel: "Language",
     dashboardLabel: "Memoryling status dashboard",
+    browserShellTitle: "Floating pet is available in the Windows desktop app",
+    browserShellBody:
+      "This browser preview does not imitate native pet, menu, tray, window, or persistence behavior. Memory access remains off.",
+    showPetGuide: "Show pet guide again",
+    guideReset: "The pet guide will appear the next time the pet is shown.",
+    guideResetFailed: "The local setting did not change. Try again from the desktop app.",
   },
   "zh-TW": {
     prototype: "記憶存取關閉 · 尚無核准來源",
@@ -100,34 +112,81 @@ const copy = {
     brandHome: "Memoryling 首頁",
     languageLabel: "語言",
     dashboardLabel: "Memoryling 狀態面板",
+    browserShellTitle: "浮動寵物只在 Windows 桌面 App 提供",
+    browserShellBody:
+      "這個瀏覽器預覽不會假裝原生寵物、選單、系統匣、視窗或持久化行為；記憶存取仍維持關閉。",
+    showPetGuide: "再次顯示寵物指南",
+    guideReset: "下次顯示寵物時，會再次出現操作指南。",
+    guideResetFailed: "本機設定沒有變更；請從桌面 App 再試一次。",
   },
 } as const;
 
-function getInitialLocale(): Locale {
-  const requested = new URLSearchParams(window.location.search).get("lang");
-  if (requested === "en" || requested === "zh-TW") return requested;
-  const saved = window.localStorage.getItem("memoryling:locale");
-  if (saved === "en" || saved === "zh-TW") return saved;
-  return navigator.language.toLowerCase().startsWith("zh") ? "zh-TW" : "en";
-}
-
 interface AppProps {
   memoryClient?: MemoryClient;
+  detailEvents?: DetailEventClient;
+  detailShell?: DetailShellClient;
+  browserPreview?: boolean;
 }
 
-export function App({ memoryClient = nativeMemoryClient }: AppProps) {
-  const [locale, setLocale] = useState<Locale>(getInitialLocale);
+export function DetailSurface({
+  memoryClient = nativeMemoryClient,
+  detailEvents = nativeDetailEventClient,
+  detailShell = nativeDetailShellClient,
+  browserPreview = !memoryClient.available,
+}: AppProps) {
+  const [locale, setLocale] = useStoredLocale();
   const [lineIndex, setLineIndex] = useState(0);
   const [eventSnoozed, setEventSnoozed] = useState(false);
   const [memoryState, setMemoryState] = useState(emptyMemoryState);
+  const [detailResetRevision, setDetailResetRevision] = useState(0);
+  const [guideResetStatus, setGuideResetStatus] = useState<"success" | "failed" | null>(null);
+  const refreshGeneration = useRef(0);
   const t = copy[locale];
   const activeMark = memoryState.marks[0];
   const hasApprovedMemory = Boolean(activeMark);
 
   useEffect(() => {
-    document.documentElement.lang = locale;
-    window.localStorage.setItem("memoryling:locale", locale);
-  }, [locale]);
+    if (!memoryClient.available) return;
+    let active = true;
+    let revisionUnlisten: (() => void) | undefined;
+    let resetUnlisten: (() => void) | undefined;
+
+    async function refreshMemoryState() {
+      const generation = ++refreshGeneration.current;
+      try {
+        const state = await memoryClient.getState();
+        if (active && generation === refreshGeneration.current) setMemoryState(state);
+      } catch {
+        // Keep the last persisted state and never expose native error details.
+      }
+    }
+
+    void detailEvents
+      .onRenderRevision(() => void refreshMemoryState())
+      .then((unlisten) => {
+        if (active) revisionUnlisten = unlisten;
+        else unlisten();
+      })
+      .catch(() => undefined);
+    void detailEvents
+      .onDetailReset(() => {
+        if (!active) return;
+        setDetailResetRevision((value) => value + 1);
+        void refreshMemoryState();
+      })
+      .then((unlisten) => {
+        if (active) resetUnlisten = unlisten;
+        else unlisten();
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+      refreshGeneration.current += 1;
+      revisionUnlisten?.();
+      resetUnlisten?.();
+    };
+  }, [detailEvents, memoryClient]);
 
   const creatureLine = useMemo(() => {
     const lines = hasApprovedMemory
@@ -141,6 +200,16 @@ export function App({ memoryClient = nativeMemoryClient }: AppProps) {
     : hasApprovedMemory
       ? t.prototypeActive
       : t.prototype;
+
+  async function resetPetGuide() {
+    setGuideResetStatus(null);
+    try {
+      await detailShell.resetOnboarding();
+      setGuideResetStatus("success");
+    } catch {
+      setGuideResetStatus("failed");
+    }
+  }
 
   return (
     <main className="app-shell">
@@ -171,8 +240,32 @@ export function App({ memoryClient = nativeMemoryClient }: AppProps) {
               繁中
             </button>
           </div>
+          {!browserPreview && (
+            <button
+              className="guide-reset-button"
+              onClick={() => void resetPetGuide()}
+              type="button"
+            >
+              {t.showPetGuide}
+            </button>
+          )}
         </div>
       </header>
+
+      <p className="guide-reset-status" aria-live="polite" role="status">
+        {guideResetStatus === "success"
+          ? t.guideReset
+          : guideResetStatus === "failed"
+            ? t.guideResetFailed
+            : ""}
+      </p>
+
+      {browserPreview && (
+        <aside className="browser-shell-boundary" data-testid="browser-shell-boundary">
+          <strong>{t.browserShellTitle}</strong>
+          <p>{t.browserShellBody}</p>
+        </aside>
+      )}
 
       <section className="hero" id="top">
         <div className="hero-copy">
@@ -190,27 +283,11 @@ export function App({ memoryClient = nativeMemoryClient }: AppProps) {
             type="button"
             aria-label={t.tapHint}
           >
-            <span className="orbit orbit-one" aria-hidden="true" />
-            <span className="orbit orbit-two" aria-hidden="true" />
-            <span className="memoryling" aria-hidden="true">
-              <span className="ear ear-left" />
-              <span className="ear ear-right" />
-              <span className="face">
-                <span className="eye eye-left" />
-                <span className="eye eye-right" />
-                <span className="cheek cheek-left" />
-                <span className="cheek cheek-right" />
-                <span className="mouth" />
-              </span>
-              {hasApprovedMemory && activeMark.style === "completion-star" && (
-                <span
-                  className="memory-mark derived-completion-star"
-                  data-testid="derived-memory-mark"
-                >
-                  ✦
-                </span>
-              )}
-            </span>
+            <CreatureBody
+              hasCompletionStar={
+                hasApprovedMemory && activeMark.style === "completion-star"
+              }
+            />
           </button>
 
           <div className="creature-caption">
@@ -231,6 +308,7 @@ export function App({ memoryClient = nativeMemoryClient }: AppProps) {
         locale={locale}
         memoryState={memoryState}
         onMemoryStateChange={setMemoryState}
+        resetRevision={detailResetRevision}
       />
 
       <section className="dashboard" aria-label={t.dashboardLabel}>
@@ -316,4 +394,5 @@ export function App({ memoryClient = nativeMemoryClient }: AppProps) {
   );
 }
 
-export default App;
+export const App = DetailSurface;
+export default DetailSurface;

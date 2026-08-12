@@ -4,26 +4,26 @@ AS_OF: 2026-08-12 (Asia/Taipei)
 
 ## Current milestone
 
-Deliver the user-confirmed pet-first direction through the proposed two-window shell as a complete synthetic-data vertical slice before widening the product to a real memory source.
+The v0.2.0 pet-first synthetic vertical slice is implemented and has passed automated, raw-native, and normally installed current-host Windows UAT. The next implementation milestone is one explicitly user-selected, supported Codex source with a Rust-owned picker and redacted preview; private-data UAT still requires a new exact-source authorization.
 
-For a fresh session, the first executable bundle is the pet-first shell below. The current-host Windows installer gate is closed; the WebView2-missing branch has a concrete unavailable-environment dependency and remains required before public distribution. Do not begin the Codex for Open Source application or real-source work before their preceding gates.
+Extended pet-shell environment acceptance and the WebView2-missing branch remain required before public distribution, but they do not justify rebuilding the completed shell. Do not begin the Codex for Open Source application before the recorded product, release, adoption, and maintainer-loop gates.
 
 ## Overall state
 
-- Stage: v0.1.0 with a complete fixture-only first-memory pipeline and a local Windows x64 NSIS test artifact
-- Product surface: bilingual desktop and browser-safe experience implemented locally
+- Stage: v0.2.0 with a complete fixture-only first-memory pipeline and pet-first Windows shell
+- Product surface: bilingual transparent pet plus on-demand detail surface; browser stays an honest detail-only preview
 - Synthetic Codex-shaped source pipeline: implemented end to end
 - User-owned Codex memory access: not implemented
 - Local store: SQLite schema v1 under Tauri app-local data
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: the first-memory implementation and current packaging／icon source bundle both pass local checks and GitHub Actions
-- Release: unsigned local Windows x64 test installer produced and current-host native UAT completed; no signed or public packaged release
+- CI: historical first-memory／packaging bundles pass GitHub Actions; current v0.2.0 local gates pass, and this bundle requires its own pushed-HEAD Actions result before remote closeout
+- Release: unsigned v0.2.0 Windows x64 current-user installer produced and normally installed current-host UAT completed; no signed or public release
 - Codex for Open Source readiness: product direction is relevant and the repository meets the basic public／maintainer form, but there is no public release, real-source proof, external adoption, or maintainer loop yet; do not submit until the recorded readiness gates are met
 - Creature growth design: user-confirmed biological／organic plus restrained sacred-premium direction, bounded variants, scoped automatic derivation, and long-term-versus-recent growth rules recorded; concept forms are reference vocabulary rather than a fixed roster, while the consent scope, classifiers, path profile, morphology-recipe compiler, genome, stages, renderer, and growth journal remain proposed and unimplemented
-- Desktop presence design: pet-only default surface with on-demand detail, native recovery paths, and a Rust-owned two-window lifecycle recorded; none of that shell is implemented
+- Desktop presence: transparent pet-only default with on-demand detail, native menu／tray／single-instance recovery, content-free position settings, and a Rust-owned two-window lifecycle implemented; extended multi-DPI／accessibility／shutdown acceptance remains open
 
-## Completed in this bundle
+## Completed vertical slices
 
 - added a strict Codex-shaped adapter v1 for one fictional bundled JSON fixture
 - added explicit fixture selection, exact scope disclosure, preview, record selection, cancel, and consent
@@ -36,13 +36,21 @@ For a fresh session, the first executable bundle is the pet-first shell below. T
 - made the creature mark conditional on persisted Rust state; removed fake always-visible marks
 - relabeled the remaining sample event and initiative UI as CONCEPT／PLANNED in both languages
 - added Vitest／Testing Library UI coverage and Rust adapter／migration／persistence／forgetting tests
-- kept Tauri capabilities and CSP unchanged; added no telemetry, network client, or arbitrary filesystem permission
-- recorded the user-confirmed pet-first desktop direction, a detailed implementation contract, and proposed ADR-0003 without presenting the current one-window app as complete
+- preserved the restrictive CSP and added no telemetry, network client, or arbitrary filesystem permission
+- recorded the user-confirmed pet-first desktop direction, a detailed implementation contract, and proposed ADR-0003 without presenting the then-current one-window app as complete
 - recorded the user-confirmed high-level visual and many-variant direction, plus a proposed weighted-profile model and ADR-0004, without presenting the concept forms as fixed routes, production assets, or live personalization
 - completed a five-round PM interview for Agent-memory-linked variation: `AgentActivityPattern` has priority over accumulated journey and collaboration style; content domain is a secondary visual layer; a future real source uses one scoped source／data-category／purpose consent followed by automatic in-scope local derivation; recent use stays ephemeral until multiple independent, outcome-qualified evidence groups pass a versioned durable-growth gate
-- completed current-user native installer UAT through fixture approval, restart persistence, lineage, forgetting, and restart without ghost state
-- verified both uninstall data choices: unchecked retained the pre-existing app-data tree; checked in the second same-artifact cycle removed it completely
+- completed historical v0.1.0 current-user native installer UAT through fixture approval, restart persistence, lineage, forgetting, and restart without ghost state
+- verified both historical v0.1.0 uninstall data choices: unchecked retained the pre-existing app-data tree; checked in the second same-artifact cycle removed it completely
 - recorded the unavailable WebView2-missing environment and fixed v0.1.0's distribution decision as unsigned, local-test-only, and not a public release
+- implemented pre-created `pet`／`main` windows, transparent tight pet bounds, bilingual one-time onboarding, native right-click／keyboard menu, tray recovery, single-instance behavior, and explicit Quit
+- made Rust own close／minimize／restore／hide transitions with tested rollback, TrayOnly handling, and content-free atomic shell settings／backup
+- added normalized work-area position persistence, bounds clamping, move debounce, topology polling, and automated 100–200%／negative-monitor geometry coverage
+- replaced shared default capabilities with exact `main`／`pet` capabilities, generated app-command permissions, and independent caller-label guards
+- proved both security layers by invoking all six sensitive memory commands from `pet`: production ACL and caller defense each reject before handler entry; `main` has a positive invoke path
+- added the whitelisted `CreatureRenderState`, opaque deterministic revisions, approve／forget refresh events, race-safe subscription, and a pet code split that does not load full-memory APIs
+- fixed concurrent first-open SQLite migration by serializing version check, migration, and commit under one immediate transaction
+- completed raw-native fixture approve／restart／lineage／forget UAT plus a normal Explorer-launched v0.2.0 current-user install, installed-shortcut cold／resident single-instance recovery, pet↔detail smoke, explicit Quit, and retain-data uninstall
 
 ## Product truth
 
@@ -50,46 +58,47 @@ The local pipeline is real and persistent, but its only permitted input is a fic
 
 The user-confirmed future growth direction allows many bounded variants within one living family, rather than a fixed pre-authored pet roster. The current concept forms only test family grammar, silhouette range, material language, and adjacent transitions. The information priority is observable Agent activity first, accumulated journey／outcomes second, and collaboration style third: activity alone controls the main silhouette and motion; journey gates permanent reshaping and controls maturity／milestones without selecting a silhouette; collaboration can add only a bounded local rhythm. Coarse content domain is a second layer limited to material, surface, or pattern accents and cannot select a species or sensitive personality label. A future real connector uses one narrow `SourceConsentScope` for one exact source, data categories, purposes, adapter version, and rule versions; new in-scope records may then be derived locally without per-record prompts. Another source needs another scope, while a category／purpose expansion needs a new consent revision. Recent use affects only expiring render hints. Permanent reshaping requires multiple deduplicated, independent, outcome-qualified evidence groups; calendar time, record volume, tokens, Agent count, and app-open time are not XP. The resulting lineage-backed profile compiles with identity, stage, and a finite module catalog into a deterministic `MorphologyRecipe`; correction, source disablement, or forgetting recomputes it. No Agent monitoring exists. Distant forms may differ greatly, but every adjacent change retains a versioned evolution bridge. The exact scope schema, evidence mapping, thresholds, module catalog, renderer, and visual limits remain proposed and unimplemented; this is not a claim about the current CSS creature, completion-star fixture, or exploratory ImageGen concepts.
 
-The user-confirmed desktop direction is now pet-first: normal presence is one transparent floating creature; right-click is the primary entry to an on-demand standard detail window, with `Win+B` tray, Start Menu, and packaged installed-shortcut recovery. The proposed implementation uses pre-created `pet`／`main` windows, Rust-owned lifecycle, per-window app-command permissions, and a content-minimized render-state boundary. The current packaged app still opens one 1180 × 780 standard window and has no floating pet, tray, or single-instance two-window lifecycle.
+The desktop is now pet-first: normal presence is one transparent floating creature; right-click or the keyboard context-menu path opens the standard detail window. Rust owns the pre-created `pet`／`main` lifecycle, native menu／tray, installed-shortcut single-instance recovery, saved bounds, and explicit Quit. The pet is capability-separated and receives only a content-minimized render DTO plus opaque revision events. Browser mode cannot claim native labels or persistence, so it intentionally renders the honest detail preview. Extended live DPI／monitor／hitbox／assistive-tech／shutdown checks remain acceptance work; ADR-0003 therefore stays Proposed.
 
 ## Windows x64 test-build status
 
-- the supported tester entry is the current-user NSIS installer `Memoryling_0.1.0_x64-setup.exe`
-- the local artifact exists at `src-tauri/target/release/bundle/nsis/Memoryling_0.1.0_x64-setup.exe`; build output remains untracked
+- the supported tester entry is the current-user NSIS installer `Memoryling_0.2.0_x64-setup.exe`
+- the local artifact exists at `src-tauri/target/release/bundle/nsis/Memoryling_0.2.0_x64-setup.exe`; build output remains untracked
 - `npm run build:windows` is the documented developer build command
 - the installer is bilingual and is configured to download Microsoft's WebView2 bootstrapper when WebView2 is missing; that conditional path is not yet UAT-verified and is separate from the network-free fixture memory path
 - the raw `src-tauri/target/release/memoryling.exe` depends on `src-tauri/target/release/fixtures/codex-first-memory-v1.json` and is not a portable distribution
 - app state is under `%LOCALAPPDATA%\app.memoryling.desktop`; uninstall can retain it unless the delete-app-data option is explicitly selected
 - the new icon and in-app brand asset were generated with Codex's built-in ImageGen; alpha-channel and transparent-pixel checks passed for the source and generated PNG path
-- current-host native UAT passed install → Start Menu launch → fixture preview／approve → restart persistence → lineage → forget → restart without ghost state, followed by both uninstall choices
-- the installer is unsigned and may show Unknown publisher or SmartScreen warnings; v0.1.0 is fixed as a local test artifact and is not public release-ready
-- the finalized local installer is 2,759,655 bytes with SHA-256 `62FE4E5D87E4F221174F120F84A94303345C3694CA57090353438037F271D79B`; regenerate the checksum after any rebuild
-- packaging/icon source commit `2aead61` passed fresh Windows CI run `31394540587`
+- raw-native UAT passed pet onboarding／menu／lifecycle, fixture preview／approve／restart／lineage／forget, cross-surface refresh, single-instance recovery, explicit Quit, and a 100% second-monitor smoke
+- normal Explorer-launched current-user installation created the real LocalAppData program, HKCU registration, Start Menu and desktop shortcuts; installed cold and resident launches both recovered one process and the pet-first lifecycle
+- unchecked v0.2.0 uninstall removed the process, program, registration, and shortcuts while retaining `%LOCALAPPDATA%\app.memoryling.desktop`; only metadata was inspected and no database content was read
+- a direct packaged-agent installer launch was rejected as evidence because Windows redirected it into the agent package's virtualized LocalAppData; its virtualized program／shortcut were removed before the normal run
+- v0.1.0 remains a no-redo historical baseline for the full fixture tour and both uninstall data choices; the v0.2.0 run did not repeat checked-delete
+- the installer is unsigned and may show Unknown publisher or SmartScreen warnings; v0.2.0 is local-test-only and not public release-ready
+- the finalized v0.2.0 installer is 2,875,965 bytes with SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`; regenerate the checksum after any rebuild
+- historical v0.1.0 packaging/icon commit `2aead61` passed Windows CI run `31394540587`
 
 ## Verification evidence
 
-- PASS — 5 frontend interaction tests covering off → preview → approve → mark → lineage → forget, restart restore, bilingual browser boundary, invalid-timestamp rendering defense, and failed-forget state integrity
-- PASS — 7 Rust tests covering strict parsing and RFC 3339 validation, unknown-version fail-closed, preview zero-persistence, pending-token binding and failed-approval retry, migration and future-schema rejection, restart persistence, idempotent approval, lineage, fixture immutability, and complete supported-chain forgetting
-- PASS — npm run check (frontend tests, TypeScript, Vite production build, Rust tests, and cargo check)
-- PASS — cargo fmt --manifest-path src-tauri/Cargo.toml --check
-- PASS — cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
-- PASS — npm audit reported 0 vulnerabilities
-- PASS — Tauri desktop launched and exposed the bundled source, exact access scope, and empty app-local store through its native accessibility tree
-- PASS — app-local SQLite was created outside the repository
-- PASS — the bundled runtime resource exists and its SHA-256 matches the committed synthetic fixture
-- PASS — English and Traditional Chinese browser smoke at desktop width plus a 390 × 844 viewport, with no horizontal overflow
-- PASS — browser console contained no errors or warnings and the page linked no external runtime resources
-- PASS — restrictive CSP and `core:default` capability remain unchanged
-- PASS — `npm run build:windows` produced the Windows x64 current-user NSIS installer and bundled `memoryling.exe` plus the synthetic fixture resource
-- PASS — raw release-app smoke opened the bilingual Tauri window; both the Windows title bar and in-app header showed the generated Memoryling icon
-- PASS — installer-launch smoke reached the Traditional Chinese `Memoryling 安裝` window with the generated icon, then closed without installing
-- PASS — generated ICO contains 16／24／32／48／64／256 px layers; the 1,254 × 1,254 RGBA source has transparent pixels
-- PASS — checksum-matched packaged app completed the native fixture tour, restored its persisted mark after Start Menu relaunch, exposed all four lineage stages, forgot the supported graph, and relaunched with no ghost mark or lineage
-- PASS — retention uninstall removed the process, install directory, shortcut, and registration while preserving the pre-existing app-data tree and its two direct children; no database content was read
-- PASS — the same artifact reinstalled and opened in the expected real-memory-off／no-approved-source state, then explicit delete-app-data uninstall removed the process, install directory, both shortcuts, registration, and entire app-data tree; post-check completed at 2026-08-12T17:17:31+08:00
-- DEFERRED — WebView2-missing bootstrapper UAT requires a disposable clean Windows x64 environment; this host has WebView2 151.0.4129.78 and no Windows Sandbox／Hyper-V test environment, so the installed host runtime was not removed
+- PASS — 23 frontend tests cover native-label routing, browser honesty, pet／detail code splitting, whitelisted DTO sanitization, revision races and retry, onboarding, pointer／keyboard menu paths, drag recovery, fixture approve／lineage／forget, and bilingual boundaries
+- PASS — 29 Rust tests cover the strict fixture adapter, pending approval, schema and concurrent first-open migration, persistence／recomputation, shell settings recovery, position and 100–200% DPI geometry matrices, lifecycle rollback, TrayOnly behavior, and onboarding atomicity
+- PASS — production capabilities reject all six sensitive memory commands from `pet` before handler entry; an independent empty-authority invoke run proves the Rust caller-label defense rejects the same six; `main` has a positive production invoke
+- PASS — `npm run check`, `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings`
+- PASS — the pet entry bundle excludes full-memory client identifiers and detail UI; browser mode renders only the honest detail preview
+- PASS — restrictive CSP remains; broad `core:default` was replaced by exact `main`／`pet` capabilities, and the pet has no cross-window mutation permission
+- PASS — `npm run build:windows` produced the v0.2.0 NSIS installer, release executable, and synthetic fixture resource
+- PASS — raw release UAT observed transparent pet-only launch, 360 × 430 Traditional Chinese onboarding → 320 × 320 dismissed bounds, native right-click and Shift+F10 menus, pet↔detail close／minimize lifecycle, explicit native Quit, and one-process relaunch
+- PASS — the raw fixture tour observed preview／consent／approve, persisted completion star after restart, all four lineage stages, forget, restart without ghost state, and approve／forget synchronization across surfaces
+- PASS — raw pet movement and a second-monitor 100% smoke were observed; precise drag bounds and the remaining live DPI／topology matrix stay open
+- PASS — normal Explorer-launched v0.2.0 current-user install created the real program, registration, and shortcuts; installed Start Menu cold and resident launches both recovered one pet-first process
+- PASS — installed right-click Open, main close → pet, explicit Quit, and process-absence checks
+- PASS — unchecked v0.2.0 uninstall removed process, program directory, registration, and both shortcuts while preserving the app-data tree; only metadata was inspected and no database content was read
+- PASS — rejected virtualized harness attempt and its virtual program／shortcut were removed; it is not counted as product installation evidence
+- HISTORICAL PASS — checksum-matched v0.1.0 UAT covered the full fixture tour plus unchecked-retain and checked-delete uninstall choices; it remains a no-redo baseline, not substituted v0.2.0 evidence
+- PENDING — live 125／150／175／200% and mixed-DPI, monitor hot-unplug／taskbar relocation, adjacent-desktop hitbox, Win+B tray keyboard access, Narrator／NVDA, and sign-out／shutdown acceptance
+- DEFERRED — WebView2-missing bootstrapper UAT requires a disposable clean Windows x64 environment; this host has WebView2 151.0.4129.78 and no Windows Sandbox／Hyper-V test environment, so the host runtime was not removed
 
-The UAT used the packaged installed app and real NSIS uninstaller, not a browser mock. The user completed the initial installer confirmation and the final explicit-delete action; agent-assisted native UI covered the fixture, restart, lineage, forget, retention, and second-install path. No database contents or UAT screenshots were collected or added to the repository.
+The v0.2.0 installed UAT used the real normally installed NSIS artifact and uninstaller, not a browser mock or the rejected virtualized attempt. No database contents, private memories, or UAT screenshots were collected or added to the repository.
 
 Remote evidence:
 
@@ -106,7 +115,7 @@ Remote evidence:
 
 Memoryling can truthfully apply as a public MIT project maintained by `artpoet`, and its source-traceable／reversible Agent-memory architecture is relevant to the Codex ecosystem. It is not yet a competitive maintainer-program application: the public repository was created on 2026-08-10 and remains a young one-contributor project with no public Release or demonstrated external maintainer loop. The implemented product remains synthetic fixture-only.
 
-The internal decision is **do not submit yet**. Finish the pet shell → one real source sequence, close the deferred release-environment checks, publish an honest beta and demo, then demonstrate genuine external testing plus at least one public feedback／issue → fix → follow-up release maintainer loop. The complete program facts, dynamic evidence warning, readiness gates, application drafts, and API-credit privacy boundary live in [the Codex for Open Source readiness plan](docs/research/2026-08-12_codex-for-open-source-readiness.md). Suggested tester counts are internal credibility targets, not official OpenAI thresholds.
+The internal decision is **do not submit yet**. With the pet shell complete, prove one real-source sequence, close release-environment checks, publish an honest beta and demo, then demonstrate genuine external testing plus at least one public feedback／issue → fix → follow-up release maintainer loop. The complete program facts, dynamic evidence warning, readiness gates, application drafts, and API-credit privacy boundary live in [the Codex for Open Source readiness plan](docs/research/2026-08-12_codex-for-open-source-readiness.md). Suggested tester counts are internal credibility targets, not official OpenAI thresholds.
 
 ## Known gaps
 
@@ -117,14 +126,16 @@ The internal decision is **do not submit yet**. Finish the pet shell → one rea
 - conversation model strategy remains intentionally open
 - the evolving-creature system has product drafts and proposed ADR-0004, but its `SourceConsentScope`, in-scope automatic classifier, recent-hint TTL, outcome-qualified durable-growth gates, final visual asset, path-profile mapping, lineage-bearing bounded `MorphologyRecipe` catalog and compatibility matrix, genome, multi-source growth graph, renderer, privacy mode, and accessibility acceptance remain unimplemented
 - no process, session, or Agent-presence monitoring exists; any future ephemeral presence adapter requires a separate product／privacy decision and explicit consent
-- the pet-first shell is design-only: transparent pet window, hidden detail window, native context menu, tray, single-instance recovery, safe position restore, and narrow render DTO remain unimplemented
-- current custom memory commands are not yet permission-separated by window; a future pet surface must be denied list／preview／cancel／full-state／approve／forget commands, not merely avoid calling them in normal UI
+- extended pet-shell acceptance remains open for live 125–200%／mixed DPI, monitor hot-unplug and taskbar relocation, adjacent-desktop click-through, precise drag bounds, Win+B, Narrator／NVDA, and sign-out／shutdown
+- compact pet and onboarding envelopes are implemented; wide／tall／long growth envelopes remain future renderer work
 - WebView2-missing bootstrapper behavior still needs UAT in a disposable clean Windows x64 environment; this host has WebView2 151.0.4129.78 and no Windows Sandbox／Hyper-V environment, and its runtime must not be removed for testing
-- code signing and public distribution remain incomplete; v0.1.0 is intentionally unsigned and local-test-only, and the recorded checksum changes after any rebuild
+- code signing and public distribution remain incomplete; v0.2.0 is unsigned and local-test-only, and the recorded checksum changes after any rebuild
 
 ## Next bundle
 
-Implement the proposed pet-first shell against synthetic state as one vertical slice: `pet`／`main` surfaces, native menu and tray, single-instance recovery, generated per-window app-command permissions plus pet-denial tests, close／minimize／restore behavior, position／DPI handling, narrow render DTO, approve／forget synchronization, bilingual accessibility, and packaged desktop smoke. The current v0.1.0 standard window is the old fixture shell, not the confirmed pet-first experience. Only after the pet shell is proven should the first user-selected Codex-source pilot resume; do not treat private `MEMORY.md` files as a public format specification.
+Resume the first user-selected Codex-source pilot as one narrow vertical slice: validate one stable supported format, add a Rust-owned picker scoped to one explicit file, show a redacted preview, bind one exact source／category／purpose consent, and keep the existing lineage／forget path. Private-data UAT requires a new user authorization naming the exact source; do not treat private `MEMORY.md` files as a public format specification, scan tool-home directories, or generalize arbitrary filesystem access.
+
+In parallel with release preparation—not by rebuilding the completed pet shell—close the remaining live DPI／monitor／hitbox／Win+B／assistive-tech／shutdown matrix and the safe clean-environment WebView2 branch. Those gates block ADR-0003 acceptance and public-release claims, not the next synthetic-to-real implementation slice.
 
 The future Phase 2 bounded-variant growth direction is recorded in `docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md`, `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`, and proposed ADR-0004; it does not supersede the installer, pet-shell, and real-source gates above.
 

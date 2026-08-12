@@ -19,7 +19,7 @@
 - Product: Memoryling｜記憶獸
 - Tagline: Your agent memories, alive.
 - Chinese tagline: 讓你的 Agent 記憶，長成一個生命。
-- Stage: fixture-only first-memory vertical slice with current-host Windows x64 NSIS UAT, v0.1.0
+- Stage: v0.2.0 fixture-only pet-first vertical slice with current-host Windows x64 NSIS UAT
 - Repository: https://github.com/artpoet/Memoryling
 - Primary public language: English
 - First-class personal language: Traditional Chinese
@@ -46,6 +46,11 @@ Implemented now:
 - current-user Windows x64 NSIS test-build configuration with English／Traditional Chinese installer languages
 - configured WebView2 download-bootstrapper support; the missing-runtime branch still needs a safe disposable Windows environment
 - generated Memoryling test icon and in-app brand asset with PNG transparency checked
+- pet-first native desktop shell: transparent floating `pet`, hidden on-demand `main`, native context／keyboard menu, tray recovery, and single-instance behavior
+- Rust-owned close／minimize／restore／explicit-Quit lifecycle with content-free shell settings, bounded position recovery, and one-time bilingual onboarding
+- exact per-window capabilities plus caller-label guards; `pet` receives only a narrow `CreatureRenderState`, revision events, and its own guarded drag command
+- lazy surface routing: native labels are authoritative, browser mode stays an honest detail preview, and the pet bundle does not load full-memory APIs
+- current-host v0.2.0 raw-native and normally installed NSIS smoke through fixture approve／restart／lineage／forget, Start Menu single-instance recovery, and retain-data uninstall
 - no telemetry and no external font or runtime content dependency in the fixture memory path
 
 Not implemented:
@@ -55,9 +60,9 @@ Not implemented:
 - a production connector for an externally selected durable-memory file
 - derivations beyond the deterministic completion-star rule
 - the designed identity core, content-derived `EvolutionPathProfile`, lineage-bearing `MorphologyRecipe`, creature genome, adjacent-stage／recipe-change EvolutionBridges, large-form evolution stages, layered renderer, and growth journal
-- the user-confirmed pet-first desktop shell: transparent pet window, hidden detail window, native context menu, tray, single-instance recovery, safe position restore, and narrow render-state IPC
 - real conversation model
 - native reminder delivery
+- full live pet-shell acceptance at 125／150／175／200% and mixed DPI, monitor hot-unplug／taskbar relocation, adjacent-desktop hitbox, Win+B keyboard tray access, Narrator／NVDA, and sign-out／shutdown
 - WebView2-missing installer UAT in a safe disposable Windows environment
 - code signing or a public release-ready package
 
@@ -76,19 +81,25 @@ Do not describe roadmap items as working features.
 
 The current code implements this path end to end for exactly one bundled synthetic Codex-shaped resource. It does not read a user's Codex tool-home or other external files.
 
-The user-confirmed future interaction direction is “two surfaces, one life”: a floating `pet` is normally visible, while the standard `main` detail window opens on demand. The two-window／Rust lifecycle remains a proposed technical design. Right-click is the primary entry; `Win+B` tray, Start Menu, and packaged installed shortcuts provide recovery. This lifecycle is documented but not implemented—the current app still opens one standard 1180 × 780 window.
+The implemented interaction is “two surfaces, one life”: a transparent floating `pet` is normally visible and the standard `main` detail window opens on demand. Rust owns visibility, menu／tray／single-instance transitions, saved bounds, and explicit Quit; right-click or the keyboard menu opens detail, while Start Menu and the installed shortcut recover the same process. The pet reads only a content-minimized render DTO. Browser mode deliberately shows the honest detail preview because it has no trustworthy native window label or resident-shell runtime.
 
 ## Key paths
 
-- src/App.tsx — bilingual concept behavior and copy
-- src/App.css — visual system and CSS creature
+- src/App.tsx — on-demand bilingual detail surface and safe revision refresh
+- src/PetSurface.tsx — transparent pet interaction, onboarding, menu, keyboard, and drag behavior
+- src/SurfaceRouter.tsx — native-label-authoritative surface routing and browser honesty
+- src/creatureClient.ts — whitelisted pet DTO, revision events, and narrow pet commands
+- src/useCreatureRenderState.ts — race-safe render-state subscription and refresh
+- src/App.css and src/PetSurface.css — detail and transparent pet visual systems
 - src/FirstMemoryFlow.tsx — source selection, preview, consent, lineage, and forgetting UI
 - src/memoryClient.ts — typed Tauri command boundary
 - src-tauri/src/memory/ — strict adapter, pending preview, SQLite store, derivation, and forgetting
 - src-tauri/migrations/0001_first_memory.sql — local schema v1
 - src-tauri/fixtures/codex-first-memory-v1.json — fictional test-only source
 - src-tauri/icons/icon-source.png — built-in ImageGen test-art source; not public release-approved
-- src-tauri/ — native Tauri shell and minimal capabilities
+- src-tauri/src/desktop_shell/ — Rust-owned resident lifecycle, tray／menu, settings, position, and recovery
+- src-tauri/src/caller.rs — unspoofable window／webview caller-label guards
+- src-tauri/capabilities/main.json and pet.json — exact per-surface capabilities
 - package.json — frontend, validation, and Windows NSIS build commands
 - src-tauri/tauri.conf.json — current-user NSIS, WebView2 prerequisite, resource, and icon configuration
 - docs/USER_GUIDE.md — English Windows x64 fixture-only installation and use guide
@@ -97,9 +108,9 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - docs/zh-TW/PRODUCT_VISION.md — Traditional Chinese product intent
 - docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md — user-confirmed growth direction with proposed implementation details; design only, not implemented
 - docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md — five-round PM specification for scoped Agent-memory derivation, information priority, recent-versus-durable growth, and variant acceptance; design only, not implemented
-- docs/drafts/pet-first-desktop-shell-2026-08-11.md — user-confirmed pet-only presence plus proposed Windows lifecycle and acceptance plan; design only, not implemented
+- docs/drafts/pet-first-desktop-shell-2026-08-11.md — implemented v0.2.0 foundation plus remaining Windows acceptance matrix
 - docs/research/2026-08-12_codex-for-open-source-readiness.md — official program facts, current public-evidence snapshot, application readiness gates, truthful draft answers, and submission boundaries
-- docs/adr/0003-pet-first-two-window-desktop-shell.md — proposed two-window, Rust-owned resident-shell decision
+- docs/adr/0003-pet-first-two-window-desktop-shell.md — implemented two-window decision under extended acceptance; status remains Proposed
 - docs/adr/0004-deterministic-content-derived-evolution-paths.md — proposed local, lineage-aware bounded-variant growth decision
 - docs/ARCHITECTURE.md — intended system and connector contract
 - docs/PRIVACY_PRINCIPLES.md — non-negotiable trust model
@@ -126,13 +137,13 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - “Complete forgetting” is scoped to Memoryling's local imported copy and supported downstream graph; it never modifies the source and is not a physical secure-erasure guarantee.
 - Browser preview has no native memory runtime. Do not add mock persistence or present planned behavior as live.
 - The supported tester entry is the unsigned current-user NSIS installer. The raw release exe requires its generated fixture sidecar and is not portable.
-- Native UAT verified that leaving delete-app-data clear retained the pre-existing `%LOCALAPPDATA%\app.memoryling.desktop` tree and selecting it removed the tree; this is not a physical secure-erasure guarantee.
+- Launch installer UAT from normal Windows Explorer. A direct packaged-agent launch can be redirected into the agent package's virtualized LocalAppData; reject that run as harness evidence and clean only its virtualized install／shortcut, never the real app-data tree.
+- v0.2.0 UAT verified that leaving delete-app-data clear retained `%LOCALAPPDATA%\app.memoryling.desktop`; the earlier checksum-matched v0.1.0 cycle separately verified the checked-delete option. Neither is a physical secure-erasure guarantee, and no database content was read.
 - The host already has WebView2 151.0.4129.78 and no safe Windows Sandbox／Hyper-V clean environment. The missing-runtime bootstrapper branch is deferred; never remove the host runtime just to test it. Any prerequisite download is separate from the network-free fixture memory pipeline.
 - Generated test artwork and transparent PNGs are not evidence of signing, store review, or public release readiness.
-- The evolving-creature design draft is not a live procedural renderer, genome engine, or completed Phase 2 slice.
-- The branching concept art is a visual-family and adjacent-transition reference only—not a fixed pre-authored route／pet roster, production sprite set, or one-to-one mapping from an activity axis to a body. The current runtime has no path profile, activity taxonomy, morphology-recipe compiler, or real-memory signal mapping.
-- The pet-first design draft is not a transparent window, native menu, tray, single-instance process, or completed desktop shell. Do not fake those native behaviors in browser mode or expose full memory state to a future pet surface.
-- Tauri `invoke_handler` app commands are callable by every window by default. A future `pet` must receive generated app-command permissions plus caller-label denial tests; a narrow DTO alone does not protect full memory／approve／forget commands.
+- Growth drafts and branching concept art are design vocabulary only—not a live renderer, fixed route／pet roster, production sprite set, or real-memory mapping. See ADR-0004 and the two indexed growth drafts for the full boundary.
+- Native window labels, not query strings, select the pet surface. Never fake pet／tray behavior in browser mode or widen the pet DTO with memory text.
+- Tauri app commands are not safely window-scoped by default. Preserve both layers now in place: exact `main`／`pet` capabilities and Rust caller-label guards, including the real-invoke denial test for all six sensitive memory commands.
 - Codex for Open Source is a discretionary OSS-maintainer program, not a product contest or guaranteed `$1,200`. Memoryling is eligible in form but not application-ready: it still lacks a public Release, real-source proof, external adoption, and a demonstrated maintainer loop. Do not re-research the settled program basics every session; refresh official terms and live GitHub metrics immediately before submission.
 
 ## Working conventions
@@ -142,11 +153,7 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - Use synthetic fixtures only.
 - Record architectural decisions as ADRs.
 - Treat route labels as observable approved activity signals, never as sensitive personality or sentiment classifications.
-- Treat `EvolutionPathProfile` as a weighted influence vector that may compile into many bounded, versioned `MorphologyRecipe` variants. Only authorized, lineage-bearing durable Agent-activity evidence may affect permanent form; live active／idle／session presence stays ephemeral.
-- For the proposed real-source growth system, one `SourceConsentScope` binds one exact source plus allowed data categories, purposes, adapter version, and consent／mapping versions. Records inside that scope may derive locally without per-record prompts; another source needs another scope, while any category or purpose expansion needs a new consent revision.
-- Apply growth information in this order: observable Agent activity alone controls primary silhouette／motion; accumulated journey and outcomes gate permanent reshaping and control maturity／milestones without selecting a silhouette; collaboration style controls at most one bounded rhythm accent. Coarse content domain may affect only secondary material／surface vocabulary.
-- Recent activity produces only TTL-bound `EphemeralActivityHint` presentation. Permanent reshaping requires multiple deduplicated, independent, outcome-qualified evidence groups; calendar time, raw record volume, token count, Agent count, and app-open time are never XP.
-- No live Agent monitoring exists. Any future `LiveAgentPresence` adapter is a separate consented feature: allowlisted enum only, memory-only with TTL, no SQLite／logs／telemetry, neutral by default, and cleared immediately when disabled or unavailable.
+- For future growth, follow the indexed variation draft and ADR-0004: exact source scope, lineage-backed bounded recipes, activity-first morphology, outcome-gated durability, ephemeral recent hints, and no usage-volume XP or silent monitoring.
 - Update PROJECT_STATUS.md after a meaningful change.
 - Avoid widening Tauri capabilities without a demonstrated need.
 
@@ -175,21 +182,21 @@ Windows x64 current-user NSIS test build:
 
 Expected local artifact:
 
-    src-tauri/target/release/bundle/nsis/Memoryling_0.1.0_x64-setup.exe
+    src-tauri/target/release/bundle/nsis/Memoryling_0.2.0_x64-setup.exe
 
 ## Current coherent next bundle
 
 Fresh-session instruction: start with the first unfinished gate in this section and finish that one coherent bundle through verification, SSOT, commit, and push. Do not stop at planning or a native connector skeleton, and do not submit the external application without a new explicit user instruction.
 
-The Windows x64 current-host gate closed on 2026-08-12: the unchanged checksum-matched artifact passed current-user install, native fixture preview／approve／restart／lineage／forget, both uninstall data choices, and clean post-uninstall checks. The retention run began with pre-existing app data, so it proves retention behavior, not that the installer created that tree. The WebView2-missing branch is deferred to a safe disposable Windows environment. v0.1.0 remains unsigned, local-test-only, and not a public release.
+The v0.1.0 current-host installer gate closed on 2026-08-12 and is a no-redo historical baseline: its checksum-matched artifact passed the full fixture tour and both uninstall data choices. The WebView2-missing branch remains deferred to a safe disposable Windows environment; never remove the host runtime to test it.
 
-First unfinished gate: complete the pet-first shell against synthetic state before widening source access—pre-created `pet`／`main` surfaces, Rust-owned menu／tray／single-instance lifecycle, per-window app-command permissions with pet-denial tests, content-minimized `CreatureRenderState`, close／minimize／restore behavior, position／DPI recovery, approve／forget synchronization, bilingual accessibility, and packaged native smoke. Do not stop at window connectors or a browser mock.
+The v0.2.0 pet-first synthetic gate also closed on 2026-08-12: automated security／lifecycle／DPI-position tests, raw-native fixture UAT, and a normal Explorer-launched current-user install all passed. Installed Start Menu cold／resident launch kept one process, pet↔detail lifecycle worked, explicit Quit ended the process, and unchecked uninstall removed program state while retaining app data. The artifact is unsigned, local-test-only, 2,875,965 bytes, SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`. Extended live DPI／monitor／hitbox／assistive-tech／shutdown checks remain acceptance work, so ADR-0003 stays Proposed and this is not a public release.
 
-Only after that shell passes should the first user-selected Codex-source pilot resume: validate a stable supported format, add a Rust-owned narrow picker and redacted preview, and require explicit authorization before private-data UAT. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.
+First unfinished implementation gate: resume the first user-selected Codex-source pilot by validating one stable supported format, then add a Rust-owned narrow picker and redacted preview. Stop before private-data UAT unless the user explicitly authorizes the exact source and scope. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip to open-ended AI chat. Run the remaining pet-shell environment matrix before public release claims, but do not rebuild the completed v0.2.0 shell to do so.
 
-The later Phase 2 growth implementation must start from the synthetic fixture matrix in `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`; do not implement a fixed sprite route, per-record consent spam, silent scope expansion, or usage-volume leveling.
+Later Phase 2 growth must start from the indexed synthetic fixture matrix; do not create a fixed sprite route, per-record consent spam, silent scope expansion, or usage-volume leveling.
 
-The Codex for Open Source application is a cross-phase outcome, not the next coding bundle. After the pet-first synthetic slice and one real-source slice, follow `docs/research/2026-08-12_codex-for-open-source-readiness.md`: finish remaining release-environment checks, publish an honest beta and short synthetic demo, gather genuine external use, complete at least one feedback／issue → fix → follow-up release maintainer loop, refresh dynamic program／GitHub evidence, and only then submit. Never manufacture traction or add runtime private-memory API uploads for the application.
+Codex for Open Source is not the next bundle. Follow the indexed readiness plan only after the real-source, release, genuine-adoption, and maintainer-loop gates; refresh dynamic evidence immediately before submission. Never manufacture traction, upload private memories for the application, or submit without a new explicit user instruction.
 
 ## Closeout checklist
 

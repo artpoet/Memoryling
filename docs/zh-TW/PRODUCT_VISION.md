@@ -21,11 +21,11 @@ Memoryling 把一個人散落在 AI Agent 裡的持久記憶，變成住在桌�
 
 ## 桌面存在契約
 
-Memoryling 平常留在桌面上的應該是寵物本身，而不是一直打開的 dashboard。使用者已確認的方向是一隻小型、透明的浮動寵物；右鍵是開啟原生選單的主要方式，選擇「開啟 Memoryling」後，才顯示記憶、成長、lineage、棲地、隱私與設定的標準詳細視窗。
+Memoryling 平常留在桌面上的是寵物本身，而不是一直打開的 dashboard。v0.2.0 foundation 已實作一隻小型、透明的浮動寵物；右鍵會開啟原生選單，選擇「開啟 Memoryling」後，才顯示記憶、成長、lineage、棲地、隱私與設定的標準詳細視窗。
 
-右鍵不是唯一的救援入口。`Win+B` 系統匣、Start Menu 與 packaged UAT 證實存在的 installed app shortcut 都必須能找回被隱藏或離開螢幕的寵物，並聚焦唯一一個詳細視窗。寵物已取得 focus 時，Enter／Space／Menu key／`Shift+F10` 可開啟同一選單。開啟或還原詳細內容時暫時收起或停靠浮動寵物，避免同時出現兩隻不同的 Memoryling；關閉或最小化詳細內容後恢復寵物。隱藏、關閉詳細內容、忘記來源與結束程式是四種不同操作。
+右鍵不是唯一的救援入口。系統匣、Start Menu 與 installed shortcut 都能找回單一常駐程序並聚焦唯一的詳細視窗；目前主機已驗證冷啟動與常駐時再次啟動。寵物取得 focus 時，Enter／Space／Menu key／`Shift+F10` 可開啟同一選單。開啟詳細內容時會收起寵物，避免同時出現兩隻不同的 Memoryling；關閉或最小化詳細內容後恢復寵物。隱藏、關閉詳細內容、忘記來源與明確 Quit 是不同操作。`Win+B`、延伸 DPI／螢幕救援、輔助科技與 sign-out／shutdown 仍待專門實機驗收。
 
-這個 pet-first 雙視窗 shell 是已記錄的產品與架構方向，尚未成為目前功能。在真實 connector 完成前，寵物表面必須持續看得到「記憶存取關閉」。完整提案記錄於[寵物優先桌面 shell 設計稿](../drafts/pet-first-desktop-shell-2026-08-11.md)。
+這個 pet-first 雙視窗 foundation 已以 Rust-owned lifecycle 與窄化 render-state boundary 實作；完整驗收仍由[寵物優先桌面 shell 設計稿](../drafts/pet-first-desktop-shell-2026-08-11.md)與 proposed ADR-0003 追蹤。在真實 connector 完成前，寵物表面仍持續顯示「記憶存取關閉」。
 
 ## 寵物成長契約
 

@@ -11,9 +11,25 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
+#[cfg(test)]
+pub(crate) static SENSITIVE_HANDLER_ENTRIES: std::sync::atomic::AtomicUsize =
+    std::sync::atomic::AtomicUsize::new(0);
+
+#[cfg(test)]
+fn record_sensitive_handler_entry() {
+    SENSITIVE_HANDLER_ENTRIES.fetch_add(1, Ordering::SeqCst);
+}
+
+#[cfg(not(test))]
+fn record_sensitive_handler_entry() {}
+
 use tauri::{path::BaseDirectory, AppHandle, Manager, State};
 
-pub(crate) use model::{ApproveImportRequest, ImportPreview, MemoryState, SourceOption};
+use crate::caller::{MainCaller, RenderCaller};
+
+pub(crate) use model::{
+    ApproveImportRequest, CreatureRenderState, ImportPreview, MemoryState, SourceOption,
+};
 
 use model::PreparedImport;
 use store::MemoryStore;
@@ -74,19 +90,30 @@ impl PendingImports {
             .remove(preview_id);
         Ok(())
     }
+
+    pub(crate) fn clear_all(&self) -> Result<(), String> {
+        self.imports
+            .lock()
+            .map_err(|_| "Memoryling could not access the pending preview.".to_string())?
+            .clear();
+        Ok(())
+    }
 }
 
 #[tauri::command]
-pub(crate) fn list_memory_sources() -> Result<Vec<SourceOption>, String> {
+pub(crate) fn list_memory_sources(_caller: MainCaller) -> Result<Vec<SourceOption>, String> {
+    record_sensitive_handler_entry();
     adapter::list_sources()
 }
 
 #[tauri::command]
-pub(crate) fn preview_memory_source(
-    app: AppHandle,
+pub(crate) fn preview_memory_source<R: tauri::Runtime>(
+    _caller: MainCaller,
+    app: AppHandle<R>,
     pending: State<'_, PendingImports>,
     source_id: String,
 ) -> Result<ImportPreview, String> {
+    record_sensitive_handler_entry();
     let source_path = app
         .path()
         .resolve(
@@ -101,39 +128,61 @@ pub(crate) fn preview_memory_source(
 
 #[tauri::command]
 pub(crate) fn cancel_memory_preview(
+    _caller: MainCaller,
     pending: State<'_, PendingImports>,
     preview_id: String,
 ) -> Result<(), String> {
+    record_sensitive_handler_entry();
     pending.discard(&preview_id)
 }
 
 #[tauri::command]
-pub(crate) fn get_memory_state(app: AppHandle) -> Result<MemoryState, String> {
+pub(crate) fn get_memory_state<R: tauri::Runtime>(
+    _caller: MainCaller,
+    app: AppHandle<R>,
+) -> Result<MemoryState, String> {
+    record_sensitive_handler_entry();
     store_for(&app)?.state()
 }
 
 #[tauri::command]
-pub(crate) fn approve_memory_import(
-    app: AppHandle,
+pub(crate) fn approve_memory_import<R: tauri::Runtime>(
+    _caller: MainCaller,
+    app: AppHandle<R>,
     pending: State<'_, PendingImports>,
     request: ApproveImportRequest,
 ) -> Result<MemoryState, String> {
+    record_sensitive_handler_entry();
     let store = store_for(&app)?;
-    pending.use_for_approval(&request.preview_id, &request.source_id, |prepared| {
+    let state = pending.use_for_approval(&request.preview_id, &request.source_id, |prepared| {
         store.approve_import(prepared, &request.selected_record_ids)
-    })
+    })?;
+    crate::desktop_shell::emit_creature_state_changed(&app);
+    Ok(state)
 }
 
 #[tauri::command]
-pub(crate) fn forget_memory_source(
-    app: AppHandle,
+pub(crate) fn forget_memory_source<R: tauri::Runtime>(
+    _caller: MainCaller,
+    app: AppHandle<R>,
     source_id: String,
 ) -> Result<MemoryState, String> {
+    record_sensitive_handler_entry();
     adapter::ensure_supported_source(&source_id)?;
-    store_for(&app)?.forget_source(&source_id)
+    let state = store_for(&app)?.forget_source(&source_id)?;
+    crate::desktop_shell::emit_creature_state_changed(&app);
+    Ok(state)
 }
 
-fn store_for(app: &AppHandle) -> Result<MemoryStore, String> {
+#[tauri::command]
+pub(crate) fn get_creature_render_state(
+    _caller: RenderCaller,
+    app: AppHandle,
+) -> Result<CreatureRenderState, String> {
+    store_for(&app)?.creature_render_state()
+}
+
+pub(crate) fn store_for<R: tauri::Runtime>(app: &AppHandle<R>) -> Result<MemoryStore, String> {
     let directory = app
         .path()
         .app_local_data_dir()

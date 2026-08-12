@@ -21,11 +21,11 @@ The creature should feel continuous, not randomly generated. If it changes, the 
 
 ## Desktop presence contract
 
-Memoryling's default desktop presence should be the creature itself, not an always-open dashboard. The user-confirmed direction is one small transparent floating pet; right-click is the primary way to open a native menu, and Open Memoryling reveals the standard detail window for memories, growth, lineage, habitat, privacy, and settings.
+Memoryling's default desktop presence is the creature itself, not an always-open dashboard. The v0.2.0 foundation implements one small transparent floating pet; right-click opens a native menu, and Open Memoryling reveals the standard detail window for memories, growth, lineage, habitat, privacy, and settings.
 
-Right-click is not the only recovery path. The `Win+B` system tray, Start Menu, and any installed app shortcut proven by packaged UAT must be able to recover a hidden or off-screen pet and focus the one detail window. When the pet already has focus, Enter／Space／Menu key／`Shift+F10` opens the same menu. Opening or restoring details temporarily hides or docks the floating pet so the user never sees two separate creatures; closing or minimizing details restores the pet. Hiding, closing details, forgetting a source, and quitting remain distinct actions.
+Right-click is not the only recovery path. The tray, Start Menu, and installed shortcut recover the single resident process and focus its one detail window; installed cold and resident launch were verified on the current host. When the pet has focus, Enter／Space／Menu key／`Shift+F10` opens the same menu. Opening details hides the pet so the user never sees two separate creatures; closing or minimizing details restores it. Hiding, closing details, forgetting a source, and explicit Quit remain distinct actions. `Win+B`, extended DPI／monitor recovery, assistive technology, and sign-out／shutdown still require dedicated live acceptance.
 
-This pet-first two-window shell is a recorded product and architecture direction, not implemented behavior. Until a real connector exists, the pet surface must keep a visible “memory access is off” state. The complete proposal is in the [pet-first desktop shell design draft](drafts/pet-first-desktop-shell-2026-08-11.md).
+This pet-first two-window foundation is implemented with Rust-owned lifecycle and a narrow render-state boundary; its full acceptance remains tracked in the [pet-first desktop shell design draft](drafts/pet-first-desktop-shell-2026-08-11.md) and proposed ADR-0003. Until a real connector exists, the pet keeps a visible “memory access is off” state.
 
 ## Creature growth contract
 

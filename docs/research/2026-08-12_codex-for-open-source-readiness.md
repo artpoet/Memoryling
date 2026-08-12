@@ -31,7 +31,7 @@ Snapshot captured from public GitHub data on 2026-08-12:
 - issues／pull requests: 0／0
 - five recorded Windows CI runs passed
 - implemented proof: synthetic fixture → preview and consent → app-local SQLite → deterministic mark → machine-readable lineage → transactional forgetting and recomputation
-- not implemented: user-owned real-memory connector, floating pet shell, deterministic growth renderer, public packaged release, or external-user maintainer loop
+- implemented locally since this snapshot: v0.2.0 floating pet shell and current-host installed-package smoke; still not implemented: user-owned real-memory connector, deterministic growth renderer, public packaged release, or external-user maintainer loop
 
 These counts are dynamic evidence. Refresh them immediately before any application; never copy this snapshot as if it were current.
 
@@ -52,7 +52,7 @@ The strongest ecosystem case is a reusable read-only adapter contract, normalize
 Complete in this order:
 
 1. **Close Windows test-build UAT — current-host path complete; one clean-environment condition deferred.** The checksum-matched artifact completed current-user install → launch → fixture preview／approve／explain／forget → restart and both uninstall data choices on 2026-08-12. The retention run began with pre-existing app data, and a second same-artifact cycle proved explicit deletion. The WebView2-missing branch awaits a safe disposable Windows x64 environment; this does not block the synthetic pet-shell bundle but must close before public distribution. Refresh hashes after any rebuild.
-2. **Ship the pet-first synthetic vertical slice.** Implement the floating pet, on-demand detail window, native menu／tray／single-instance recovery, permission separation, cross-surface state consistency, accessibility basics, and packaged native smoke without widening memory access.
+2. **Ship the pet-first synthetic vertical slice — current implementation bundle complete.** v0.2.0 implements the floating pet, on-demand detail window, native menu／tray／single-instance recovery, permission separation, cross-surface state consistency, and current-host installed-package smoke without widening memory access. Extended live DPI／monitor／hitbox／assistive-tech／shutdown acceptance still blocks ADR acceptance and public-release claims, not the next real-source implementation slice.
 3. **Prove one real source safely.** Support one documented, user-selected, read-only real Agent-memory source with redacted preview, narrow consent, lineage, correction／forgetting, and explicitly authorized private-data UAT. Never infer a public format from a private tool-home file.
 4. **Prepare a public beta.** Add a strong README hero, a 60–90 second synthetic-data demo, a verified GitHub Release, checksums, release notes, installation boundaries, and a clear `Working now / Next / Vision` split. Decide signing and distribution honestly.
 5. **Create genuine adoption evidence.** Recruit real external testers and record consented feedback, release downloads, issues or discussions, fixes, and a follow-up release. Demonstrate at least one complete `feedback／issue → maintainer response → fix → verified release` loop.
@@ -69,7 +69,7 @@ Use only synthetic data in screenshots and recording. A concise demo should show
 2. an approved record creates one deterministic visible consequence;
 3. the user opens `Why did this happen?` and sees source → event → signal → effect;
 4. forgetting the source removes or recomputes the consequence;
-5. future pet and growth material is labeled `NEXT / CONCEPT` until implemented.
+5. future growth material is labeled `NEXT / CONCEPT`; the implemented pet shell is described separately from its remaining acceptance matrix.
 
 Do not show private paths, memory text, prompts, databases, tokens, or unredacted tool-home content.
 
@@ -93,7 +93,7 @@ The form currently asks for a public GitHub identity and repository, primary／c
 
 - Do not submit until the readiness gates have produced real public evidence, unless the user explicitly changes this decision after reviewing the current facts.
 - Do not describe fixture-only behavior as access to real Codex or Agent memories.
-- Do not describe planned pet, connector, or growth behavior as implemented.
+- Do not describe planned connector or growth behavior, or unverified extended pet-shell acceptance, as implemented.
 - Do not add runtime cloud AI, telemetry, or private-memory uploads merely to request API credits.
 - Do not call the program a guaranteed `$1,200`, funding, prize, or cash benefit.
 - Do not invent or inflate stars, downloads, testers, issues, pull requests, releases, testimonials, maintainer work, or ecosystem importance.

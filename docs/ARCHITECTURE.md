@@ -2,7 +2,7 @@
 
 ## Status
 
-This document separates the intended product architecture from the subset implemented as of 2026-08-12. The implemented local pipeline runs end to end for exactly one fictional Codex-shaped resource bundled with the desktop app. No user-owned Codex file, tool-home, or other external source is connected.
+This document separates the intended product architecture from the subset implemented as of 2026-08-12. Memoryling 0.2.0 now implements the pet-first resident desktop shell and runs the local fixture pipeline end to end for exactly one fictional Codex-shaped resource bundled with the desktop app. No user-owned Codex file, tool-home, or other external source is connected, and real-source and creature-growth implementation have not started.
 
 ## System shape
 
@@ -21,19 +21,19 @@ The v1 fixture slice follows this shape but replaces the external source with a 
 
 | Layer | Responsibility | Current state |
 |---|---|---|
-| Desktop shell | Native window, lifecycle, notifications | One standard Tauri window and memory IPC commands exist; the proposed pet-first two-window resident shell, tray, and single-instance lifecycle are not implemented |
-| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual concept UI plus fixture selection, preview, consent, lineage, and forgetting; fixture state is separate and visible real-memory access remains off in desktop and browser |
+| Desktop shell | Native window, lifecycle, notifications | 0.2.0 pre-creates transparent `pet` and hidden `main` windows; Rust owns native menu, tray, single-instance recovery, show／hide／focus, close／minimize／restore compensation, explicit Quit, and pet position recovery |
+| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual pet and detail surfaces plus fixture selection, preview, consent, lineage, forgetting, one-time onboarding, reduced-motion handling, and a visible real-memory-off state in desktop and browser |
 | Source adapters | Read selected durable-memory formats without mutating them | Fixture adapter v1 reads one fixed bundled JSON resource; no external path or Codex tool-home access |
 | Import gate | Preview scope, explain access, obtain consent | Implemented for the fixture, with pending preview state held in Rust memory; no real-source picker |
 | Normalizer | Convert source records into a versioned local event schema | Schema v1 supports the fixture's `completion` record only |
 | Derivation engine | Produce traits, tensions, story hooks, reminder candidates | One deterministic `completion` signal and `completion-star` world effect only |
-| Local store | Persist normalized events, derived effects, lineage, and settings | SQLite schema v1 stores approved fixture records and lineage under Tauri app-local data; general settings are not included |
+| Local store | Persist normalized events, derived effects, lineage, and settings | SQLite schema v1 stores approved fixture records and lineage under Tauri app-local data; content-free shell preferences and pet position use a separate atomic JSON file in the same app-local directory |
 | Conversation layer | Ground dialogue in approved local context | Not implemented; provider decision open |
 | Reminder policy | Enforce quiet hours, budget, urgency, and snooze state | UI concept only |
 
-## Proposed pet-first desktop shell
+## Implemented pet-first desktop shell
 
-The user-confirmed product direction is “two surfaces, one life,” recorded in proposed [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md) and the detailed [pet-first desktop shell draft](drafts/pet-first-desktop-shell-2026-08-11.md). This section describes intended architecture, not the current runtime.
+The user-confirmed product direction is “two surfaces, one life,” recorded in proposed [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md) and the detailed [pet-first desktop shell draft](drafts/pet-first-desktop-shell-2026-08-11.md). The 0.2.0 implementation now follows this architecture, but ADR-0003 remains **Proposed** until the remaining live Windows DPI, multi-monitor, hitbox, accessibility, and session-lifecycle gates pass.
 
 ```text
 one Tauri process
@@ -43,13 +43,25 @@ one Tauri process
   └─ Rust lifecycle + canonical SQLite state
 ```
 
-The `main` WebView should be created at startup but remain hidden, because Tauri documents a Windows deadlock risk when a WebView window is created inside a synchronous command or event handler. Rust should own show, hide, focus, `main` CloseRequested interception, native menu, tray, position recovery, and explicit quit without blocking Windows session shutdown. Pet frontend core capability should remain narrow—normally only window dragging and render-state event listening—rather than receiving cross-window creation, focus, menu, or tray permissions. `main` also needs an explicit reviewed permission set instead of inheriting the current broad `core:default`.
+Both WebViews are pre-created hidden; Rust setup shows only `pet`, avoiding handler-time WebView construction. The pet is transparent, undecorated, skip-taskbar, non-closable, always-on-top by default, and resizes from the 360 × 430 logical onboarding envelope to the 320 × 320 compact envelope while preserving its screen anchor. Rust owns show, hide, focus, `main` `CloseRequested` interception, pending-preview reset, native menu, tray, position recovery, and explicit Quit. Lifecycle transitions use compensating rollback so a failed second window operation leaves one recoverable surface rather than two visible windows or none.
 
-The pet surface must not call the existing full memory-state API because its lineage contains approved normalized text. A safe DTO alone is insufficient: Tauri app commands registered through `invoke_handler` are available to every window by default. The build must use `tauri_build::AppManifest::commands` to generate command permissions, assign all list／preview／cancel／full-state／approve／forget permissions only to `main`, give `pet` only a separate `CreatureRenderState` command plus necessary interactions, and also reject non-`main` callers inside sensitive commands. Negative tests must invoke each sensitive command from `pet` and prove fail-closed behavior.
+The build uses `tauri_build::AppManifest::commands` and exact local-only `main`／`pet` capabilities; neither surface inherits `core:default`, remote scopes, wildcards, or deny-pattern ambiguity. List／preview／cancel／full-state／approve／forget are `main`-only and also require a `MainCaller` whose WebView and native-window labels both match. `pet` receives only render-safe state, shell state, menu, onboarding, and `start_pet_dragging` app commands plus event listen／unlisten. The drag command acts only on the caller's pet window, so pet JavaScript cannot select and drag `main` through a generic core window API. A production-authority invoke harness denies all six sensitive commands at the ACL layer, and a separate empty-authority harness proves the caller guard denies the same six before handler body entry; a `main` list invoke is the positive control.
 
-`CreatureRenderState` contains only appearance parameters, neutral state, and an opaque revision. Approve, forget, or future genome commits emit a content-free revision event; each surface then refetches only the typed state allowed for that surface. No memory text, path, locator, or explanation payload belongs in pet IPC, native menu labels, tray labels, window titles, or operating-system notifications. Closing details must cancel any pending preview in Rust before hiding because hiding a WebView does not unmount it; minimizing preserves the preview.
+`CreatureRenderState` contains only bounded appearance parameters, neutral fixture state, opaque mark IDs, and a 64-hex revision. Approve and forget emit the same content-free `{revision}` notification to both surfaces, which then refetch their typed state; event-delivery failure does not roll back a committed memory transaction. No memory text, path, locator, explanation, source identity, or content hash enters pet IPC, native menu labels, tray labels, window titles, or operating-system notifications. Closing details cancels any pending preview in Rust before hiding because hiding a WebView does not unmount it; minimizing preserves the preview.
 
-Right-click is the primary entry. When `pet` has focus, Enter／Space／Menu key／`Shift+F10` opens the same native menu at a fixed pet anchor; reliable no-focus keyboard recovery is `Win+B` system tray, Start Menu, or a packaged UAT-confirmed installed shortcut. Opening or restoring `main` hides or docks `pet`; closing or minimizing `main` restores it, and only an explicit Quit ends the process. Pet position is restored in logical coordinates and clamped at launch, show／recovery, drag end, scale change, and single-instance callbacks; immediate topology／taskbar handling needs a verified Windows hook or polling strategy. Browser mode continues to show the detail preview and must not imitate native floating-window behavior.
+Right-click is the primary entry. When `pet` has focus, Enter／Space／Menu key／`Shift+F10` invokes the same native menu at a fixed pet anchor. Native menu, transparent pet, onboarding, one-detail-window lifecycle, minimize／restore, single-instance recovery, and explicit native Quit passed the core Windows smoke; position persistence／clamp and tray actions have automated coverage. A normal Explorer-launched current-user NSIS install and the actual installed Start shortcut passed both cold launch and resident single-instance relaunch: the second launch focused the existing detail surface without creating another process. Direct tray-action and `Win+B` traversal remain pending live acceptance.
+
+Pet position is stored in a content-free JSON record with monitor identity, work-area dimensions, logical coordinates, normalized coordinates, and scale factor. Rust restores and clamps it on launch and recovery, coalesces move／scale persistence, and polls monitor work-area topology. Pure geometry tests cover negative origins, taskbar work-area offsets, oversized windows, removed-monitor fallback, and logical 320-pixel sizing at 100／125／150／200%; live 125–200% and mixed-DPI movement, hot-unplug, and taskbar relocation remain acceptance work. Browser mode continues to show the detail preview and does not imitate native floating-window behavior.
+
+### 0.2.0 verification snapshot
+
+- Automated evidence: 23 frontend tests and 29 Rust tests pass. Rust coverage includes concurrent first-open migration, lifecycle compensation, position／anchor recovery, content-minimized DTOs, exact capabilities, and the two independent six-command denial layers described above.
+- Native and packaged evidence: transparent pet／first-run onboarding, pointer and focused-keyboard native menu paths, close／minimize／restore, single-instance recovery, explicit native Quit, raw movement／second-monitor observation, and core pet／main state transitions pass on the current Windows host. Tray actions and position recovery have automated evidence; their remaining live matrix is not inferred from that.
+- Fixture evidence: raw bundled fixture preview and approval, restart persistence, source → event → signal → completion-star lineage, cross-surface state, and complete forgetting pass; no real source was used.
+- Installer evidence: a normal Explorer-launched NSIS current-user install, actual installed Start shortcut cold launch and resident relaunch, explicit Quit, and uninstall with retained app data pass. The retained files were checked only as local app-data state, not committed or printed.
+- Artifact: `Memoryling_0.2.0_x64-setup.exe`, 2,875,965 bytes, SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`, `FileVersion`／`ProductVersion` 0.2.0, `NotSigned`.
+- Harness trap: an early agent-direct installer launch produced Windows virtualization behavior and is not valid product evidence or a product failure. Acceptance uses normal Explorer and installed-shortcut paths.
+- Still pending before ADR acceptance: live 125–200%／mixed-DPI testing, hot-unplug／taskbar relocation, adjacent-desktop hitbox probing, `Win+B`, Narrator／NVDA, sign-out／shutdown, and compact／wide／tall／long growth-envelope coverage. WebView2-missing bootstrapper testing remains deferred. Real-source and growth work have not started.
 
 ## Implemented v1 records and future shape
 
@@ -156,7 +168,7 @@ The current fixture adapter satisfies this contract only for its fixed synthetic
 - embedded local model versus optional remote conversation provider;
 - validated Codex durable-memory format, native source selection, and permission UX;
 - migration strategy after SQLite schema v1;
-- Windows resident-app lifecycle and notification integration;
+- remaining Windows resident-shell acceptance across live DPI／monitor／taskbar changes, desktop hitbox, accessibility, and session shutdown;
 - derivations and signal-to-genome mappings beyond the deterministic completion-star boundary;
 - approved-activity taxonomy, signal-to-profile mapping, quantization rules, and mapping-version migration;
 - final EvolutionBridge grammar for stage and recipe changes, stage names, and renderer implementation after synthetic visual prototyping.

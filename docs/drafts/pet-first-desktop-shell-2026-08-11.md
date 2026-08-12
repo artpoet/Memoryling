@@ -1,9 +1,9 @@
 # Memoryling Pet-First Desktop Shell 設計稿
 
-> Status: User-confirmed interaction direction; proposed UX and technical details; not implemented
-> AS_OF: 2026-08-11 (Asia/Taipei)
+> Status: User-confirmed direction; 0.2.0 core vertical slice implemented and verified; ADR-0003 remains Proposed pending the full Windows acceptance matrix
+> AS_OF: 2026-08-12 (Asia/Taipei)
 > Scope: Windows floating pet, context menu, detail window, tray recovery, lifecycle, and accessibility
-> Truth boundary: the current app still opens one 1180 × 780 standard window; no floating pet window, tray, or two-window lifecycle exists yet
+> Truth boundary: pet-first shell and fixture continuity are live; real-source and creature-growth implementation have not started, and only the compact baseline envelope exists
 
 ## 1. 結論
 
@@ -27,6 +27,17 @@ Memoryling 應採用「兩個表面、一個生命」：平常只顯示一隻安
 - 開啟詳細內容時先收起浮動寵物；關閉詳細視窗後寵物回到原位置，避免同時出現兩隻 Memoryling。
 - 寵物預設 always-on-top，以符合「浮動」感；使用者可從右鍵選單、系統匣或設定取消置頂／隱藏。
 - 不預設登入時自動啟動；autostart 必須留到未來明確 opt-in。
+
+### 0.2.0 live evidence
+
+- 23 個 frontend tests 與 29 個 Rust tests 通過；Rust 包含首次並行開庫、lifecycle 補償、position／anchor、privacy DTO、exact capabilities 與 settings recovery。
+- `pet` 逐一 invoke list／preview／cancel／full-state／approve／forget 六個敏感 commands 時，production ACL 與 caller-label defense 兩層各自 fail closed，handler side-effect counter 保持 0；`main` list 是正向控制。
+- 透明 pet、一次性 onboarding、原生 pointer／focused-keyboard menu、single-instance、close／minimize／restore、raw movement／second-monitor observation、核心 pet／main smoke 與 explicit native Quit 通過。Tray actions 與 position recovery 有 automated evidence，不冒充完整 live acceptance。
+- raw bundled fixture 的 preview／approve、restart persistence、source → event → signal → completion-star lineage 與 forget 通過；未使用真實記憶。
+- 正常由 Explorer 啟動的 current-user NSIS install、實際 Start shortcut 的 cold launch 與 resident single-instance relaunch、以及保留資料的 uninstall 通過。
+- `Memoryling_0.2.0_x64-setup.exe` 為 2,875,965 bytes，SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`，版本 0.2.0，`NotSigned`。
+- 早期 agent-direct installer launch 觸發 Windows virtualization，屬無效 harness artifact，不是產品失敗；packaged 證據只採正常 Explorer／installed-shortcut 路徑。
+- 尚未通過：live 125–200%／mixed DPI、monitor hot-unplug、taskbar relocation、desktop adjacent-hitbox、`Win+B`、Narrator／NVDA、sign-out／shutdown、compact／wide／tall／long envelope。WebView2-missing bootstrapper 仍 deferred。
 
 ## 3. 體驗原則
 
@@ -55,7 +66,7 @@ Memoryling 應採用「兩個表面、一個生命」：平常只顯示一隻安
 
 在 real connector 完成前，這個 pet surface 內含一個 compact `Memory access off` honesty badge；它不構成第二個產品面板。
 
-尺寸需在選定寵物視覺後量測，初始 prototype 可從約 220–260 logical px 的緊密工作區開始，不把此數字視為最終規格。透明 window 仍會以整個矩形攔截滑鼠；Tauri 的 click-through 是整窗切換，不會依透明像素自動穿透，因此縮小 hit box 是 P0 正確性要求，不只是視覺 polish。Phase 0.5 shell 只以 route-agnostic 的 compact／wide／tall／long synthetic envelope fixtures 驗證 bounds，不等待或假裝已鎖定 Phase 2 taxonomy。若採固定 envelope，不能為巨大弧線、光環或尾端粒子留下大面積透明攔截區；若 render state 需要動態 resize，尺寸變更必須由 Rust 管理，完成後重新 clamp，而不是讓 pet WebView 任意改窗。
+0.2.0 使用 360 × 430 logical px 的 first-run onboarding envelope，dismiss 後由 Rust 原子地保存並縮為 320 × 320 compact envelope，同時保留 bottom-right／center anchor、clamp 並保存新位置；任一步失敗會回復舊 geometry 且不提交 onboarding flag。透明 window 仍會以整個矩形攔截滑鼠；Tauri 的 click-through 是整窗切換，不會依透明像素自動穿透，因此縮小 hit box 是 P0 正確性要求，不只是視覺 polish。相鄰桌面 hitbox 實測與 route-agnostic wide／tall／long envelope 尚未完成，不能把 compact baseline 說成 Phase 2 growth coverage。
 
 ### B. Detail window — `main`
 
@@ -99,6 +110,7 @@ v1 採用原生 context menu，首項是清楚的主要動作：
 Open Memoryling / 開啟 Memoryling
 ────────────────────────────
 Real memory access: Off / 真實記憶存取：關閉   (disabled status)
+Show pet / 顯示寵物
 Always on top / 永遠顯示在最上層              (checked)
 Hide pet / 隱藏寵物
 Quit Memoryling / 結束 Memoryling
@@ -113,7 +125,7 @@ Quit Memoryling / 結束 Memoryling
 | Input | 行為 | 不應發生 |
 |---|---|---|
 | Left click | 短反應、眨眼、姿態或一行本機文案 | 不開 dashboard、不發網路請求 |
-| Left drag | 目標是在 4–8 DIP gesture threshold 後拖曳 pet window；先以 packaged Windows spike 驗證延後呼叫 `startDragging` 是否穩定 | 未通過 spike 前不承諾 click／drag 已正確分流 |
+| Left drag | frontend 在 gesture threshold 後呼叫 `start_pet_dragging`；Rust `PetCaller` 只拖曳 caller 自己的 pet window | 不開放可指定任意 window label 的 generic core drag capability；相鄰桌面 hitbox 仍待 live UAT |
 | Right click | 開啟原生 context menu | 不直接開完整視窗 |
 | Enter／Space／Menu key／Shift+F10（pet 已 focus） | 以固定 pet anchor 開啟同一原生選單 | 不把游標可能位於別處的 `popup_menu` 當鍵盤定位 |
 | `Win+B` → tray | 鍵盤找回 Open／Show／Hide／Quit | 不要求先聚焦 skip-taskbar pet |
@@ -134,7 +146,7 @@ Quit Memoryling / 結束 Memoryling
 - 「找不到我時，可以從系統匣叫我回來」；
 - 「真實記憶存取目前關閉」。
 
-完成第一次成功開啟 detail 後不再自動顯示教學。選擇 Skip 會將本機 `onboardingDismissed` 永久設為 true；教學必須尊重 reduced motion，也不能每次更新後重新出現。Privacy & Settings 保留 Controls／How to use 入口，讓使用者能再次查看。
+0.2.0 已實作：完成第一次成功開啟 detail 後不再自動顯示教學；選擇 Skip 會將本機 `onboardingDismissed` 保存為 true。geometry 調整與 JSON 設定採 transaction-like 順序，resize／reposition／save 任一步失敗都回復舊 bounds 且前端繼續顯示 onboarding。教學尊重 reduced motion，也不會每次更新後重新出現；Privacy & Settings 保留 Controls／How to use 入口供重設。
 
 在 real connector 尚未完成前，pet 下方保留一個極小、單行、低干擾但可讀的狀態 tag：`Memory access off`／`記憶存取關閉`。這是目前誠實性邊界，不可只藏在右鍵選單或 detail 裡。
 
@@ -161,7 +173,7 @@ DASHBOARD_OPEN
 
 DETAIL_MINIMIZED + PET_VISIBLE
   ├─ taskbar restore / Open → DASHBOARD_OPEN (pet hidden)
-  ├─ Hide pet → DETAIL_MINIMIZED + TRAY_ONLY
+  ├─ Hide pet → TRAY_ONLY (pet 與 minimized main 都 hidden；main 仍預建供 Open 恢復)
   └─ Quit → EXITED
 
 TRAY_ONLY
@@ -169,7 +181,7 @@ TRAY_ONLY
   ├─ Open → DASHBOARD_OPEN
   └─ Quit → EXITED
 
-launch / pet show / drag end / scale change / single-instance recovery
+launch / pet show / settled move or scale change / single-instance recovery
   → validate + clamp pet position → previous running state
 ```
 
@@ -177,100 +189,96 @@ P0 不承諾尚未設計的 in-process WebView crash reconstruction；若整個 
 
 ## 9. Position、monitor 與 DPI
 
-- 初次位置放在 primary monitor work area 右下角，保留安全邊距，不蓋住 taskbar。
-- 儲存 logical／DIP position、monitor identity 與 work-area normalized position，不只存 physical pixels。
-- 至少在 launch、pet show／recovery、drag end、scale-factor change 與 single-instance callback 時重新驗證位置。Tauri 沒有完整的 monitor-topology／taskbar-change WindowEvent；若要求變更當下即時處理，實作 slice 必須選擇並驗證 Windows `WM_DISPLAYCHANGE`／`WM_SETTINGCHANGE` hook 或受控 polling，而不是假設 framework 已自動通知。
-- 任何 render-state transition 若改變 pet logical bounds，Rust 必須先計算安全尺寸、保留可見 anchor、套用 resize，再依目前 monitor work area clamp；失敗時保留上一個可操作 bounds，不可讓唯一入口消失。
-- 若原 monitor 不存在，移到 primary work area 的安全位置。
-- 至少保留足夠可點擊／可拖曳區域在畫面內，禁止整隻落在螢幕外。
-- 驗收 100%、125%、150%、200% 與混合 DPI 多螢幕。
+- 0.2.0 初次位置放在 primary monitor work area 右下角並保留安全邊距；獨立的 content-free shell JSON 儲存 logical／DIP position、monitor identity、work-area dimensions、normalized position 與 scale，不只存 physical pixels。
+- Rust 在 launch、pet show／recovery、settled move／scale change 與 single-instance callback 重新選 monitor 並 clamp；pet 可見時另以受控 polling 偵測 monitor／work-area topology 變化，因為 Tauri 沒有完整的 taskbar-change WindowEvent。
+- onboarding resize 會先保留 bottom-right／center anchor，再依目前 work area reposition、clamp 與 persist；resize／reposition／save 任一步失敗都回復舊 geometry 與 setting。
+- 純 geometry tests 已涵蓋 taskbar work-area offset／縮小、oversized window、monitor removal fallback，以及 100%、125%、150%、200% 下 320 logical px 對應的不同 physical size。
+- live 125–200%／mixed DPI、monitor hot-unplug、taskbar relocation 與相鄰桌面 hitbox 仍待 packaged Windows UAT，不能用純 geometry tests 代替。
 - v1 不做 click-through；它容易讓寵物無法重新被點擊或拖曳。
 
-官方 window-state plugin 可協助保存位置，但只允許 `StateFlags::POSITION` 且 filter／allowlist 僅追蹤 `pet`；`main` 必須排除。仍要補 monitor identity、normalized position、removal 與 work-area clamp，不能把 plugin restore 視為完整驗收。
+0.2.0 沒有採用 generic window-state restore；shell settings 由 Rust 以 temp sibling、atomic replace 與 recovery 處理，且與 memory SQLite／forget lifecycle 分離。這避免還原 `main` visibility，也保留 invalid／truncated settings fail-safe recovery。
 
 ## 10. Accessibility
 
 - pet 視覺可 `aria-hidden`，外層使用原生 button／可聚焦控制提供名稱與簡短狀態。
 - App 啟動時不搶走目前工作的 focus。
-- pet window 已取得 focus 時，Enter／Space／`Shift+F10`／Menu key 開啟錨定於 pet 的原生選單；原生系統處理 Esc、方向鍵與 Enter。未聚焦時用 `Win+B` 進入系統匣或從 Start Menu／installed shortcut 找回，v1 不以未驗證的 global shortcut 假裝補足可及性。
-- tray 與 Start Menu／packaged UAT 證實存在的 installed shortcut 是右鍵以外的完整 recovery path。
+- pet window 已取得 focus 時，Enter／Space／`Shift+F10`／Menu key 開啟錨定於 pet 的原生選單；frontend tests 已覆蓋 focused-keyboard dispatch，原生系統處理 Esc、方向鍵與 Enter。
+- 正常 Explorer 安裝後的實際 Start shortcut 已通過 cold／resident recovery smoke；direct tray actions 與 `Win+B` 鍵盤遍歷仍待 live UAT，v1 不以未驗證的 global shortcut 假裝補足可及性。
 - screen reader 只播報狀態改變一次，不逐幀朗讀動畫。
-- reduced-motion 模式直接顯示穩定姿態，不播放強烈進出場或 morph。
-- 高對比、Narrator／NVDA、200% zoom 與鍵盤-only 都是 P0 驗收，不延後到視覺 polish。
+- reduced-motion 模式直接顯示穩定姿態，不播放強烈進出場或 morph；此分支已有 frontend test。
+- 高對比、Narrator／NVDA、live 200% 與完整 keyboard-only 路徑仍是 P0 驗收，不延後到視覺 polish。
 - detail window 保留語義化 heading、landmark、focus order 與文字版「Why did this happen?」。
 
-## 11. Proposed Tauri architecture
+## 11. Implemented Tauri architecture（ADR remains Proposed）
 
 ### Window configuration
 
-建議保留現有 `main` label 作 detail，新增 `pet`：
+0.2.0 保留 `main` label 作 detail，並新增 `pet`：
 
 | Setting | `pet` | `main` |
 |---|---|---|
 | route | `index.html?surface=pet` | `index.html?surface=detail` |
-| initial visibility | true | false |
+| initial visibility | pre-created hidden；Rust setup 顯示 | pre-created hidden |
 | transparent | true | false |
 | decorations | false | true |
 | resizable | false | true |
 | always on top | true by default | false |
 | skip taskbar | true | false |
 | initial focus | false | only when explicitly opened |
-| size | tight fixed bounds proven with P0 compact／wide／tall／long envelope fixtures, or Rust-owned resize＋re-clamp | current 1180 × 780 constraints |
+| size | 360 × 430 onboarding → 320 × 320 compact；Rust-owned resize／anchor／re-clamp；wide／tall／long pending | current 1180 × 780 constraints |
 
-Tauri 官方 configuration 支援 `transparent`、`decorations`、`alwaysOnTop`、`skipTaskbar` 與多個 unique window labels。`pet` 應明確設 `shadow: false`；Windows 透明視窗仍需實測白色 flash，`noRedirectionBitmap` 只是可評估的 workaround，不應未驗證就宣稱必要。`visibleOnAllWorkspaces` 不支援 Windows，因此產品不可承諾跨所有虛擬桌面永遠顯示。
+0.2.0 已以 Tauri configuration 預建兩個 unique window labels，並為 `pet` 設定 transparent、decorations false、shadow false、always-on-top、skip-taskbar、不可 resize 與不可 close。Windows 透明視窗仍需在完整 DPI／GPU matrix 留意白色 flash；`visibleOnAllWorkspaces` 不支援 Windows，因此產品不承諾跨所有虛擬桌面永遠顯示。
 
 ### Surface routing
 
-`main.tsx` 依 `surface` query／window label 渲染：
+`main.tsx` 已依 `surface` query／window label 渲染：
 
 - `PetSurface`：只載入 render-safe `CreatureRenderState`、互動與 access-off tag；
 - `DetailSurface`：沿用完整 App 與 FirstMemoryFlow；
 - browser：維持 detail preview，明說 floating pet／native menu 不可用，不偽造多視窗行為。
 
-目前全域 `html`／`body` 有最小寬度與深色背景；`PetSurface` 必須採獨立的透明 surface reset，否則 native window 透明也只會顯示成黑色矩形。
+`PetSurface` 已採獨立透明 surface reset，不繼承 detail 的最小寬度與深色背景；native pet smoke 證實不再是 dashboard／黑色矩形。
 
 ### Rust-owned lifecycle
 
-視窗生命週期宜由 Rust 管理，而不是讓每個 WebView 取得廣泛 window mutation 權限：
+0.2.0 由 Rust 管理視窗生命週期，WebView 不取得廣泛 window mutation 權限：
 
-- `open_detail_window`：取得預建的 `main`，依序 unminimize、show、focus，然後 hide `pet`；任一步失敗都要保留 pet／tray recovery，不能先把唯一入口藏掉；
-- `return_to_pet`：hide `main`，validate position，show `pet`；
-- `main` minimize／restore：minimize 顯示 pet，restore 隱藏 pet；
-- `set_pet_visibility`／`set_pet_always_on_top`；
-- `quit_memoryling`；
-- 只攔 `main` 的 `CloseRequested`，把 X／Alt+F4 改為 cancel pending preview + hide；不可 blanket 阻擋 `ExitRequested`，tray Quit 與 Windows sign-out／shutdown 必須能結束；
-- tray 與 single-instance callback 呼叫相同 Rust functions。
+- Open 取得預建的 `main`，依序 unminimize、show、focus，再 hide `pet`；Return 先恢復／clamp `pet`，再 hide `main`。兩條路徑都有 compensating rollback，逐步 failure tests 驗證不留下雙窗或無 recovery surface。
+- `main` minimize 顯示 pet，restore／focus 收起 pet；Tray Hide 會把 pet 與仍在 taskbar 的 minimized main 一起藏進一致的 tray-only mode。
+- 只攔 `main` 的 `CloseRequested`，先在 Rust 清除 pending preview，再 hide main、恢復 pet；Minimize 不清 preview。
+- explicit Quit 不被 resident close interception 吞掉；tray、menu 與 single-instance callback 重用同一組 Rust lifecycle functions。正常 Quit 已 smoke 通過；Windows sign-out／shutdown 仍待 live UAT。
 
-目前 capability 只有綁 `main` 的 `core:default`，而且 `invoke_handler` 註冊的 app commands 預設可被所有 windows／webviews 呼叫。實作時必須同時收窄兩層：
+0.2.0 沒有 `core:default`、remote origin 或 wildcard；app commands 同時收窄兩層：
 
-1. 以 `tauri_build::AppManifest::commands` 產生每個 app command 的 permissions；`main` 才能呼叫 `list_memory_sources`、`preview_memory_source`、`cancel_memory_preview`、`get_memory_state`、`approve_memory_import`、`forget_memory_source`，`pet` 只取得 `get_creature_render_state` 與必要的 menu／interaction command；
-2. 每個敏感 Rust command 再檢查 caller window label 必須是 `main`，作為 defense in depth；
-3. `pet` 與 `main` 都不複製 `core:default`，而是逐項列出確實使用的 core permissions。
+1. `tauri_build::AppManifest::commands` 產生 exact permissions；只有 `main` 能呼叫 `list_memory_sources`、`preview_memory_source`、`cancel_memory_preview`、`get_memory_state`、`approve_memory_import`、`forget_memory_source`；
+2. 每個敏感 command 的 `MainCaller` 同時核對 message webview label 與 owning window label；`PetCaller`／`RenderCaller` 也只接受其明確 surface；
+3. `pet` 只取得窄的 render／shell／menu／onboarding commands 與 caller-bound `start_pet_dragging`；它不能傳入其他 window label，也沒有 generic core window-drag permission；
+4. production-context ACL invoke harness 與 empty-authority caller harness 都逐一拒絕六個敏感 commands，handler side-effect counter 為 0；`main` list 作正向控制。
 
-若 pet frontend 直接呼叫 `startDragging`，只授予 `core:window:allow-start-dragging`；若接收 render-state revision，再只加 listen／unlisten event 權限。不要開放任意 create／destroy／resize、show／focus、menu 或 tray 權限。
+兩個 local webviews 只列出實際需要的 event permissions；menu、tray、跨窗 show／hide／focus、resize 與位置存取都由 Rust 擁有。`pet` 沒有任意 create／destroy／resize、show／focus、menu、tray 或指定 label 的 window capability。
 
 ### Native menu、tray 與 single instance
 
-- Rust setup 建立並持有單一原生 context menu。`PetSurface` 的 `contextmenu` event 只呼叫狹窄 command；Rust 驗證 caller window label 必須是 `pet`，右鍵以 `Window::popup_menu` 顯示，鍵盤則以 `popup_menu_at` 錨定 pet。menu event 直接呼叫 Rust lifecycle，pet frontend 不取得 menu 或跨窗權限。
-- tray 使用 Tauri desktop tray API；Rust dependency 需開啟 `tray-icon` feature。Rust 建立的 menu／tray 不需要 frontend capability。
-- `tauri-plugin-single-instance` 應作為第一個 plugin 註冊；第二次啟動只喚醒既有 process 並聚焦 detail，不記錄或轉發 argv、cwd 或可能含私密路徑的值。
-- `tauri-plugin-window-state` 可作位置保存候選，優先由 Rust 使用，避免為 frontend 擴大 plugin permissions；使用 `StateFlags::POSITION` 並以 filter／allowlist 只追蹤 `pet`，排除 `main`，不還原 ALL／VISIBLE。
+- Rust setup 建立並持有單一原生 context menu。`PetSurface` 的 pointer／focused-keyboard event 只呼叫狹窄 command；Rust 驗證 caller 必須是 `pet`，並在正確 anchor popup。menu event 直接呼叫 Rust lifecycle，pet frontend 不取得 menu 或跨窗權限。
+- tray 使用 Tauri desktop tray API 建立 Open／Show／Hide／Always on top／Quit；Rust 建立的 menu／tray 不需要 frontend capability。
+- `tauri-plugin-single-instance` 是第一個 plugin；第二次啟動只喚醒既有 process 並聚焦 detail，不保存或轉發 argv、cwd 或可能含私密路徑的值。實際 Start shortcut 的 cold／resident 兩路已通過。
+- 位置與 onboarding 使用 Rust-owned content-free JSON，不使用 generic window-state plugin，也不還原 `main` visibility。
 
 不新增網路、telemetry、global shortcut、autostart 或任意 filesystem capability。
 
 ## 12. Cross-window state
 
-Rust／SQLite 仍是唯一 canonical state。現有完整 `MemoryState` 的 lineage 含核准後文字，不能交給 pet surface；需新增內容最小化的 typed DTO：
+Rust／SQLite 仍是 memory canonical state；shell settings 則是獨立的 content-free JSON。完整 `MemoryState` lineage 含核准後文字，不能交給 pet surface；0.2.0 已加入內容最小化的 typed DTO：
 
-1. detail 啟動時呼叫既有完整 state command；pet 的 app-command capability 只允許 `get_creature_render_state`，其中不含 normalized text、locator、path 或 explanation content；
-2. approve、forget 或未來 genome revision commit 成功後，Rust 發送只含 opaque revision／counts 的 `creature-state-changed` event；
-3. 兩個 surfaces 收到事件後分別重新讀取其 scope 允許的 typed state；
+1. detail 以 `MainCaller` 讀完整 state；pet 只取得 `CreatureRenderState`，其中不含 normalized text、display、locator、path、content hash 或 explanation content；
+2. approve、forget 或未來 genome revision commit 成功後，Rust 對 `pet` 與 `main` 發送只含 `{revision}` 的 `memoryling://creature-state-changed`；event failure 不回滾已提交的 memory transaction；
+3. 兩個 surfaces 收到 content-free event 後分別重新讀取其 scope 允許的 typed state；
 4. event 不攜帶 normalized text、source path 或 memory payload；
 5. pet renderer 只取得最終 render-safe mark IDs、visual-module IDs、受限 geometry／motion parameters 與 opaque revision，不取得 route profile ID／權重、來源細節、原始 activity labels 或人格摘要。
 
-detail 以 X／Alt+F4 關閉時，Rust close-request path 必須先在 backend 明確取消 pending preview，再 hide；`hide(main)` 不會 unmount WebView，不能依賴 React cleanup。Minimize 不取消 preview。若取消或後續 hide 失敗，回傳狀態必須維持一致並保留 tray recovery。
+detail 以 X／Alt+F4 關閉時，Rust close-request path 會先在 backend 明確取消 pending preview，再 hide；`hide(main)` 不會 unmount WebView，因此不依賴 React cleanup。Minimize 不取消 preview；failure compensation 維持一致 mode 並保留一個 recovery surface。
 
-locale、always-on-top、onboarding completion 與 pet position 屬本機 UI settings，不可混入 memory-derived genome 或 lineage。Always-on-top 的 Rust canonical setting 同步驅動 pet context menu 與 tray 的 checked state，不能各自保存兩份值。
+locale、always-on-top、onboarding completion 與 pet position 屬本機 UI settings，不混入 memory-derived genome 或 lineage。Always-on-top 的 Rust canonical setting 同步驅動 pet context menu 與 tray 的 checked state；onboarding completion 只在 geometry transition 成功後原子提交。
 
 ## 13. Privacy and presentation
 
@@ -282,9 +290,9 @@ locale、always-on-top、onboarding completion 與 pet position 屬本機 UI set
 
 ## 14. Delivery plan
 
-此功能不是 CSS 改版，而是新的 Windows resident-app lifecycle。建議在 real-source connector 前，用 synthetic fixture 完成以下垂直切片：
+此功能不是 CSS 改版，而是新的 Windows resident-app lifecycle。0.2.0 已以 bundled raw fixture 完成 shell core；下列狀態明確區分已交付與仍待驗收的部分。
 
-### Slice A — Two-window shell
+### Slice A — Two-window shell（0.2.0 completed）
 
 - `pet`／`main` window configuration；
 - surface routing；
@@ -294,62 +302,55 @@ locale、always-on-top、onboarding completion 與 pet position 屬本機 UI set
 - browser truth boundary；
 - unit tests + native desktop smoke。
 
-### Slice B — Native access and recovery
+### Slice B — Native access and recovery（0.2.0 core completed）
 
 - native right-click menu；
 - caller-label validation、最小 pet／main core capabilities 與 app-command permissions；
-- keyboard equivalents；
+- focused-keyboard menu equivalents 已有 automated coverage；`Win+B` live traversal pending；
 - tray Show／Hide／Open／Quit；
 - single-instance Start／installed shortcut relaunch；
 - access-off status與首次 onboarding。
 
-### Slice C — Position and state continuity
+### Slice C — Position and state continuity（compact baseline completed；live matrix／growth pending）
 
-- packaged Windows drag-vs-click spike and fallback interaction；
-- position persistence；
-- launch／show／drag-end／scale-change clamp 與 Windows display／taskbar-change trigger spike；
-- Rust revision event + pet refetch；
-- approve／forget 後 pet mark 即時同步；
-- 以 route-agnostic 的 compact／wide／tall／long synthetic envelope states 驗證固定 envelope 或 Rust-owned resize，並在每次 bounds 變更後重新 clamp；實際 route matrix 留到 Phase 2；
-- restart persistence；WebView process-failure recovery remains a separately tested P1。
+- pointer gesture threshold 與 caller-bound native drag 已完成；packaged adjacent-desktop hitbox pending；
+- content-free JSON position persistence、launch／show／settled move／scale／single-instance clamp 與 topology polling 已完成 automated coverage；live mixed-DPI／hot-unplug／taskbar relocation pending；
+- Rust content-free revision event、pet／main refetch、approve／forget mark sync 與 restart persistence 已完成；
+- compact onboarding → baseline resize／anchor／rollback 已完成；route-agnostic wide／tall／long envelopes 與實際 route matrix 未開始；
+- WebView process-failure detection／recovery remains a separately tested P1。
 
-### Slice D — Detail information architecture
+### Slice D — Detail information architecture（not started）
 
 - 把現有長頁整理為 Overview／Memories／Growth／Habitat／Privacy；
 - 不改動既有 fixture lineage 與 forgetting truth；
 - 英文／繁中 parity、keyboard、Narrator／NVDA 與 200% zoom。
 
-### Slice E — Windows packaging UAT
+### Slice E — Windows packaging UAT（core passed；full matrix pending）
 
-- current-user install；
-- Start Menu／實際安裝的 app shortcut relaunch；
-- pet launch、menu、dashboard、close-return、tray、quit；
-- explicit Quit and Windows sign-out／shutdown；
-- 100–200% DPI、多螢幕移除、taskbar relocation；
-- uninstall data-retain／delete choices；
-- rebuild NSIS and regenerate checksum。
+- current-user Explorer install、實際 Start shortcut cold／resident relaunch、pet／main core、menu、close-return、explicit native Quit 與 retained-data uninstall 已通過；
+- Windows sign-out／shutdown、live 125–200%／mixed DPI、monitor removal、taskbar relocation 與 `Win+B` pending；
+- WebView2-missing bootstrapper deferred；
+- 0.2.0 NSIS 與 checksum 已重建：2,875,965 bytes，SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`，`NotSigned`。
 
 每個 slice 必須完成產品路徑、Rust／React tests、native desktop smoke、文件與真實狀態更新，不能只留下 window connector 骨架。
 
 ## 15. Acceptance criteria
 
-- fresh launch 只顯示一個 pet surface，內含必要的 compact access-off badge，不自動開 dashboard。
-- 右鍵能在游標處開 menu；pet 已 focus 時 Enter／Space／`Shift+F10` 能在 pet 旁開 menu；Open Memoryling 是第一個 enabled item。
-- `Win+B` tray、Start Menu 與 packaged UAT 證實存在的 installed shortcut 都能找回 app。
-- Open 只顯示／聚焦一個 detail window，pet 同時收起。
-- detail minimize 顯示 pet，restore 再收起 pet；X／Alt+F4 取消 backend pending preview 並回到原位置的 pet。
-- tray Quit 才結束 process；resident close logic 不阻擋 Windows sign-out／shutdown。
-- 再次啟動不產生第二個 process、pet 或 SQLite writer。
-- 從 `pet` 逐一 invoke 既有 memory list／preview／cancel／state／approve／forget commands 全部 fail closed；只檢查正常 DTO 不算通過。
-- pet window 的外框不得在 visible pet＋honesty badge 的聯集外多出超過 12 DIP 的透明 margin；packaged smoke 要點擊外框四周相鄰桌面，確認沒有更大的隱形攔截區。
-- route-agnostic 的 compact／wide／tall／long envelope fixtures 都要在 100–200% DPI 驗證 bounds、拖曳、右鍵 menu anchor 與 work-area clamp；不得只測最緊湊的 baseline。實際 route／hybrid matrix 由 Phase 2 acceptance 負責。
-- 混合 DPI、monitor removal 與 taskbar relocation 後 pet 仍可見可操作。
-- fixture approve／forget 後 pet mark 與 detail explanation 一致；失敗交易不改 UI。
-- pet IPC／events 不含核准記憶文字、來源 locator、路徑或 lineage explanation。
-- browser 不假裝支援 native floating pet。
-- runtime 無網路請求、telemetry 或圖片／LLM API。
-- memory access off 在 real connector 前保持可見。
-- 開啟 detail 任一步驟失敗時，pet 或 tray 仍可見且可重試。
+- [x] Fresh launch 只顯示透明 pet surface 與 access-off badge，不自動開 dashboard；first-run onboarding 可 atomic dismiss／resize，失敗會 rollback。
+- [x] Pointer 右鍵與 focused-keyboard command 開同一原生 menu；Open Memoryling 是第一個 enabled item。
+- [x] 正常 Explorer 安裝後，Start Menu 的實際 shortcut 可 cold launch；resident relaunch 聚焦既有 app，不產生第二個 process、pet 或 SQLite writer。
+- [x] Open 只顯示／聚焦一個 detail window；detail minimize／restore、X／Alt+F4 pending-preview reset、tray-only Hide 與 recovery 維持單一一致 surface。
+- [x] Explicit native Quit 結束 process；direct tray action acceptance 仍列於下方未完成 gate。
+- [x] 從 `pet` 逐一 invoke memory list／preview／cancel／state／approve／forget，在 production ACL 與 caller-label defense 兩層都 fail closed，handler 未執行。
+- [x] Raw fixture preview／approve、restart、source → event → signal → completion-star lineage 與 forget 一致；失敗 transaction 不改 committed state。
+- [x] Pet DTO／events 不含核准記憶文字、display、locator、path、content hash 或 lineage explanation；event payload only `{revision}`。
+- [x] Browser 不假裝支援 native floating pet；runtime 無網路、telemetry、圖片／LLM API，且 real memory access off 保持可見。
+- [x] Lifecycle 每一步 failure 的 automated tests 驗證 compensating rollback，保留一個可恢復 surface。
+- [ ] Direct tray Open／Show／Hide／always-on-top／Quit、`Win+B` traversal、Narrator／NVDA、高對比與完整 keyboard-only live UAT。
+- [ ] Windows sign-out／shutdown 不被 resident close logic 阻擋的 live UAT。
+- [ ] Pet visible union 外框不超過 12 DIP，並以 packaged adjacent-desktop clicking 驗證沒有更大透明 hitbox。
+- [ ] Compact／wide／tall／long envelopes、live 125–200%／mixed DPI、monitor hot-unplug 與 taskbar relocation。
+- [ ] WebView2-missing bootstrapper path；目前 deferred，不阻擋 0.2.0 core evidence，但阻擋 ADR Accepted。
 
 ## 16. P1 after the shell is proven
 
@@ -372,7 +373,7 @@ locale、always-on-top、onboarding completion 與 pet position 屬本機 UI set
 - 不改寫已完成的 fixture lineage／forgetting 基礎；
 - 不把 browser mock 當 native window 驗證；
 - 不複製 Codex 的角色造型、資產或品牌識別；只借鑑「桌面上單一浮動生命、進階內容按需開啟」的互動層次；
-- 不在沒有選定視覺目標前重畫 production pet。
+- 不把尚未實作的 wide／tall／long growth visuals 說成 production pet 已具備。
 
 ## 18. Official technical references
 

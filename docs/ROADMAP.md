@@ -14,27 +14,32 @@ This roadmap describes intent, not a delivery promise.
 - [ ] exercise the WebView2-missing bootstrapper in a safe disposable Windows x64 environment
 - [x] record the finalized local test-artifact checksum and fresh Windows CI evidence
 - [x] decide that v0.1.0 remains unsigned, local-test-only, and not a public release
+- [x] build and hash unsigned `Memoryling_0.2.0_x64-setup.exe`: version 0.2.0, 2,875,965 bytes, SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`, `NotSigned`
 - [ ] complete code signing and public-distribution readiness before any public release
 - [ ] keyboard and screen-reader audit
 
 ## Phase 0.5 — Pet-first desktop presence
 
-Design foundation recorded: the user-confirmed [pet-first desktop shell draft](drafts/pet-first-desktop-shell-2026-08-11.md) and proposed [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md) define “two surfaces, one life.” Normal presence is one transparent floating pet; right-click is the primary detail entry, while `Win+B` tray, Start Menu, and packaged installed-shortcut paths provide recovery. Focused-pet keyboard actions open the same menu. This is design evidence, not implemented desktop behavior.
+The 0.2.0 vertical slice now implements the user-confirmed “two surfaces, one life” direction from the [pet-first desktop shell draft](drafts/pet-first-desktop-shell-2026-08-11.md) and proposed [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md). Normal presence is one transparent floating pet with one-time onboarding and visible memory-off honesty; right-click or a focused-pet keyboard action opens the native menu, while tray, Start Menu, and installed-shortcut relaunch recover the one detail surface. ADR-0003 remains Proposed because the remaining live Windows acceptance matrix is not complete.
 
 - [x] confirm the pet-only default surface and on-demand detail direction
 - [x] document native lifecycle, privacy, accessibility, DPI, and recovery requirements
-- [ ] add pre-created `pet` and hidden `main` surfaces with Rust-owned show／hide／focus and close／minimize／restore lifecycle
-- [ ] add native pet context menu, focused keyboard equivalent, tray Show／Hide／Open／Quit, and single-instance relaunch
-- [ ] generate per-window app-command permissions, deny all sensitive memory commands from `pet`, and test caller-label defense
-- [ ] add a content-minimized `CreatureRenderState` boundary and cross-surface revision synchronization
-- [ ] persist and clamp pet position across restart, work-area changes, mixed DPI, and monitor removal
-- [ ] keep the visible real-memory-off state, one-time onboarding, reduced-motion behavior, and bilingual parity
-- [ ] prove approve／restart／explain／forget consistency through packaged native desktop smoke
-- [ ] pass keyboard, Narrator／NVDA, 100–200% DPI, multi-monitor, shortcut, tray, and NSIS lifecycle UAT
+- [x] add pre-created `pet` and hidden `main` surfaces with Rust-owned show／hide／focus and compensating close／minimize／restore lifecycle
+- [x] add native pet context menu, focused keyboard equivalent, tray Show／Hide／Open／Quit, safe caller-bound dragging, and single-instance relaunch
+- [x] generate exact per-window app-command permissions and prove all six sensitive memory commands fail closed from `pet` independently at the production ACL and caller-label layers
+- [x] add a content-minimized `CreatureRenderState` boundary and content-free revision synchronization to pet and detail
+- [x] persist and clamp pet position across restart with monitor／work-area context, move／scale settle, topology polling, atomic shell settings, anchor-preserving onboarding resize, and pure 100–200% geometry tests
+- [x] keep the visible real-memory-off state, transparent pet, one-time bilingual onboarding, reduced-motion behavior, and browser truth boundary
+- [x] prove raw fixture approve／restart／lineage／forget consistency through native and packaged desktop smoke
+- [x] pass a normal Explorer-launched current-user NSIS install, actual installed Start shortcut cold and resident single-instance relaunch, core pet／main lifecycle, explicit Quit, and retained-data uninstall UAT
+- [x] pass 23 frontend tests and 29 Rust tests, including first-open SQLite concurrency and lifecycle rollback
+- [ ] live-test 125／150／200% and mixed-DPI movement, monitor hot-unplug, taskbar relocation, and adjacent-desktop pet hitbox
+- [ ] complete `Win+B`, Narrator／NVDA, keyboard-only, sign-out／shutdown, and remaining accessibility UAT
+- [ ] prove compact／wide／tall／long growth envelopes; only the compact baseline exists, and real-source／growth implementation has not started
 
 Exit condition: launching the packaged app shows exactly one recoverable floating pet; every supported entry opens exactly one detail window; pet attempts to invoke sensitive commands fail closed; both surfaces stay privacy-safe and state-consistent; browser mode remains honest; and no network boundary is added.
 
-**Exit status: not met.** The product direction and implementation contract are recorded, but the current app still opens one standard window and has no pet window, tray, or two-window lifecycle.
+**Exit status: not met, with the core 0.2.0 slice implemented.** Automated tests and current-host core native／packaged flows pass, but live DPI／mixed-monitor／taskbar／hitbox, `Win+B`, Narrator／NVDA, sign-out／shutdown, and non-compact envelope gates remain open. The WebView2-missing bootstrapper stays deferred. An early agent-direct launch that triggered Windows virtualization is an invalid harness artifact, not a product failure; only normal Explorer and installed-shortcut runs count as packaged evidence.
 
 ## Phase 1 — First real memory
 

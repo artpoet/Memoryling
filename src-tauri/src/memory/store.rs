@@ -1,11 +1,14 @@
 use std::{collections::HashSet, fs, path::PathBuf, time::Duration};
 
 use rusqlite::{params, Connection, Transaction, TransactionBehavior};
+use sha2::{Digest, Sha256};
 
 use super::{
     adapter::stable_id,
     model::{
-        CreatureMark, LineageSource, MemoryState, PreparedImport, DERIVATION_VERSION,
+        BodyModule, CreatureEnvelope, CreatureMark, CreatureMotion, CreaturePalette,
+        CreatureRenderMark, CreatureRenderMarkStyle, CreatureRenderState, FixtureState,
+        LineageSource, MemoryState, PreparedImport, RealMemoryAccess, DERIVATION_VERSION,
         STORE_SCHEMA_VERSION,
     },
 };
@@ -24,6 +27,11 @@ impl MemoryStore {
     pub(crate) fn state(&self) -> Result<MemoryState, String> {
         let connection = self.open_connection()?;
         state_from_connection(&connection)
+    }
+
+    pub(crate) fn creature_render_state(&self) -> Result<CreatureRenderState, String> {
+        let connection = self.open_connection()?;
+        creature_render_state_from_connection(&connection)
     }
 
     pub(crate) fn approve_import(
@@ -144,7 +152,7 @@ impl MemoryStore {
             })?;
         }
 
-        let connection = Connection::open(&self.path)
+        let mut connection = Connection::open(&self.path)
             .map_err(|error| local_store_error("open database", error))?;
         connection
             .busy_timeout(Duration::from_secs(5))
@@ -156,16 +164,22 @@ impl MemoryStore {
             .pragma_update(None, "secure_delete", true)
             .map_err(|error| local_store_error("enable secure deletion", error))?;
 
-        let version = connection
+        let migration = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|error| local_store_error("begin schema migration", error))?;
+        let version = migration
             .pragma_query_value(None, "user_version", |row| row.get::<_, i64>(0))
             .map_err(|error| local_store_error("read schema version", error))?;
         match version {
-            0 => connection
+            0 => migration
                 .execute_batch(MIGRATION_0001)
                 .map_err(|error| local_store_error("apply schema migration", error))?,
             STORE_SCHEMA_VERSION => {}
             _ => return Err("The local Memoryling database schema is not supported.".to_string()),
         }
+        migration
+            .commit()
+            .map_err(|error| local_store_error("commit schema migration", error))?;
 
         Ok(connection)
     }
@@ -335,6 +349,64 @@ fn state_from_connection(connection: &Connection) -> Result<MemoryState, String>
     })
 }
 
+fn creature_render_state_from_connection(
+    connection: &Connection,
+) -> Result<CreatureRenderState, String> {
+    let fixture_state = if count(connection, "source_imports")? == 0 {
+        FixtureState::Empty
+    } else {
+        FixtureState::Approved
+    };
+    let completion_star_count = connection
+        .query_row(
+            "SELECT COUNT(*)
+             FROM world_effects
+             WHERE state = 'active' AND effect_style = 'completion-star'",
+            [],
+            |row| row.get::<_, i64>(0),
+        )
+        .map_err(|error| local_store_error("read render-safe creature state", error))?;
+
+    let marks = if completion_star_count > 0 {
+        vec![CreatureRenderMark {
+            id: "mark-1".to_string(),
+            style: CreatureRenderMarkStyle::CompletionStar,
+        }]
+    } else {
+        Vec::new()
+    };
+    let fixture_revision_value = match fixture_state {
+        FixtureState::Empty => "empty",
+        FixtureState::Approved => "approved",
+    };
+    let marks_revision_value = if marks.is_empty() {
+        "none"
+    } else {
+        "completion-star"
+    };
+    let revision = Sha256::digest(
+        format!(
+            "1|off|{fixture_revision_value}|compact|baseline|violet-mint|calm|{marks_revision_value}"
+        )
+        .as_bytes(),
+    )
+    .iter()
+    .map(|byte| format!("{byte:02x}"))
+    .collect();
+
+    Ok(CreatureRenderState {
+        schema_version: 1,
+        revision,
+        real_memory_access: RealMemoryAccess::Off,
+        fixture_state,
+        envelope: CreatureEnvelope::Compact,
+        body_module: BodyModule::Baseline,
+        palette: CreaturePalette::VioletMint,
+        motion: CreatureMotion::Calm,
+        marks,
+    })
+}
+
 fn count(connection: &Connection, table: &str) -> Result<usize, String> {
     let query = format!("SELECT COUNT(*) FROM {table}");
     let count = connection
@@ -352,6 +424,8 @@ fn local_store_error(context: &str, error: rusqlite::Error) -> String {
 mod tests {
     use std::{
         fs,
+        sync::{Arc, Barrier},
+        thread,
         time::{SystemTime, UNIX_EPOCH},
     };
 
@@ -390,12 +464,67 @@ mod tests {
     }
 
     #[test]
+    fn concurrent_first_open_migrates_once_and_preserves_data() {
+        let (store, directory) = temporary_store();
+        let database_path = store.path.clone();
+        let worker_count = 8;
+        let barrier = Arc::new(Barrier::new(worker_count));
+        let workers = (0..worker_count)
+            .map(|_| {
+                let path = database_path.clone();
+                let barrier = Arc::clone(&barrier);
+                thread::spawn(move || {
+                    barrier.wait();
+                    MemoryStore::new(path).state()
+                })
+            })
+            .collect::<Vec<_>>();
+
+        for worker in workers {
+            let state = worker
+                .join()
+                .expect("concurrent first-open worker should not panic")
+                .expect("every concurrent first open should migrate or observe the migration");
+            assert_eq!(state.store_schema_version, STORE_SCHEMA_VERSION);
+            assert_eq!(state.source_count, 0);
+            assert_eq!(state.event_count, 0);
+        }
+
+        let prepared = prepare_import("codex.synthetic.first-memory", &fixture_path())
+            .expect("fixture should parse after concurrent migration");
+        let approved = store
+            .approve_import(&prepared, &[prepared.events[0].source_record_id.clone()])
+            .expect("data should remain writable after concurrent migration");
+        let reopened = MemoryStore::new(database_path)
+            .state()
+            .expect("migrated database should reopen with approved data");
+        assert_eq!(reopened, approved);
+        assert_eq!(reopened.source_count, 1);
+        assert_eq!(reopened.event_count, 1);
+        assert_eq!(reopened.signal_count, 1);
+        assert_eq!(reopened.marks.len(), 1);
+
+        fs::remove_dir_all(directory).expect("temporary store should be removable");
+    }
+
+    #[test]
     fn approval_persists_lineage_and_forgetting_removes_every_effect() {
         let (store, directory) = temporary_store();
         let prepared = prepare_import("codex.synthetic.first-memory", &fixture_path())
             .expect("fixture should parse");
         let selected = vec![prepared.events[0].source_record_id.clone()];
         let fixture_bytes_before = fs::read(fixture_path()).expect("fixture should be readable");
+
+        let empty_render = store
+            .creature_render_state()
+            .expect("empty render state should load");
+        assert_eq!(empty_render.fixture_state, FixtureState::Empty);
+        assert!(empty_render.marks.is_empty());
+        assert_eq!(empty_render.revision.len(), 64);
+        assert!(empty_render
+            .revision
+            .bytes()
+            .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase()));
 
         let approved = store
             .approve_import(&prepared, &selected)
@@ -408,6 +537,35 @@ mod tests {
         assert_eq!(approved.marks[0].style, "completion-star");
         assert_eq!(approved.marks[0].lineage.len(), 1);
         assert_eq!(approved.marks[0].lineage[0].source_record_id, selected[0]);
+
+        let approved_render = store
+            .creature_render_state()
+            .expect("approved render state should load");
+        assert_eq!(approved_render.fixture_state, FixtureState::Approved);
+        assert_eq!(approved_render.marks.len(), 1);
+        assert_ne!(approved_render.revision, empty_render.revision);
+        let pet_json =
+            serde_json::to_string(&approved_render).expect("render state should serialize");
+        for forbidden in [
+            "memoryText",
+            "sourceId",
+            "sourceRecordId",
+            "locator",
+            "contentHash",
+            "explanationKey",
+        ] {
+            assert!(!pet_json.contains(forbidden));
+        }
+        for private_value in [
+            prepared.events[0].normalized_text.as_str(),
+            prepared.events[0].source_id.as_str(),
+            prepared.events[0].source_record_id.as_str(),
+            prepared.events[0].content_hash.as_str(),
+            prepared.source.display_name.as_str(),
+            prepared.source.locator.as_str(),
+        ] {
+            assert!(!pet_json.contains(private_value));
+        }
 
         let persisted_source = Connection::open(&store.path)
             .expect("store should reopen for schema assertion")
@@ -446,6 +604,12 @@ mod tests {
         assert_eq!(forgotten.event_count, 0);
         assert_eq!(forgotten.signal_count, 0);
         assert!(forgotten.marks.is_empty());
+        let forgotten_render = store
+            .creature_render_state()
+            .expect("forgotten render state should load");
+        assert_eq!(forgotten_render.fixture_state, FixtureState::Empty);
+        assert_eq!(forgotten_render.revision, empty_render.revision);
+        assert!(forgotten_render.marks.is_empty());
         let connection = Connection::open(&store.path).expect("forgotten store should reopen");
         for table in [
             "source_imports",
@@ -475,6 +639,9 @@ mod tests {
         let prepared = prepare_import("codex.synthetic.first-memory", &fixture_path())
             .expect("fixture should parse");
 
+        let render_before = store
+            .creature_render_state()
+            .expect("empty render state should load");
         assert!(store.approve_import(&prepared, &[]).is_err());
         assert!(store
             .approve_import(&prepared, &["unknown-record".to_string()])
@@ -484,6 +651,12 @@ mod tests {
         assert_eq!(state.source_count, 0);
         assert_eq!(state.event_count, 0);
         assert!(state.marks.is_empty());
+        assert_eq!(
+            store
+                .creature_render_state()
+                .expect("failed approval should preserve render state"),
+            render_before
+        );
 
         fs::remove_dir_all(directory).expect("temporary store should be removable");
     }

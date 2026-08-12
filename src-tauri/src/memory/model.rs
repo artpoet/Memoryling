@@ -117,3 +117,67 @@ pub struct MemoryState {
     pub signal_count: usize,
     pub marks: Vec<CreatureMark>,
 }
+
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct CreatureRenderState {
+    pub schema_version: u8,
+    pub revision: String,
+    pub real_memory_access: RealMemoryAccess,
+    pub fixture_state: FixtureState,
+    pub envelope: CreatureEnvelope,
+    pub body_module: BodyModule,
+    pub palette: CreaturePalette,
+    pub motion: CreatureMotion,
+    pub marks: Vec<CreatureRenderMark>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum RealMemoryAccess {
+    Off,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum FixtureState {
+    Empty,
+    Approved,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum CreatureEnvelope {
+    Compact,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum BodyModule {
+    Baseline,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum CreaturePalette {
+    VioletMint,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum CreatureMotion {
+    Calm,
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct CreatureRenderMark {
+    pub id: String,
+    pub style: CreatureRenderMarkStyle,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum CreatureRenderMarkStyle {
+    CompletionStar,
+}

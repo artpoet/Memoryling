@@ -57,16 +57,16 @@ No user-owned agent memory has been imported or used for real-data UAT. The visi
 
 The scoped automatic-derivation model described above is future design, not behavior of the current fixture pilot. It does not weaken the current import preview or explicit fixture approval flow, and it must pass a dedicated privacy review before real-source implementation.
 
-## Proposed pet-surface display boundary
+## Implemented pet-surface display boundary
 
-The user-confirmed floating-pet shell is not implemented, but its privacy contract is already fixed:
+The v0.2.0 floating-pet shell enforces this privacy contract; extended live accessibility and screen-sharing acceptance remain open:
 
-- The resident pet surface receives a dedicated render-safe state, not the full memory or lineage DTO. It must not receive normalized memory text, source paths or locators, private explanation content, or arbitrary record payloads.
-- A safe DTO is not sufficient by itself. Per-window app-command permissions and caller-label checks must deny list／preview／cancel／full-state／approve／forget commands from the pet surface, with negative invoke tests.
+- The resident pet surface receives a whitelisted render-safe state, not the full memory or lineage DTO. It excludes normalized memory text, source paths or locators, private explanation content, and arbitrary record payloads.
+- Exact per-window app-command permissions plus Rust caller-label checks deny list／preview／cancel／full-state／approve／forget commands from the pet surface. Production-ACL and independent caller-defense invoke tests cover all six.
 - Pet reactions, native menu items, tray labels, window titles, onboarding, and operating-system surfaces must remain neutral; they cannot reveal names, projects, traits, or source summaries.
-- Cross-window events carry only opaque revisions or non-sensitive counts. Each surface refetches a typed state limited to its purpose.
+- Cross-window events carry only opaque revisions or non-sensitive shell state. Each surface refetches a typed state limited to its purpose.
 - Closing the detail window, hiding the pet, quitting the app, and forgetting a source are distinct operations and must never be described as equivalent deletion.
-- The visible real-memory-off status remains on the pet surface until a real connector is verified. Browser mode must not imitate native persistence or resident-window behavior.
+- The visible real-memory-off status remains on the pet surface until a real connector is verified. Native labels are authoritative; browser mode renders the honest detail preview and does not imitate persistence or resident-window behavior.
 - A screenshot／screen-sharing privacy mode and neutral growth-summary review are required before public testing with real memory-derived state.
 
 ## Before any network feature

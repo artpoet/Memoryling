@@ -1,0 +1,18 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "Detail-window access to approved Memoryling commands",
+  "local": true,
+  "webviews": ["main"],
+  "permissions": [
+    "allow-list-memory-sources",
+    "allow-preview-memory-source",
+    "allow-cancel-memory-preview",
+    "allow-get-memory-state",
+    "allow-approve-memory-import",
+    "allow-forget-memory-source",
+    "allow-reset-pet-onboarding",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten"
+  ]
+}

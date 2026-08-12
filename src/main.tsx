@@ -1,11 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+import SurfaceRouter from "./SurfaceRouter";
+import { getCurrentSurface } from "./surface";
 
-document.title = "Memoryling — Your agent memories, alive";
+const surface = getCurrentSurface();
+document.documentElement.dataset.surface = surface === "pet" ? "pet" : "detail";
+document.title = "Memoryling";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <SurfaceRouter surface={surface} />
   </React.StrictMode>,
 );

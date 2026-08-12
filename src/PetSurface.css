@@ -1,0 +1,170 @@
+html[data-surface="pet"],
+html[data-surface="pet"] body,
+html[data-surface="pet"] #root {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #f7f3ff;
+  background: transparent !important;
+}
+
+html[data-surface="pet"] *,
+html[data-surface="pet"] *::before,
+html[data-surface="pet"] *::after {
+  box-sizing: border-box;
+}
+
+.pet-surface {
+  position: relative;
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  padding: 8px;
+  place-items: center;
+  overflow: hidden;
+  background: transparent;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  user-select: none;
+}
+
+.pet-button {
+  position: absolute;
+  inset: 8px 8px 46px;
+  display: grid;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pet-button:active { cursor: grabbing; }
+
+.pet-button:focus-visible {
+  outline: 3px solid #82e7c5;
+  outline-offset: -3px;
+  border-radius: 34px;
+}
+
+.pet-button .creature-body {
+  width: min(100%, 304px);
+  height: min(100%, 266px);
+  transform: scale(1.08);
+}
+
+.pet-button .orbit-one { width: 286px; height: 146px; }
+.pet-button .orbit-two { width: 218px; height: 260px; }
+.pet-button.pet-reacting .memoryling { transform: translateY(-4px) scale(1.035); }
+
+.pet-access-badge {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+  margin: 0;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 197, 107, 0.42);
+  border-radius: 999px;
+  color: #f2dfbd;
+  background: rgba(29, 23, 40, 0.92);
+  box-shadow: 0 7px 22px rgba(0, 0, 0, 0.28);
+  font-size: 12px;
+  font-weight: 750;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.pet-surface-onboarding {
+  align-content: start;
+  padding: 8px;
+}
+
+.pet-surface-onboarding .pet-button {
+  inset: 0 0 auto;
+  height: 205px;
+}
+
+.pet-surface-onboarding .pet-button .creature-body {
+  transform: scale(0.82);
+  transform-origin: top center;
+}
+.pet-surface-onboarding .pet-button .orbit-one { width: 286px; }
+.pet-surface-onboarding .pet-button .orbit-two { height: 198px; }
+.pet-surface-onboarding .pet-access-badge { bottom: 8px; }
+
+.pet-onboarding {
+  position: absolute;
+  right: 8px;
+  bottom: 48px;
+  left: 8px;
+  z-index: 3;
+  padding: 13px 14px;
+  border: 1px solid rgba(203, 186, 255, 0.32);
+  border-radius: 17px;
+  color: #eee8ff;
+  background: rgba(24, 19, 38, 0.96);
+  box-shadow: 0 15px 38px rgba(0, 0, 0, 0.38);
+}
+
+.pet-onboarding h1 {
+  margin: 0 0 7px;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+
+.pet-onboarding ul {
+  display: grid;
+  gap: 3px;
+  margin: 0 0 9px;
+  padding-left: 18px;
+  color: #bcb2cc;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.pet-onboarding button {
+  width: 100%;
+  min-height: 31px;
+  border: 0;
+  border-radius: 9px;
+  color: #171120;
+  background: linear-gradient(135deg, #b6a2ff, #82e7c5);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.pet-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-button.pet-reacting .memoryling { transform: none; }
+}
+
+@media (forced-colors: active) {
+  .pet-access-badge,
+  .pet-onboarding {
+    border: 2px solid CanvasText;
+    color: CanvasText;
+    background: Canvas;
+    forced-color-adjust: auto;
+  }
+
+  .pet-button:focus-visible { outline-color: Highlight; }
+}

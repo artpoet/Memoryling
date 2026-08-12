@@ -7,13 +7,13 @@
 
 ## Context
 
-Memoryling is intended to feel like a small desktop life, but the implemented app currently opens one conventional 1180 × 780 dashboard window. The user has confirmed a pet-first interaction direction: normal presence should be one floating creature, while detailed memory, growth, lineage, and settings content opens only on demand from the creature.
+Memoryling is intended to feel like a small desktop life. The 0.2.0 vertical slice now implements the user-confirmed pet-first direction: normal presence is one transparent floating creature, while detailed memory, lineage, and settings content opens on demand in one conventional detail window. Real-source and creature-growth work have not started.
 
 Making right-click the only entry would create discoverability and recovery failures. A transparent resident window also introduces Windows-specific lifecycle, focus, DPI, multi-monitor, accessibility, and single-instance requirements that cannot be solved as a CSS-only redesign.
 
 ## Proposed decision
 
-Memoryling will adopt one native process with two pre-created Tauri windows and one canonical Rust／SQLite state:
+Memoryling will adopt one native process with two pre-created Tauri windows, canonical Rust／SQLite memory state, and a separate content-free local shell-settings record:
 
 1. **`pet` is the normal surface.** It is a tightly bounded, transparent, undecorated, fixed-size, skip-taskbar window. It does not take initial focus. It is always-on-top by default, with an explicit user toggle and Hide action.
 2. **`main` is the detail surface.** It retains standard Windows decorations, taskbar and Alt+Tab behavior, resizing, semantic application UI, and full lineage controls. It is created at startup but remains hidden until explicitly opened.
@@ -23,10 +23,21 @@ Memoryling will adopt one native process with two pre-created Tauri windows and 
 6. **App commands are window-scoped.** Tauri app-command permissions generated with `AppManifest::commands` grant full memory commands only to `main`; `pet` receives only its render-safe state and necessary interaction commands. Sensitive Rust commands also reject non-`main` caller labels as defense in depth. Neither surface inherits an unreviewed `core:default` set.
 7. **Pet state is content-minimized.** `pet` receives a dedicated `CreatureRenderState` that contains only render-safe appearance and neutral status data. It never receives approved memory text, source paths or locators, private lineage explanations, or arbitrary memory payloads.
 8. **Real-memory honesty remains visible.** Until a real connector and consent flow exist, the one pet surface includes a low-interference but readable “memory access is off” badge. Browser preview does not fake native windows, tray, or persistence.
-9. **Position is recoverable.** Pet placement is stored in logical coordinates with monitor and work-area context, then clamped at launch, show／recovery, drag end, scale change, and single-instance recovery. Immediate monitor／taskbar topology handling requires an explicit Windows hook or polling decision. P0 does not use click-through.
+9. **Position is recoverable.** Pet placement is stored in logical coordinates with monitor and work-area context, then clamped at launch, show／recovery, settled move／scale change, and single-instance recovery. A controlled poll revalidates visible-pet monitor／work-area topology. P0 does not use click-through.
 10. **No new network boundary.** This shell adds no remote AI, runtime image generation, telemetry, cloud sync, arbitrary filesystem access, autostart, or global shortcut.
 
-The technical proposal remains **Proposed** until a packaged Windows vertical slice passes native lifecycle, accessibility, DPI, multi-monitor, privacy, and single-instance acceptance.
+The architecture is implemented, but this ADR remains **Proposed** until the remaining live Windows accessibility, DPI, multi-monitor, desktop-hitbox, and session-lifecycle acceptance gates pass.
+
+## 0.2.0 implementation evidence
+
+- **Automated:** 23 frontend tests and 29 Rust tests pass. The Rust suite covers an eight-thread first-open SQLite migration race, transition rollback, position／anchor recovery, content-minimized DTOs, exact local-only capabilities, and shell settings recovery.
+- **Two independent security layers:** a production-authority invoke harness denies `pet` access to list, preview, cancel-preview, full-state, approve, and forget before handler entry; an empty-authority harness independently proves the dual WebView／native-window `MainCaller` label guard denies the same six. A `main` list invoke is the positive control.
+- **Native core:** transparent pet, one-time onboarding, pointer and focused-keyboard native menu paths, single-instance recovery, close／minimize／restore, raw movement／second-monitor observation, core pet／main state transitions, and explicit native Quit pass on the current Windows host. Tray actions and position recovery have automated evidence but are not overstated as completed live acceptance.
+- **Fixture continuity:** raw bundled fixture preview／approve, restart persistence, source → event → signal → completion-star lineage, cross-surface state, and complete forgetting pass. No real user memory was used.
+- **Packaged:** a normal Explorer-launched current-user NSIS install and the actual installed Start shortcut pass cold launch and resident single-instance relaunch. Explicit Quit and retained-data uninstall also pass.
+- **Artifact:** `Memoryling_0.2.0_x64-setup.exe`, 2,875,965 bytes, SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`, version 0.2.0, `NotSigned`.
+- **Harness boundary:** an earlier agent-direct installer launch triggered Windows virtualization. That route is invalid acceptance evidence and is not classified as a product failure; packaged claims use normal Explorer and installed-shortcut launches.
+- **Still pending:** live 125–200%／mixed-DPI movement, monitor hot-unplug, taskbar relocation, adjacent-desktop hitbox probing, `Win+B`, Narrator／NVDA, sign-out／shutdown, and compact／wide／tall／long growth envelopes. WebView2-missing bootstrapper testing is deferred.
 
 ## Consequences
 
@@ -59,15 +70,18 @@ The technical proposal remains **Proposed** until a packaged Windows vertical sl
 
 ## Acceptance gate
 
-Before this ADR can be marked Accepted, the packaged Windows build must prove:
+Before this ADR can be marked Accepted, the packaged Windows build must close every remaining unchecked gate:
 
-- fresh launch shows one transparent pet without stealing focus or adding a taskbar item;
-- native right-click, focused-pet keyboard menu, `Win+B` tray, Start Menu, and any packaged installed shortcut can open or recover one detail window;
-- detail close or minimize restores the pet; detail restore hides it; explicit Quit ends the one process without blocking Windows session shutdown;
-- repeat launch does not create another pet, tray icon, or SQLite writer;
-- pet IPC and events contain no memory text, source locator, path, or explanation payload;
-- attempts from `pet` to invoke list, preview, cancel-preview, full-state, approve, or forget commands are denied fail-closed by capability and caller-label tests;
-- approve, restart, explain, forget, and failed-transaction states stay consistent across both surfaces;
-- pet position remains usable across 100–200% scaling, mixed-DPI monitors, taskbar movement, and monitor removal;
-- Narrator／NVDA, reduced motion, keyboard-only operation, and packaged NSIS smoke pass;
-- real-memory access remains visibly off and no network request is introduced.
+- [x] fresh launch shows one transparent pet without stealing focus or adding a taskbar item;
+- [x] native right-click, focused-pet keyboard menu, Start Menu, and the actual installed shortcut open or recover one detail window;
+- [x] detail close or minimize restores the pet; detail restore hides it; explicit Quit ends the one process;
+- [x] repeat installed-shortcut launch keeps one resident process and reuses the existing app surfaces;
+- [x] pet IPC and events contain no memory text, source locator, path, explanation, source identity, or content hash;
+- [x] `pet` attempts to invoke list, preview, cancel-preview, full-state, approve, or forget are denied fail-closed by both production ACL and caller-label tests;
+- [x] raw fixture approve, restart, explanation lineage, forget, and failed-transaction states stay consistent across both surfaces;
+- [x] real-memory access remains visibly off and the shell adds no network boundary;
+- [ ] live 125–200% scaling, mixed-DPI movement, monitor hot-unplug, taskbar relocation, and adjacent-desktop hitbox probing pass;
+- [ ] direct tray Open／Show／Hide／always-on-top／Quit, `Win+B`, Narrator／NVDA, and remaining keyboard-only acceptance pass;
+- [ ] Windows sign-out／shutdown prove the resident close logic does not block session exit;
+- [ ] compact／wide／tall／long envelope bounds and interaction pass; only compact baseline behavior exists today;
+- [ ] the deferred WebView2-missing bootstrapper check is completed before public distribution.

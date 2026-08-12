@@ -1,5 +1,3 @@
-BEGIN IMMEDIATE;
-
 CREATE TABLE source_imports (
     source_id TEXT PRIMARY KEY NOT NULL,
     adapter_id TEXT NOT NULL,
@@ -58,4 +56,3 @@ CREATE INDEX derived_signal_sources_event_idx ON derived_signal_sources(memory_e
 CREATE INDEX world_effect_signals_signal_idx ON world_effect_signals(signal_id);
 
 PRAGMA user_version = 1;
-COMMIT;

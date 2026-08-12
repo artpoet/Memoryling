@@ -14,6 +14,7 @@ interface FirstMemoryFlowProps {
   client: MemoryClient;
   memoryState: MemoryState;
   onMemoryStateChange: (state: MemoryState) => void;
+  resetRevision?: number;
 }
 
 const flowCopy = {
@@ -169,6 +170,7 @@ function FirstMemoryFlow({
   client,
   memoryState,
   onMemoryStateChange,
+  resetRevision = 0,
 }: FirstMemoryFlowProps) {
   const t = flowCopy[locale];
   const [sources, setSources] = useState<SourceOption[]>([]);
@@ -207,6 +209,20 @@ function FirstMemoryFlow({
       active = false;
     };
   }, [client, onMemoryStateChange]);
+
+  useEffect(() => {
+    if (resetRevision === 0) return;
+    setSelectedSourceId("");
+    setPreview(null);
+    setSelectedRecordIds([]);
+    setConsent(false);
+    setForgetConsent(false);
+    setShowForget(false);
+    setShowWhy(false);
+    setWorking(false);
+    setError(false);
+    setNotice(null);
+  }, [resetRevision]);
 
   const selectedSource = useMemo(
     () => sources.find((source) => source.id === selectedSourceId),
