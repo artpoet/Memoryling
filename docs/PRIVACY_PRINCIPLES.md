@@ -12,13 +12,15 @@ Raw agent memories and derived state stay on the user's device by default. No te
 
 Memoryling must explain which source it wants to read, which path or account is involved, and what categories of records will be imported. Consent to one source does not authorize another.
 
+For the proposed growth system, one consent scope covers one exact source, its source-specific adapter version, allowed data categories, local derivation purposes, and consent／mapping versions. New records inside that exact scope may then update abstract local growth without per-record prompts. Another source requires another scope; a new category, purpose, or materially changed mapping requires a new consent revision. This never authorizes scanning another location or silently expanding use. The user must be able to inspect aggregate reasons, correct classification, disable derivation, revoke a scope, and forget its local downstream effects.
+
 ### 3. Read-only connectors
 
 Source adapters may read approved durable-memory records but must not alter, delete, reorganize, or “repair” the source agent's files.
 
 ### 4. Import preview
 
-Before persistence, users should see the proposed scope, record count, time range, and representative redacted samples. They can exclude records or cancel.
+Before the initial real-source scope is activated, users should see the proposed source, adapter version, data categories, purposes, initial record count／time range, and representative redacted samples. They can exclude initial records or cancel. Once that exact scope is active, later in-scope records may persist and derive automatically without another per-record preview; users instead retain aggregate inspection, correction, scope disable／revoke, and forgetting controls. Any scope expansion returns to preview and consent.
 
 The current pilot shows fictional fixture text. Redaction behavior for a real source must be designed and verified before private-data UAT.
 
@@ -52,6 +54,8 @@ The implemented first-memory pipeline has a deliberately narrower boundary than 
 - SQLite foreign keys and `secure_delete` are enabled, but this is an application-level deletion control, not a cryptographic secure-erasure guarantee.
 
 No user-owned agent memory has been imported or used for real-data UAT. The visible real-memory access state must remain off until a real connector and consent flow are verified.
+
+The scoped automatic-derivation model described above is future design, not behavior of the current fixture pilot. It does not weaken the current import preview or explicit fixture approval flow, and it must pass a dedicated privacy review before real-source implementation.
 
 ## Proposed pet-surface display boundary
 

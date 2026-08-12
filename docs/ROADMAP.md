@@ -58,13 +58,20 @@ Exit condition: one approved Codex memory can create one explainable, removable 
 
 ## Phase 2 — A life that continues
 
-Design foundation recorded: the user confirmed the biological／organic plus restrained sacred-premium direction and a content-responsive space with many variants. The current concept forms are vocabulary and adjacent-bridge references, not a fixed pre-authored pet roster. The [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) and proposed [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md) propose a deterministic, lineage-aware weighted profile compiled into bounded `MorphologyRecipe` variants. Distant forms may diverge, while each adjacent stage or recipe change retains a versioned, understandable evolution bridge. Permanent growth comes only from approved durable Agent-activity evidence; no live monitoring exists, and any future separately consented presence state remains reversible. This is design evidence, not implemented Phase 2 functionality or an accepted schema.
+Design foundation recorded: the user confirmed the biological／organic plus restrained sacred-premium direction and a content-responsive space with many variants. The current concept forms are vocabulary and adjacent-bridge references, not a fixed pre-authored pet roster. The [future creature-growth boundary](ARCHITECTURE.md#future-creature-growth-boundary), [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md), [Agent-memory variation rules](drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md), and proposed [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md) describe a deterministic, lineage-aware weighted profile compiled into bounded `MorphologyRecipe` variants. The proposed PM split uses authorized Agent-use behavior for primary morphology, authorized history outcomes for maturity and marks, collaboration mode for local motion, and content domain only for a secondary material accent. This is design evidence, not implemented Phase 2 functionality, an accepted schema, or an extension of the current fixture consent.
 
 - [ ] persistent creature traits and visual marks
 - [ ] versioned identity core, growth contributions, recomputable creature genome, and evolution stages
+- [ ] add a versioned `SourceConsentScope` over one selected source and adapter version, allowed data categories, and named derivation purposes; derive automatically only within that scope, use a separate scope for another source, and require a new revision preview／consent before category／purpose／mapping expansion
+- [ ] implement the A／C／B evidence contract: A Agent-use behavior alone shapes primary morphology, C outcome-qualified history gates reshaping／advances maturity／creates lineage marks without selecting a silhouette, and B collaboration mode affects only bounded local movement
+- [ ] restrict approved content-domain influence to a secondary material／surface accent rather than stage, main form, or personality inference
+- [ ] derive `EphemeralActivityHint` from newly normalized in-scope records as a content-minimized, memory-only TTL state that cannot enter SQLite, contributions, maturity, or permanent recipes
+- [ ] keep any optional live-presence adapter as a distinct, separately consented, content-free, TTL-bound source that cannot mutate permanent growth
+- [ ] require multiple deduplicated independent outcome-qualified canonical groups before permanent structural reshaping; prove time, record volume, duplicate sources, tokens, session length, and open hours add no XP
 - [ ] versioned, lineage-aware `EvolutionPathProfile` as a weighted influence vector, with deterministic recipe recomputation
 - [ ] finite versioned module catalog, compatibility matrix, visual-slot caps, and quantized `MorphologyRecipe` compiler for many bounded variants
 - [ ] deterministic EvolutionBridge records and adjacent-stage continuity acceptance
+- [ ] atomically rederive profile, maturity, recipe, bridges, marks, journal, explanations, and caches after forget, approved-evidence correction, or consent-scope disable, with no ghost modules or stale lineage
 - [ ] layered local renderer with no runtime image-generation dependency
 - [ ] multi-day story event state machine
 - [ ] habitat changes linked to completions and recurring themes
@@ -73,9 +80,10 @@ Design foundation recorded: the user confirmed the biological／organic plus res
 - [ ] reduced-motion, keyboard, screen-reader, high-contrast, and 200% zoom acceptance for automatic evolution
 - [ ] screenshot／streaming privacy mode and neutral growth-summary behavior before public testing
 - [ ] a local source-detail unlock gate for Growth Journal explanations before exposing private record details
-- [ ] any optional live-presence adapter remains separately consented, content-free, TTL-bound, memory-only, and unable to mutate permanent growth
 
-Exit condition: the creature demonstrates continuity across restarts, explains every persistent change, and produces many distinguishable but bounded and understandable variants from a synthetic approved-activity profile matrix; forgetting recomputes the recipe without ghost modules, live Agent presence does not mutate permanent form, and rendering makes no runtime model call.
+Exit condition: synthetic fixtures prove that `SourceConsentScope` blocks unapproved source／category／purpose expansion; A／C／B and secondary-domain evidence stay within their assigned influence limits; multiple deduplicated outcome-qualified groups—not time or usage volume—gate permanent reshape; forget, correction, and scope disable deterministically rederive all downstream state; every persistent recipe change has an understandable `EvolutionBridge`; and rendering makes no runtime model call.
+
+**Exit status: not met.** The consent scope, A／B／C evidence lanes, outcome gate, ephemeral hint, recipe compiler, bridge records, and correction／disable recomputation are proposed only and do not exist in the current fixture runtime.
 
 ## Phase 3 — Useful initiative
 

@@ -96,6 +96,7 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - docs/PRODUCT_VISION.md — product intent
 - docs/zh-TW/PRODUCT_VISION.md — Traditional Chinese product intent
 - docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md — user-confirmed growth direction with proposed implementation details; design only, not implemented
+- docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md — five-round PM specification for scoped Agent-memory derivation, information priority, recent-versus-durable growth, and variant acceptance; design only, not implemented
 - docs/drafts/pet-first-desktop-shell-2026-08-11.md — user-confirmed pet-only presence plus proposed Windows lifecycle and acceptance plan; design only, not implemented
 - docs/adr/0003-pet-first-two-window-desktop-shell.md — proposed two-window, Rust-owned resident-shell decision
 - docs/adr/0004-deterministic-content-derived-evolution-paths.md — proposed local, lineage-aware bounded-variant growth decision
@@ -139,7 +140,10 @@ The user-confirmed future interaction direction is “two surfaces, one life”:
 - Use synthetic fixtures only.
 - Record architectural decisions as ADRs.
 - Treat route labels as observable approved activity signals, never as sensitive personality or sentiment classifications.
-- Treat `EvolutionPathProfile` as a weighted influence vector that may compile into many bounded, versioned `MorphologyRecipe` variants. Only approved durable Agent-activity evidence may affect permanent form; live active／idle／session presence stays ephemeral.
+- Treat `EvolutionPathProfile` as a weighted influence vector that may compile into many bounded, versioned `MorphologyRecipe` variants. Only authorized, lineage-bearing durable Agent-activity evidence may affect permanent form; live active／idle／session presence stays ephemeral.
+- For the proposed real-source growth system, one `SourceConsentScope` binds one exact source plus allowed data categories, purposes, adapter version, and consent／mapping versions. Records inside that scope may derive locally without per-record prompts; another source needs another scope, while any category or purpose expansion needs a new consent revision.
+- Apply growth information in this order: observable Agent activity alone controls primary silhouette／motion; accumulated journey and outcomes gate permanent reshaping and control maturity／milestones without selecting a silhouette; collaboration style controls at most one bounded rhythm accent. Coarse content domain may affect only secondary material／surface vocabulary.
+- Recent activity produces only TTL-bound `EphemeralActivityHint` presentation. Permanent reshaping requires multiple deduplicated, independent, outcome-qualified evidence groups; calendar time, raw record volume, token count, Agent count, and app-open time are never XP.
 - No live Agent monitoring exists. Any future `LiveAgentPresence` adapter is a separate consented feature: allowlisted enum only, memory-only with TTL, no SQLite／logs／telemetry, neutral by default, and cleared immediately when disabled or unavailable.
 - Update PROJECT_STATUS.md after a meaningful change.
 - Avoid widening Tauri capabilities without a demonstrated need.
@@ -184,6 +188,8 @@ Close the Windows x64 fixture-only test-build gate:
 After that gate, complete the pet-first shell against synthetic state before widening source access: pre-created `pet`／`main` surfaces, Rust-owned menu／tray／single-instance lifecycle, per-window app-command permissions with pet-denial tests, content-minimized `CreatureRenderState`, close／minimize／restore behavior, position／DPI recovery, approve／forget synchronization, bilingual accessibility, and packaged native smoke. Do not stop at window connectors or a browser mock.
 
 Only after that shell passes should the first user-selected Codex-source pilot resume: validate a stable supported format, add a Rust-owned narrow picker and redacted preview, and require explicit authorization before private-data UAT. Do not scan tool-home directories, generalize arbitrary filesystem access, or skip directly to open-ended AI chat.
+
+The later Phase 2 growth implementation must start from the synthetic fixture matrix in `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`; do not implement a fixed sprite route, per-record consent spam, silent scope expansion, or usage-volume leveling.
 
 ## Closeout checklist
 

@@ -19,6 +19,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - Product and technical design draft for deterministic, lineage-aware creature growth with large-form evolution, adjacent-stage EvolutionBridges, reversible time states, local rendering, and no runtime image-generation dependency
 - User-confirmed pet-first desktop-shell design, proposed ADR-0003, and a staged native acceptance plan for one floating pet, on-demand detail, right-click menu, tray recovery, single-instance lifecycle, and content-minimized render state
 - User-confirmed shared biological／organic and restrained sacred-premium creature language, plus proposed ADR-0004 for deterministic, lineage-aware bounded-variant evolution and recomputation after forgetting
+- Five-round PM specification for Agent-memory-linked variants: activity > accumulated journey／outcomes > collaboration, coarse content-domain accents, scoped one-time consent with automatic in-scope local derivation, and outcome-gated durable reshaping after ephemeral recent-use hints
 
 ### Changed
 
@@ -26,6 +27,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - Real-memory access remains visibly off during the fixture pilot and in browser preview
 - Windows bundling now targets an unsigned bilingual NSIS test installer and can download Microsoft's WebView2 bootstrapper when the prerequisite is missing
 - Future creature growth now treats concept forms as visual-vocabulary references, not a fixed route roster: approved durable Agent-activity evidence may deterministically compile into many bounded `MorphologyRecipe` variants, while live Agent presence remains reversible presentation state
+- Future permanent morphology may not level from time, tokens, record volume, or one-off recent use; it requires deduplicated, independent, outcome-qualified evidence and must recompute after correction, source disablement, or forgetting
 
 ### Planned
 
