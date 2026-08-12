@@ -11,10 +11,10 @@ export interface CreatureMarkRenderState {
 }
 
 export interface CreatureRenderState {
-  schemaVersion: 1;
+  schemaVersion: 2;
   revision: string;
   realMemoryAccess: "off";
-  fixtureState: "empty" | "approved";
+  importState: "empty" | "fixture-approved" | "thread-approved";
   envelope: "compact";
   bodyModule: "baseline";
   palette: "violet-mint";
@@ -82,10 +82,10 @@ export const nativeDetailShellClient: DetailShellClient = {
 };
 
 export const baselineCreatureRenderState: CreatureRenderState = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   revision: "0".repeat(64),
   realMemoryAccess: "off",
-  fixtureState: "empty",
+  importState: "empty",
   envelope: "compact",
   bodyModule: "baseline",
   palette: "violet-mint",
@@ -110,10 +110,12 @@ export function sanitizeCreatureRenderState(value: unknown): CreatureRenderState
   if (!value || typeof value !== "object") return baselineCreatureRenderState;
   const state = value as Partial<CreatureRenderState>;
   const valid =
-    state.schemaVersion === 1 &&
+    state.schemaVersion === 2 &&
     isValidRevision(state.revision) &&
     state.realMemoryAccess === "off" &&
-    (state.fixtureState === "empty" || state.fixtureState === "approved") &&
+    (state.importState === "empty" ||
+      state.importState === "fixture-approved" ||
+      state.importState === "thread-approved") &&
     state.envelope === "compact" &&
     state.bodyModule === "baseline" &&
     state.palette === "violet-mint" &&
@@ -128,10 +130,10 @@ export function sanitizeCreatureRenderState(value: unknown): CreatureRenderState
     );
   if (!valid) return baselineCreatureRenderState;
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     revision: state.revision!,
     realMemoryAccess: "off",
-    fixtureState: state.fixtureState!,
+    importState: state.importState!,
     envelope: "compact",
     bodyModule: "baseline",
     palette: "violet-mint",

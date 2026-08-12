@@ -26,7 +26,7 @@ The 0.2.0 vertical slice now implements the user-confirmed “two surfaces, one 
 - [x] document native lifecycle, privacy, accessibility, DPI, and recovery requirements
 - [x] add pre-created `pet` and hidden `main` surfaces with Rust-owned show／hide／focus and compensating close／minimize／restore lifecycle
 - [x] add native pet context menu, focused keyboard equivalent, tray Show／Hide／Open／Quit, safe caller-bound dragging, and single-instance relaunch
-- [x] generate exact per-window app-command permissions and prove all six sensitive memory commands fail closed from `pet` independently at the production ACL and caller-label layers
+- [x] generate exact per-window app-command permissions and prove all eight current sensitive memory commands fail closed from `pet` independently at the production ACL and caller-label layers
 - [x] add a content-minimized `CreatureRenderState` boundary and content-free revision synchronization to pet and detail
 - [x] persist and clamp pet position across restart with monitor／work-area context, move／scale settle, topology polling, atomic shell settings, anchor-preserving onboarding resize, and pure 100–200% geometry tests
 - [x] keep the visible real-memory-off state, transparent pet, one-time bilingual onboarding, reduced-motion behavior, and browser truth boundary
@@ -35,33 +35,43 @@ The 0.2.0 vertical slice now implements the user-confirmed “two surfaces, one 
 - [x] pass 23 frontend tests and 29 Rust tests, including first-open SQLite concurrency and lifecycle rollback
 - [ ] live-test 125／150／200% and mixed-DPI movement, monitor hot-unplug, taskbar relocation, and adjacent-desktop pet hitbox
 - [ ] complete `Win+B`, Narrator／NVDA, keyboard-only, sign-out／shutdown, and remaining accessibility UAT
-- [ ] prove compact／wide／tall／long growth envelopes; only the compact baseline exists, and real-source／growth implementation has not started
+- [ ] prove compact／wide／tall／long growth envelopes; only the compact baseline exists, and production-supported real-memory／growth implementation has not started
 
 Exit condition: launching the packaged app shows exactly one recoverable floating pet; every supported entry opens exactly one detail window; pet attempts to invoke sensitive commands fail closed; both surfaces stay privacy-safe and state-consistent; browser mode remains honest; and no network boundary is added.
 
-**Exit status: not met, with the core 0.2.0 slice implemented.** Automated tests and current-host core native／packaged flows pass, but live DPI／mixed-monitor／taskbar／hitbox, `Win+B`, Narrator／NVDA, sign-out／shutdown, and non-compact envelope gates remain open. The WebView2-missing bootstrapper stays deferred. An early agent-direct launch that triggered Windows virtualization is an invalid harness artifact, not a product failure; only normal Explorer and installed-shortcut runs count as packaged evidence.
+**Exit status: not met, with the core 0.2.0 packaged slice implemented and preserved as a no-redo baseline.** Automated tests and current-host core native／packaged flows pass, but live DPI／mixed-monitor／taskbar／hitbox, `Win+B`, Narrator／NVDA, sign-out／shutdown, and non-compact envelope gates remain open. The WebView2-missing bootstrapper stays deferred. Source v0.3.0 adds an experimental work-record pilot but has no packaged installer UAT. An early agent-direct launch that triggered Windows virtualization is an invalid harness artifact, not a product failure; only normal Explorer and installed-shortcut runs count as packaged evidence.
 
 ## Phase 1 — First real memory
 
-Fixture foundation completed:
+Fixture and local-store foundation completed:
 
 - [x] versioned memory-event schema v1 for one synthetic `completion` record
 - [x] fixed-path, read-only adapter for one bundled fictional Codex-shaped fixture
 - [x] fixture selection, scope explanation, record preview, explicit consent, and cancel flow
-- [x] local SQLite schema v1 with migration 0001
+- [x] local SQLite schema v2: migration 0001 for the fixture graph plus migration 0002 for canonical source-consent scopes and deterministic legacy-fixture backfill
 - [x] deterministic completion star, source lineage, and “Why did this happen?” inspector
 - [x] application-level deletion and deterministic recomputation for the supported fixture path
 
-Real-source work required for the phase exit:
+Experimental work-record pilot completed in the source v0.3.0 tree:
 
-- [ ] validate and document a supported user-owned Codex durable-memory format
-- [ ] read only an exact external source explicitly selected by the user, without tool-home scanning
-- [ ] add real-source scope disclosure, redacted preview behavior, consent, and invalid-input coverage
-- [ ] complete explicitly authorized private-data UAT without exposing source content in git, logs, CI, or screenshots
+- [x] verify from official documentation that no stable Codex durable-memory export API or compatibility-guaranteed memory-file schema is available; direct tool-home parsing is not an approved integration
+- [x] document the distinction between durable memory and a version-bound Codex work／thread-history pilot in the [source-format evaluation](research/2026-08-12_codex-source-format-evaluation.md) and proposed [ADR-0005](adr/0005-codex-thread-history-source-pilot.md)
+- [x] implement a Rust-only fixed local Codex Desktop executable boundary, exact `codex-cli 0.134.0` fail-closed pin, and local App Server stdio calls limited to documented `thread/list` and `thread/read`
+- [x] implement user-triggered content-minimized listing, Rust-only raw identifiers, exactly one selected completed thread, last-completed `final_answer` extraction, content-free preview, explicit completion confirmation, and canonical consent hash
+- [x] enforce one active source, persist consent scope／normalized record in SQLite schema v2, keep external lineage content-free, and forget only Memoryling's local copy and downstream effects
+- [x] extend independent production-ACL and caller-label denial coverage to all eight sensitive commands; bound the shared operation deadline, output, and child-process cleanup
+- [x] pass synthetic adapter／migration／consent／lineage／forgetting coverage and a content-free live `thread/list` smoke on the exact pinned CLI without selecting a thread, calling `thread/read`, or exposing private content
 
-Exit condition: one approved Codex memory can create one explainable, removable creature change without any network request.
+Remaining gates for this phase:
 
-**Exit status: not met.** The bundled synthetic fixture proves the local pipeline, but it is not a user-owned Codex memory or a production connector.
+- [ ] obtain separate authorization naming one exact completed private thread and the UAT scope before any private `thread/read`
+- [ ] complete private UAT for list → one selection → redacted preview → consent → one effect → restart → explanation → forget, recording only content-free pass／fail evidence and proving the original thread remains unchanged
+- [ ] complete packaged v0.3.0 synthetic compatibility UAT; the verified v0.2.0 installer remains the historical no-redo artifact and does not prove the new connector path
+- [ ] wait for or adopt a production-supported Codex durable-memory export／API or supported successor interface, then perform a fresh privacy review and compatibility decision
+
+Exit condition: one production-supported, user-selected Codex memory source can create one explainable, removable creature change without any network request. An experimental work thread is not a durable memory and cannot satisfy this condition.
+
+**Exit status: not met.** The v0.3.0 source implementation proves the synthetic contract and a content-free live listing boundary, but no private thread was read, no v0.3.0 installer was accepted, and no production-supported Codex memory interface exists.
 
 ## Cross-phase track — Public beta and OSS maintainer evidence
 
@@ -78,7 +88,7 @@ This track supports a future [Codex for Open Source application](research/2026-0
 
 Exit condition: a public beta proves the core promise through one user-selected real source; external people have tested it; at least one visible maintainer loop is complete; and every application metric can be reproduced from public or consented evidence. There is no invented star, download, or tester threshold.
 
-**Exit status: not met.** Memoryling currently has no public Release, real-source connector, external-user evidence, or issue／fix／follow-up-release loop.
+**Exit status: not met.** Memoryling currently has no public Release, production-supported real-memory connector, private-thread acceptance, external-user evidence, or issue／fix／follow-up-release loop. The source-only experimental pilot does not satisfy those gates and does not authorize submitting an application.
 
 ## Phase 2 — A life that continues
 
@@ -86,7 +96,7 @@ Design foundation recorded: the user confirmed the biological／organic plus res
 
 - [ ] persistent creature traits and visual marks
 - [ ] versioned identity core, growth contributions, recomputable creature genome, and evolution stages
-- [ ] add a versioned `SourceConsentScope` over one selected source and adapter version, allowed data categories, and named derivation purposes; derive automatically only within that scope, use a separate scope for another source, and require a new revision preview／consent before category／purpose／mapping expansion
+- [ ] extend the current import-only, one-source `SourceConsentScope` into a reusable growth scope with disable／re-enable and correction controls; derive future records automatically only within unchanged boundaries, and require a new revision preview／consent before category／purpose／mapping expansion
 - [ ] implement the A／C／B evidence contract: A Agent-use behavior alone shapes primary morphology, C outcome-qualified history gates reshaping／advances maturity／creates lineage marks without selecting a silhouette, and B collaboration mode affects only bounded local movement
 - [ ] restrict approved content-domain influence to a secondary material／surface accent rather than stage, main form, or personality inference
 - [ ] derive `EphemeralActivityHint` from newly normalized in-scope records as a content-minimized, memory-only TTL state that cannot enter SQLite, contributions, maturity, or permanent recipes
@@ -107,7 +117,7 @@ Design foundation recorded: the user confirmed the biological／organic plus res
 
 Exit condition: synthetic fixtures prove that `SourceConsentScope` blocks unapproved source／category／purpose expansion; A／C／B and secondary-domain evidence stay within their assigned influence limits; multiple deduplicated outcome-qualified groups—not time or usage volume—gate permanent reshape; forget, correction, and scope disable deterministically rederive all downstream state; every persistent recipe change has an understandable `EvolutionBridge`; and rendering makes no runtime model call.
 
-**Exit status: not met.** The consent scope, A／B／C evidence lanes, outcome gate, ephemeral hint, recipe compiler, bridge records, and correction／disable recomputation are proposed only and do not exist in the current fixture runtime.
+**Exit status: not met.** Source v0.3.0 persists only the narrow import consent scope; reusable ongoing scope behavior, A／B／C evidence lanes, outcome gate, ephemeral hint, recipe compiler, bridge records, and correction／disable recomputation remain proposed and do not exist in the current runtime.
 
 ## Phase 3 — Useful initiative
 

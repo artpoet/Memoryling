@@ -5,8 +5,8 @@ use sha2::{Digest, Sha256};
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 
 use super::model::{
-    AccessScope, ImportPreview, NormalizedMemoryEvent, PreparedImport, PreviewRecord,
-    PreviewTimeRange, SourceOption, CODEX_ADAPTER_ID, CODEX_ADAPTER_VERSION,
+    AccessScope, ConsentScopeV1, ImportPreview, NormalizedMemoryEvent, PreparedImport,
+    PreviewRecord, PreviewTimeRange, SourceOption, CODEX_ADAPTER_ID, CODEX_ADAPTER_VERSION,
     MEMORY_EVENT_SCHEMA_VERSION,
 };
 
@@ -76,7 +76,8 @@ pub(crate) fn preview_source(
             id: event.source_record_id.clone(),
             source_timestamp: event.source_timestamp.clone(),
             kind: event.kind.clone(),
-            text_preview: event.normalized_text.clone(),
+            text_preview: Some(event.normalized_text.clone()),
+            character_count: event.normalized_text.chars().count(),
             content_hash: event.content_hash.clone(),
         })
         .collect::<Vec<_>>();
@@ -96,6 +97,8 @@ pub(crate) fn preview_source(
             network_access: false,
             arbitrary_path_access: false,
         },
+        consent_scope: prepared.consent_scope.clone(),
+        consent_scope_hash: prepared.consent_scope_hash.clone(),
     };
 
     Ok((preview, prepared))
@@ -169,11 +172,34 @@ fn parse_fixture(raw: &str, requested_source_id: &str) -> Result<PreparedImport,
         });
     }
 
+    let (consent_scope, consent_scope_json, consent_scope_hash) =
+        fixture_consent_contract(&source)?;
+
     Ok(PreparedImport {
         source,
         source_content_hash: sha256(raw.as_bytes()),
         events,
+        consent_scope,
+        consent_scope_json,
+        consent_scope_hash,
     })
+}
+
+pub(crate) fn fixture_consent_contract(
+    source: &SourceOption,
+) -> Result<(ConsentScopeV1, String, String), String> {
+    let consent_scope = ConsentScopeV1 {
+        schema_version: 1,
+        revision: 1,
+        source_id: source.id.clone(),
+        adapter_id: source.adapter_id.clone(),
+        adapter_version: source.adapter_version,
+        data_categories: vec!["synthetic-completion".to_string()],
+        purposes: vec!["local-creature-derivation".to_string()],
+        read_only: true,
+    };
+    let (consent_scope_json, consent_scope_hash) = consent_scope_contract(&consent_scope)?;
+    Ok((consent_scope, consent_scope_json, consent_scope_hash))
 }
 
 fn source_option() -> SourceOption {
@@ -192,7 +218,7 @@ pub(crate) fn stable_id(prefix: &str, values: &[&str]) -> String {
     format!("{prefix}_{}", &hash[..24])
 }
 
-fn stable_hash(values: &[&str]) -> String {
+pub(crate) fn stable_hash(values: &[&str]) -> String {
     let mut hasher = Sha256::new();
     for value in values {
         hasher.update(value.as_bytes());
@@ -205,11 +231,18 @@ fn stable_hash(values: &[&str]) -> String {
         .collect()
 }
 
-fn sha256(value: &[u8]) -> String {
+pub(crate) fn sha256(value: &[u8]) -> String {
     Sha256::digest(value)
         .iter()
         .map(|byte| format!("{byte:02x}"))
         .collect()
+}
+
+pub(crate) fn consent_scope_contract(scope: &ConsentScopeV1) -> Result<(String, String), String> {
+    let json = serde_json::to_string(scope)
+        .map_err(|_| "Memoryling could not prepare the consent scope.".to_string())?;
+    let hash = sha256(json.as_bytes());
+    Ok((json, hash))
 }
 
 #[cfg(test)]
@@ -238,7 +271,29 @@ mod tests {
         assert!(!first.access_scope.source_write_access);
         assert!(!first.access_scope.network_access);
         assert!(!first.access_scope.arbitrary_path_access);
+        assert_eq!(
+            first.records[0].text_preview.as_deref(),
+            Some("Shipped a local-first creature whose changes can always explain their source.")
+        );
+        assert_eq!(
+            first.records[0].character_count,
+            first.records[0]
+                .text_preview
+                .as_ref()
+                .expect("fixture preview remains visible")
+                .chars()
+                .count()
+        );
         assert_eq!(first.records[0].content_hash.len(), 64);
+        assert_eq!(first.consent_scope_hash.len(), 64);
+        assert_eq!(
+            sha256(
+                serde_json::to_string(&first.consent_scope)
+                    .expect("scope should serialize")
+                    .as_bytes()
+            ),
+            first.consent_scope_hash
+        );
     }
 
     #[test]

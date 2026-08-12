@@ -2,11 +2,13 @@
 
 ## Status
 
-This document separates the intended product architecture from the subset implemented as of 2026-08-12. Memoryling 0.2.0 now implements the pet-first resident desktop shell and runs the local fixture pipeline end to end for exactly one fictional Codex-shaped resource bundled with the desktop app. No user-owned Codex file, tool-home, or other external source is connected, and real-source and creature-growth implementation have not started.
+This document separates the intended product architecture from the subset implemented as of 2026-08-12. The source tree is now v0.3.0: it keeps the v0.2.0 pet-first fixture pipeline and adds a version-bound, experimental Codex work／thread-history pilot. The pilot is not Codex durable memory and is not a production connector. OpenAI currently publishes no stable durable-memory export API or compatibility-guaranteed memory-file schema, so Memoryling does not parse or scan Codex tool-home memory files. The previously verified v0.2.0 installer remains the packaged no-redo baseline; no v0.3.0 installer or private-thread UAT is claimed.
 
 ## System shape
 
-    External durable-memory sources
+    Explicitly selected local sources
+        ├─ bundled fictional fixture
+        └─ experimental Codex work／thread history (not durable memory)
         → read-only source adapters
         → import preview and consent gate
         → normalized local memory events
@@ -15,21 +17,39 @@ This document separates the intended product architecture from the subset implem
         → creature state, stories, conversations, reminders
         → bilingual Tauri UI
 
-The v1 fixture slice follows this shape but replaces the external source with a fixed bundled resource and produces only one deterministic completion-star effect. It is test infrastructure and a product-flow proof, not a production Codex connector.
+Both implemented source paths produce only one deterministic, user-confirmed completion event and one completion-star effect. The bundled fixture is test infrastructure. The Codex work-record path is a source-only compatibility pilot around an experimental local host, not evidence of a supported Codex memory interface or production readiness.
 
 ## Layers
 
 | Layer | Responsibility | Current state |
 |---|---|---|
 | Desktop shell | Native window, lifecycle, notifications | 0.2.0 pre-creates transparent `pet` and hidden `main` windows; Rust owns native menu, tray, single-instance recovery, show／hide／focus, close／minimize／restore compensation, explicit Quit, and pet position recovery |
-| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual pet and detail surfaces plus fixture selection, preview, consent, lineage, forgetting, one-time onboarding, reduced-motion handling, and a visible real-memory-off state in desktop and browser |
-| Source adapters | Read selected durable-memory formats without mutating them | Fixture adapter v1 reads one fixed bundled JSON resource; no external path or Codex tool-home access |
-| Import gate | Preview scope, explain access, obtain consent | Implemented for the fixture, with pending preview state held in Rust memory; no real-source picker |
+| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual pet and detail surfaces plus fixture selection, experimental Codex work-record selection, redacted preview, consent, lineage, forgetting, one-time onboarding, reduced-motion handling, and a visible durable-memory-off state in desktop and browser |
+| Source adapters | Read an explicitly selected local source without mutating it | Fixture adapter v1 reads one fixed bundled JSON resource; experimental `codex-app-server-thread` v1 uses only local App Server stdio `thread/list` and `thread/read` behind an exact CLI version pin, without direct Codex tool-home access |
+| Import gate | Preview scope, explain access, obtain consent | Implemented for the fixture and the experimental one-thread pilot; source content and raw identifiers remain in Rust, while the UI receives only a redacted, scope-bound preview |
 | Normalizer | Convert source records into a versioned local event schema | Schema v1 supports the fixture's `completion` record only |
 | Derivation engine | Produce traits, tensions, story hooks, reminder candidates | One deterministic `completion` signal and `completion-star` world effect only |
-| Local store | Persist normalized events, derived effects, lineage, and settings | SQLite schema v1 stores approved fixture records and lineage under Tauri app-local data; content-free shell preferences and pet position use a separate atomic JSON file in the same app-local directory |
+| Local store | Persist normalized events, consent scopes, derived effects, lineage, and settings | SQLite schema v2 stores one approved source, its canonical consent scope, normalized event, and lineage under Tauri app-local data; external lineage for the thread pilot is content-free, while shell preferences and pet position use a separate atomic JSON file |
 | Conversation layer | Ground dialogue in approved local context | Not implemented; provider decision open |
 | Reminder policy | Enforce quiet hours, budget, urgency, and snooze state | UI concept only |
+
+## Experimental Codex work-record pilot in source v0.3.0
+
+Official OpenAI documentation exposes the documented `thread/list` and `thread/read` method names without requiring the opt-in `experimentalApi` capability, but it still labels the overall App Server command／transport experimental and unsupported for production. Memoryling therefore treats this integration as a version-bound work／thread-history pilot, never as durable-memory access. The supporting evidence and decision boundary are recorded in the [Codex source-format evaluation](research/2026-08-12_codex-source-format-evaluation.md) and proposed [ADR-0005](adr/0005-codex-thread-history-source-pilot.md).
+
+The implementation boundary is deliberately narrow:
+
+1. Rust alone resolves and launches the fixed standard Codex Desktop executable under `%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe`. No WebView or caller can provide an executable, path, argument, transport, or method name. The command must report exactly `codex-cli 0.134.0`; every other version fails closed.
+2. Listing starts only after a user action. `thread/list` becomes a short-lived, content-minimized catalog with generic labels, source kind, and bounded time metadata. Raw thread IDs, titles, paths, previews, prompts, responses, and tool output remain Rust-only and are neither rendered nor persisted by the catalog.
+3. The user selects exactly one candidate. Only then may Memoryling issue one `thread/read` with turns, reject an active or malformed thread, and take the final `agentMessage` with phase `final_answer` from the last completed turn. Completion is still explicitly confirmed by the user; text is not used to infer success, personality, topic, or weight.
+4. The preview is redacted and content-free. Frontend IPC receives counts, time bounds, exclusions, and a content hash／character count—not the selected final-answer text. Approval is bound to the canonical consent-scope JSON and its 64-hex hash before the normalized completion record can enter app-local SQLite.
+5. Migration 0002 advances the local store to `PRAGMA user_version = 2` and adds `source_consent_scopes`. The current schema allows one active approved source total. A new thread requires forgetting the current Memoryling source and completing a fresh list → select → preview → consent flow.
+6. External lineage keeps only redacted or opaque hashes, adapter／mapping versions, scope hash, consent revision, timestamps, and exclusion reasons. Approved normalized text stays only in the local Memoryling database and never crosses frontend IPC, logs, pet DTOs, native labels, notifications, or repository fixtures.
+7. Forgetting deletes or recomputes Memoryling's local source, event, signal, effect, explanation, render state, cache, and lineage. It never edits, archives, deletes, resumes, or otherwise mutates the original Codex thread.
+8. The `main` capability and the independent Rust caller-label guard both protect all eight sensitive commands: fixture list／preview, Codex list／preview, cancel, full state, approve, and forget. `pet` cannot invoke any of them.
+9. CLI-version verification and the App Server request share one 10-second operation deadline. Stdout size and line length are capped, stderr is not surfaced, and timeout／failure uses bounded child-process cleanup rather than an unbounded wait. The adapter uses local stdio only and opens no WebSocket, model, telemetry, cloud, or network boundary.
+
+Synthetic contract tests and a content-free live `thread/list` compatibility smoke cover the implemented boundary. The live smoke did not select a candidate or call `thread/read`. Access to one real private thread remains a separate exact-source authorization and UAT gate; until that passes, ADR-0005 stays Proposed and durable-memory access remains visibly off.
 
 ## Implemented pet-first desktop shell
 
@@ -45,7 +65,7 @@ one Tauri process
 
 Both WebViews are pre-created hidden; Rust setup shows only `pet`, avoiding handler-time WebView construction. The pet is transparent, undecorated, skip-taskbar, non-closable, always-on-top by default, and resizes from the 360 × 430 logical onboarding envelope to the 320 × 320 compact envelope while preserving its screen anchor. Rust owns show, hide, focus, `main` `CloseRequested` interception, pending-preview reset, native menu, tray, position recovery, and explicit Quit. Lifecycle transitions use compensating rollback so a failed second window operation leaves one recoverable surface rather than two visible windows or none.
 
-The build uses `tauri_build::AppManifest::commands` and exact local-only `main`／`pet` capabilities; neither surface inherits `core:default`, remote scopes, wildcards, or deny-pattern ambiguity. List／preview／cancel／full-state／approve／forget are `main`-only and also require a `MainCaller` whose WebView and native-window labels both match. `pet` receives only render-safe state, shell state, menu, onboarding, and `start_pet_dragging` app commands plus event listen／unlisten. The drag command acts only on the caller's pet window, so pet JavaScript cannot select and drag `main` through a generic core window API. A production-authority invoke harness denies all six sensitive commands at the ACL layer, and a separate empty-authority harness proves the caller guard denies the same six before handler body entry; a `main` list invoke is the positive control.
+The build uses `tauri_build::AppManifest::commands` and exact local-only `main`／`pet` capabilities; neither surface inherits `core:default`, remote scopes, wildcards, or deny-pattern ambiguity. Fixture list／preview, Codex list／preview, cancel, full-state, approve, and forget are `main`-only and also require a `MainCaller` whose WebView and native-window labels both match. `pet` receives only render-safe state, shell state, menu, onboarding, and `start_pet_dragging` app commands plus event listen／unlisten. The drag command acts only on the caller's pet window, so pet JavaScript cannot select and drag `main` through a generic core window API. A production-authority invoke harness denies all eight sensitive commands at the ACL layer, and a separate empty-authority harness proves the caller guard denies the same eight before handler body entry; a `main` list invoke is the positive control.
 
 `CreatureRenderState` contains only bounded appearance parameters, neutral fixture state, opaque mark IDs, and a 64-hex revision. Approve and forget emit the same content-free `{revision}` notification to both surfaces, which then refetch their typed state; event-delivery failure does not roll back a committed memory transaction. No memory text, path, locator, explanation, source identity, or content hash enters pet IPC, native menu labels, tray labels, window titles, or operating-system notifications. Closing details cancels any pending preview in Rust before hiding because hiding a WebView does not unmount it; minimizing preserves the preview.
 
@@ -55,13 +75,13 @@ Pet position is stored in a content-free JSON record with monitor identity, work
 
 ### 0.2.0 verification snapshot
 
-- Automated evidence: 23 frontend tests and 29 Rust tests pass. Rust coverage includes concurrent first-open migration, lifecycle compensation, position／anchor recovery, content-minimized DTOs, exact capabilities, and the two independent six-command denial layers described above.
+- Historical v0.2.0 automated evidence: 23 frontend tests and 29 Rust tests passed. That snapshot covered concurrent first-open migration, lifecycle compensation, position／anchor recovery, content-minimized DTOs, exact capabilities, and the then-current six-command denial layers. Source v0.3.0 extends both denial layers to eight commands; its current automated and content-free compatibility evidence is recorded separately from the unchanged installer baseline.
 - Native and packaged evidence: transparent pet／first-run onboarding, pointer and focused-keyboard native menu paths, close／minimize／restore, single-instance recovery, explicit native Quit, raw movement／second-monitor observation, and core pet／main state transitions pass on the current Windows host. Tray actions and position recovery have automated evidence; their remaining live matrix is not inferred from that.
 - Fixture evidence: raw bundled fixture preview and approval, restart persistence, source → event → signal → completion-star lineage, cross-surface state, and complete forgetting pass; no real source was used.
 - Installer evidence: a normal Explorer-launched NSIS current-user install, actual installed Start shortcut cold launch and resident relaunch, explicit Quit, and uninstall with retained app data pass. The retained files were checked only as local app-data state, not committed or printed.
 - Artifact: `Memoryling_0.2.0_x64-setup.exe`, 2,875,965 bytes, SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`, `FileVersion`／`ProductVersion` 0.2.0, `NotSigned`.
 - Harness trap: an early agent-direct installer launch produced Windows virtualization behavior and is not valid product evidence or a product failure. Acceptance uses normal Explorer and installed-shortcut paths.
-- Still pending before ADR acceptance: live 125–200%／mixed-DPI testing, hot-unplug／taskbar relocation, adjacent-desktop hitbox probing, `Win+B`, Narrator／NVDA, sign-out／shutdown, and compact／wide／tall／long growth-envelope coverage. WebView2-missing bootstrapper testing remains deferred. Real-source and growth work have not started.
+- Still pending before ADR-0003 acceptance: live 125–200%／mixed-DPI testing, hot-unplug／taskbar relocation, adjacent-desktop hitbox probing, `Win+B`, Narrator／NVDA, sign-out／shutdown, and compact／wide／tall／long growth-envelope coverage. WebView2-missing bootstrapper testing remains deferred. The source-only work-record pilot has separate private-UAT and production-support gates; creature growth has not started.
 
 ## Implemented v1 records and future shape
 
@@ -87,13 +107,13 @@ The complete source → event → signal → effect graph is queried back from S
 
 ## Future creature-growth boundary
 
-Everything in this section is a future Phase 2 proposal unless explicitly identified as current fixture behavior. The current fixture preview binds one pending token to selected records from one bundled fictional resource; explicit approval persists those selected normalized records and can derive only the completion star. It does not create a reusable consent scope, observe live Agent use, classify A／B／C evidence, accumulate outcome groups, or compile a creature morphology.
+Everything in this section is a future Phase 2 proposal unless explicitly identified as current fixture or v0.3.0 pilot behavior. Source v0.3.0 persists one versioned consent-scope row for the one approved fixture or work-record source, but that scope exists only to bind the current import contract and local derivation purpose. It does not authorize automatic future-record intake, source expansion, live Agent observation, A／B／C evidence classification, outcome-group accumulation, or creature-morphology compilation.
 
-### Proposed source-consent scope
+### Future expanded source-consent scope
 
-A future `SourceConsentScope` would bind one explicit consent to one specific read-only source and adapter version, allowed data categories, and named local derivation purposes. Records that remain inside all boundaries may be normalized and deterministically derived without asking for approval for every downstream visual change. Another source requires another scope. Admitting a new data category, using authorized data for a new purpose, or materially changing mapping semantics must stop at a new scope-revision preview and require fresh consent before that expansion contributes anything.
+The implemented schema-v1 `SourceConsentScope` binds one explicit consent to one specific read-only source and adapter version, one allowlisted data category, and one named local derivation purpose. The future growth design would expand this into a reusable ongoing scope in which new records inside every unchanged boundary may be normalized and deterministically derived without per-record prompts. Another source, a new category or purpose, or materially changed mapping semantics must still stop at a new scope-revision preview and fresh consent before that expansion contributes anything.
 
-Disabling a consent scope makes its evidence ineligible for active derivation and triggers the same deterministic downstream recomputation as forgetting or correcting evidence; it never writes to or deletes the source. The exact persistence, re-enable, and retention UX remains proposed and requires synthetic acceptance before private-data testing.
+Disabling and re-enabling a consent scope are not implemented. The future rule remains that disabling a scope makes its evidence ineligible for active derivation and triggers the same deterministic downstream recomputation as forgetting or correcting evidence; it never writes to or deletes the source. That lifecycle and retention UX requires synthetic acceptance before any broader private-data testing.
 
 The user-confirmed, not-yet-implemented product direction has the following proposed deterministic shape:
 
@@ -134,9 +154,9 @@ Path contributions, other structural growth contributions, and existing WorldEff
 1. Tauri resolves one bundled resource path; the WebView cannot submit an arbitrary file path.
 2. The adapter enforces a size limit, UTF-8 JSON, source identity, format version, and the supported record kind. Unknown input fails closed.
 3. A preview token binds approval to the records prepared in Rust memory. Previewing or canceling does not persist source content, although desktop startup may initialize an empty SQLite schema.
-4. Explicit approval writes the selected normalized record, source contract, hashes, signal, effect, and lineage in local transactions.
-5. The database lives at Tauri's app-local data directory as `memoryling.sqlite3`. Migration 0001 sets `PRAGMA user_version = 1`; unknown future versions fail closed.
-6. Forgetting clears derived state, deletes the selected local source and its cascading events, then re-runs deterministic derivation over supported records that remain, all in one transaction. The current adapter exposes only one source.
+4. Explicit approval writes the selected normalized record, canonical consent scope and hash, source contract, hashes, signal, effect, and lineage in local transactions.
+5. The database lives at Tauri's app-local data directory as `memoryling.sqlite3`. Migration 0001 established the fixture tables; migration 0002 adds `source_consent_scopes` and sets `PRAGMA user_version = 2`. A known v1 fixture store is backfilled deterministically; unknown source or future schema versions fail closed.
+6. Forgetting clears derived state, deletes the selected local source and its cascading consent scope／events, then re-runs deterministic derivation over supported records that remain, all in one transaction. The current store permits only one approved source total.
 
 SQLite foreign keys and `secure_delete` are enabled for each connection. This supports application-level deletion; it is not a promise of cryptographic or physically irrecoverable erasure from storage media or backups.
 
@@ -152,25 +172,25 @@ A connector must:
 6. fail closed when a format is unknown;
 7. never collect credentials from source files.
 
-The current fixture adapter satisfies this contract only for its fixed synthetic resource. It does not establish the format, discovery path, or permission UX for user-owned Codex memory. A future production adapter must validate a real supported format and accept only a source explicitly selected by the user; it must not scan arbitrary home directories.
+The fixture adapter satisfies this contract for its fixed synthetic resource. The v0.3.0 `codex-app-server-thread` adapter applies the same contract to one explicitly selected completed Codex work thread through the exact pinned local CLI, but remains experimental because App Server is not production-supported. It does not establish a Codex durable-memory format, export contract, or permission to scan arbitrary home directories. A future production adapter still requires an officially supported interface, a fresh privacy review, and its own acceptance evidence.
 
 ## Trust boundaries
 
 - **Bundled fixture:** fictional, repository-visible, fixed-path, read-only test input. It is not user memory.
-- **Future external source files:** user-owned, untrusted input, and read-only; none are connected today.
-- **Pending preview:** source content prepared in Rust process memory and bound to a preview token until approved or discarded.
-- **Local Memoryling store:** contains approved normalized text, hashes, lineage, and derived state; never print or commit the database.
+- **Experimental Codex App Server source:** one user-selected work thread read through fixed local stdio `thread/list`／`thread/read`; it is untrusted, read-only, version-bound, and not a durable-memory source. Raw identifiers and selected text remain Rust-only.
+- **Pending preview:** source content prepared in Rust process memory and bound to a short-lived catalog／preview token until approved or discarded. The frontend receives only redacted metadata and hashes.
+- **Local Memoryling store:** contains the one approved normalized record, canonical consent scope and hash, content-free external lineage, and derived state; never print or commit the database.
 - **UI:** displays explanations but must not render source content as trusted HTML.
 - **Future model provider:** optional boundary requiring a separate ADR and explicit consent before any memory-derived context leaves the device.
 
 ## Open decisions
 
 - embedded local model versus optional remote conversation provider;
-- validated Codex durable-memory format, native source selection, and permission UX;
-- migration strategy after SQLite schema v1;
+- a production-supported Codex durable-memory export／API or supported successor to the experimental App Server pilot;
+- migration strategy after SQLite schema v2;
 - remaining Windows resident-shell acceptance across live DPI／monitor／taskbar changes, desktop hitbox, accessibility, and session shutdown;
 - derivations and signal-to-genome mappings beyond the deterministic completion-star boundary;
 - approved-activity taxonomy, signal-to-profile mapping, quantization rules, and mapping-version migration;
 - final EvolutionBridge grammar for stage and recipe changes, stage names, and renderer implementation after synthetic visual prototyping.
 
-Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-only SQLite v1 boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md), the proposed pet-first shell in [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md), and the proposed content-derived route model in [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md).
+Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-first SQLite boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md), the proposed pet-first shell in [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md), the proposed content-derived route model in [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md), and the proposed version-bound Codex thread-history pilot in [ADR-0005](adr/0005-codex-thread-history-source-pilot.md).

@@ -4,9 +4,9 @@
 
 [English](README.md) · [Windows 測試指南](docs/zh-TW/USER_GUIDE.md) · [產品願景](docs/zh-TW/PRODUCT_VISION.md) · [架構](docs/ARCHITECTURE.md) · [路線圖](docs/ROADMAP.md)
 
-Memoryling 是一個開源、local-first 的桌面生命。牠會從 AI Agent 的持久記憶中成長；外觀、對話、連續事件與偶爾出現的重要提醒，都應該有可以追溯的原因。
+Memoryling 是一個開源、local-first 的桌面生命，設計目標是從使用者明確核准的 AI Agent 記憶來源中成長；外觀、對話、連續事件與偶爾出現的重要提醒，都應該有可以追溯的原因。
 
-這個 Repo 目前包含雙語、pet-first 的 Windows 桌面外殼，以及僅使用 fixture 的記憶流程；**尚未讀取任何真實 Agent 記憶，也沒有連接使用者的 Codex tool-home**。
+目前 source tree 是 **v0.3.0 開發階段**，包含雙語、pet-first 的 Windows 桌面外殼、合成 fixture 流程，以及綁定特定版本的實驗性 Codex 工作紀錄／thread history 試行。這項試行不是 Codex 持久記憶存取，也不是正式 connector：OpenAI 目前並未針對此用途公開穩定的持久記憶匯出 API，或具有相容性保證的記憶檔案 schema。
 
 ## 它有什麼不同
 
@@ -18,7 +18,7 @@ Memoryling 是一個開源、local-first 的桌面生命。牠會從 AI Agent �
 - **主動性有界線：**安靜時段、每日提醒額度與敏感度由你控制。
 - **遺忘是一整條鏈：**刪除來源後，衍生出的特徵、事件與提醒也要被刪除或重新計算。
 
-## 現有 pet-first 外殼與 fixture 試行
+## 現有 pet-first 外殼、fixture 流程與工作紀錄試行
 
 目前的 Tauri + React App 包含：
 
@@ -37,11 +37,26 @@ Memoryling 是一個開源、local-first 的桌面生命。牠會從 AI Agent �
 4. 確定性地衍生一顆完成之星，並檢視它出現的原因。
 5. 遺忘本機匯入副本，並移除或重新計算目前支援的下游影響。
 
-瀏覽器預覽不能執行這條流程，並刻意維持誠實的詳細表面；它不會假裝有浮動寵物、原生選單、系統匣、single-instance lifecycle 或原生持久化。這項試行不能掃描任意路徑、讀取使用者的 Codex 檔案，也不能寫入 Agent 記憶庫，而且不會發出網路請求。
+瀏覽器預覽不能執行這條流程，並刻意維持誠實的詳細表面；它不會假裝有浮動寵物、原生選單、系統匣、single-instance lifecycle 或原生持久化。fixture 流程不能掃描任意路徑、讀取使用者的 Codex 檔案，也不能寫入 Agent 記憶庫，而且不會發出網路請求。
+
+### 僅在 source tree 的實驗性 Codex 工作紀錄試行
+
+v0.3.0 source tree 也實作了一條範圍狹窄的本機 **Codex 工作紀錄／thread history** 試行，絕不稱為「Codex 記憶」。只有標準本機 Codex Desktop CLI 回報完全相符的測試版本 `codex-cli 0.134.0` 時才會繼續，其他版本一律 fail closed。流程刻意要求每一步都由使用者明確觸發：
+
+1. 啟動時不會探索任何內容；使用者必須主動選擇 **瀏覽本機 Codex 工作紀錄**。
+2. 內容最小化的 `thread/list` 只產生短效、中性的候選項目，不顯示 thread 標題、摘要、路徑、原始識別碼、提示詞、回覆或工具輸出。
+3. 只有使用者明確選取一個候選後，Memoryling 才能透過本機 stdio 呼叫 `thread/read`；只考慮最後一個已完成 turn 中、phase 為 `final_answer` 的最終 `agentMessage`，其餘內容類別都排除。
+4. 預覽只顯示有限的數量、時間／來源 metadata、排除項目與精確同意範圍，不會顯示所選 thread 文字。
+5. 只有完成精確同意與明確的「工作已完成」確認後，所選 final answer 才能被正規化並存進 Memoryling 的 App 本機 SQLite。
+6. adapter 為唯讀、不接受任意路徑、不會呼叫模型或外部網路，也不能寫入或刪除 Codex 資料。同一時間只能有一個核准來源；**遺忘**只刪除 Memoryling 的本機副本與目前支援的下游影響，不會刪除原始 thread。
+
+畫面上的持久記憶存取仍維持關閉。截至 2026-08-12，私人 thread UAT 尚未獲得授權，也尚未執行；source implementation 與不含內容的 catalog smoke 不代表已經有打包版或正式支援的 connector。
 
 ## Windows x64 pet-first fixture-only 測試版
 
-測試使用者的正式入口是目前使用者（current-user）NSIS 安裝程式 `Memoryling_0.2.0_x64-setup.exe`。這是本機產出的未簽章 Windows x64 artifact，尚未達到公開發布品質；真實 Codex 記憶存取仍維持關閉。
+唯一完成原生安裝 UAT 的測試入口，仍是目前使用者（current-user）NSIS artifact `Memoryling_0.2.0_x64-setup.exe`。它僅使用 fixture、未簽章，也尚未達到公開發布品質。精確檔案大小為 2,875,965 bytes，SHA-256 為 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`。
+
+source version 已是 v0.3.0，不代表 v0.3.0 安裝器已經 build、測試或核准。除非這個 artifact 或相關 packaging 行為改變，完全相同的 v0.2.0 artifact 及其已完成的安裝／lifecycle／保留資料解除安裝證據，都是禁止重做的基準線。
 
 安裝前請先閱讀 [Windows x64 測試指南](docs/zh-TW/USER_GUIDE.md)。指南包含完整 fixture 操作流程、WebView2 前置下載、Windows 安全警告、解除安裝時的 App data 保留行為，以及 raw release exe 為何不是 portable 發布包。
 
@@ -75,9 +90,9 @@ Memoryling 不是通用 AI 助理、套著吉祥物的待辦工具，也不是�
 
 ## 專案狀態
 
-Memoryling 目前是 **fixture-backed 開發階段（v0.2.0）**。pet-first 雙表面外殼、SQLite／來源鏈 v1 基礎，以及本機產出的未簽章 Windows x64 NSIS 測試 artifact 已可使用。這個完全相同的 v0.2.0 artifact 已通過 Explorer 啟動的 current-user 安裝、installed shortcut 的 single-instance 與 pet lifecycle smoke、明確 Quit，以及保留 App data 的解除安裝。WebView2 缺失分支、其餘 accessibility／DPI／救援驗收、真實記憶 connector、系統通知、程式碼簽章與可公開發布的正式安裝包仍在路線圖上。
+Memoryling 目前是 **v0.3.0 source 開發階段**。pet-first 雙表面外殼、本機 SQLite／來源鏈基礎、合成 fixture 路徑，以及綁定版本的實驗性 Codex 工作紀錄試行都已在 source 中實作。唯一完成安裝 UAT 的仍是上方所述、僅使用 fixture 的精確 v0.2.0 artifact。
 
-fixture 基礎與目前的 pet-first 合成資料 bundle 都已實作，正常安裝的目前主機 smoke 也已通過；但 Phase 1 exit condition 尚未完成，目前沒有選取或匯入任何使用者擁有的 Codex 記憶。下一個實作 slice 可以開始驗證一種真實 Codex 格式，並維持使用者明確選取、唯讀、先預覽再同意的邊界。其餘 DPI／accessibility／session-recovery matrix 仍會阻擋完整 shell acceptance 與公開發布宣稱。
+Phase 1 仍未完成：目前沒有受支援的 Codex 持久記憶介面，工作紀錄試行依賴實驗性 App Server host，且另需授權的單一私人 thread UAT 尚未執行。WebView2 缺失分支、其餘 accessibility／DPI／救援驗收、正式支援的記憶 connector、系統通知、程式碼簽章與可公開發布的正式安裝包，也仍在路線圖上。
 
 ## 參與開發
 

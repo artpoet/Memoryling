@@ -448,6 +448,8 @@ mod tests {
             [
                 "list_memory_sources",
                 "preview_memory_source",
+                "list_codex_threads",
+                "preview_codex_thread",
                 "cancel_memory_preview",
                 "get_memory_state",
                 "approve_memory_import",

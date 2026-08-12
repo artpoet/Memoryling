@@ -14,6 +14,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             memory::list_memory_sources,
             memory::preview_memory_source,
+            memory::list_codex_threads,
+            memory::preview_codex_thread,
             memory::cancel_memory_preview,
             memory::get_memory_state,
             memory::approve_memory_import,
@@ -67,6 +69,11 @@ mod invoke_security_tests {
                 "preview_memory_source",
                 json!({ "sourceId": "codex.synthetic.first-memory" }),
             ),
+            ("list_codex_threads", json!({})),
+            (
+                "preview_codex_thread",
+                json!({ "catalogId": "not-a-catalog", "candidateId": "not-a-candidate" }),
+            ),
             (
                 "cancel_memory_preview",
                 json!({ "previewId": "not-a-preview" }),
@@ -98,6 +105,8 @@ mod invoke_security_tests {
                 .invoke_handler(tauri::generate_handler![
                     memory::list_memory_sources,
                     memory::preview_memory_source,
+                    memory::list_codex_threads,
+                    memory::preview_codex_thread,
                     memory::cancel_memory_preview,
                     memory::get_memory_state,
                     memory::approve_memory_import,
@@ -141,6 +150,8 @@ mod invoke_security_tests {
             .invoke_handler(tauri::generate_handler![
                 memory::list_memory_sources,
                 memory::preview_memory_source,
+                memory::list_codex_threads,
+                memory::preview_codex_thread,
                 memory::cancel_memory_preview,
                 memory::get_memory_state,
                 memory::approve_memory_import,

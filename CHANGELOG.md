@@ -8,10 +8,40 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ### Planned
 
-- User-selected, read-only connector for a validated real Codex durable-memory format
-- Redacted real-source preview behavior and explicitly authorized private-data UAT
+- Separately authorized exact-source private-thread UAT for the pinned experimental work-record pilot
+- Packaged v0.3.0 synthetic compatibility UAT; the verified v0.2.0 installer remains the historical no-redo artifact
+- A production-supported, user-selected Codex durable-memory export／API or supported successor interface, followed by a fresh privacy review
 - Native reminder delivery with quiet hours and daily budgets
 - Remaining packaged pet-shell acceptance for accessibility, 125–200% and mixed DPI, monitor／taskbar topology changes, tray keyboard recovery, and Windows session shutdown
+
+## [0.3.0] - 2026-08-12
+
+> Unreleased, source-only development milestone. It has no accepted v0.3.0 installer and no private-thread UAT. The connector is an experimental, exact-version Codex work／thread-history pilot—not durable-memory access or a production connector. The verified v0.2.0 installer remains unchanged and does not need to be rebuilt or re-tested for its already accepted scope.
+
+### Added
+
+- Official-source evaluation recording that OpenAI publishes no stable Codex durable-memory export API or compatibility-guaranteed memory-file schema; direct Codex tool-home parsing is outside the product contract
+- Proposed ADR-0005 for an honestly labeled, version-bound Codex work／thread-history pilot through documented App Server `thread/list` and `thread/read` method names over local stdio, while preserving the overall host／transport's experimental and unsupported-for-production status
+- Rust-only fixed standard Codex Desktop executable resolution with an exact `codex-cli 0.134.0` fail-closed pin; neither the WebView nor a caller can supply an executable, path, method, or transport
+- User-triggered, content-minimized thread listing with short-lived opaque handles and Rust-only raw identifiers, followed by one explicit selected-thread read of the last completed turn's `final_answer`
+- Redacted preview that exposes only bounded count／time／exclusion／character-count／hash metadata, explicit completion confirmation, and approval bound to a canonical consent-scope hash
+- SQLite migration 0002 and schema v2 `source_consent_scopes`, including deterministic backfill of the known fixture-only v1 store, one-active-source enforcement, and content-free external lineage for the thread pilot
+- Transactional local-only forgetting for the selected source, consent scope, event, signal, effect, explanation, render state, cache, and lineage without editing or deleting the original Codex thread
+- Synthetic adapter, malformed-response, version-pin, timeout, migration, scope-hash, one-source, redaction, lineage, restart, and forgetting coverage
+
+### Security
+
+- Extended both exact Tauri production capabilities and independent Rust caller-label guards from six to all eight sensitive commands, adding Codex list／preview to the fixture list／preview, cancel, full-state, approve, and forget boundary
+- Shared one 10-second deadline across CLI-version verification and each App Server operation, capped stdout／line／final-answer sizes, hidden stderr, and bounded child-process cleanup after timeout or failure
+- Kept raw thread IDs, titles, paths, prompts, commentary, reasoning, tool output, and selected final-answer text out of frontend IPC, UI, logs, pet DTOs, native labels, notifications, external lineage, and repository fixtures
+- Added no telemetry, cloud sync, remote model call, WebSocket, runtime network request, background monitoring, direct Codex-home scan, or source mutation
+
+### Validated locally
+
+- Synthetic tests exercise the experimental adapter contract, SQLite v1 → v2 migration, canonical consent binding, one-source invariant, redacted boundaries, deterministic completion effect, restart state, lineage, and transactional local forgetting
+- A content-free live `thread/list` compatibility smoke passed against the exact pinned local CLI. It did not select any candidate, call `thread/read`, expose thread metadata or content, or constitute private-data UAT
+- A native source-tree smoke preserved the pet-first default and opened the detail UI with the experimental work-record boundary labeled separately while durable-memory access remained visibly off
+- No private thread was read. Private UAT remains blocked on separate authorization naming the exact completed thread and scope; even a future pass would validate only this pinned experimental pilot
 
 ## [0.2.0] - 2026-08-12
 

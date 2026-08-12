@@ -13,8 +13,20 @@ export interface PreviewRecord {
   id: string;
   sourceTimestamp: string;
   kind: "completion";
-  textPreview: string;
+  textPreview?: string;
+  characterCount: number;
   contentHash: string;
+}
+
+export interface ConsentScope {
+  schemaVersion: 1;
+  revision: 1;
+  sourceId: string;
+  adapterId: string;
+  adapterVersion: number;
+  dataCategories: string[];
+  purposes: string[];
+  readOnly: true;
 }
 
 export interface ImportPreview {
@@ -32,6 +44,20 @@ export interface ImportPreview {
     networkAccess: boolean;
     arbitraryPathAccess: boolean;
   };
+  consentScope: ConsentScope;
+  consentScopeHash: string;
+}
+
+export interface CodexThreadCandidate {
+  candidateId: string;
+  displayName: string;
+  updatedAt: string;
+  sourceKind: string;
+}
+
+export interface CodexThreadCatalog {
+  catalogId: string;
+  candidates: CodexThreadCandidate[];
 }
 
 export interface LineageSource {
@@ -43,8 +69,12 @@ export interface LineageSource {
   adapterVersion: number;
   sourceRecordId: string;
   sourceTimestamp: string;
-  memoryText: string;
+  memoryText?: string;
+  contentRedacted: boolean;
+  characterCount: number;
   contentHash: string;
+  consentScopeHash?: string;
+  consentRevision?: number;
 }
 
 export interface CreatureMark {
@@ -69,6 +99,7 @@ export interface ApproveImportRequest {
   previewId: string;
   sourceId: string;
   selectedRecordIds: string[];
+  consentScopeHash?: string;
 }
 
 export interface MemoryClient {
@@ -76,13 +107,18 @@ export interface MemoryClient {
   listSources(): Promise<SourceOption[]>;
   getState(): Promise<MemoryState>;
   previewSource(sourceId: string): Promise<ImportPreview>;
+  listCodexThreads(): Promise<CodexThreadCatalog>;
+  previewCodexThread(
+    catalogId: string,
+    candidateId: string,
+  ): Promise<ImportPreview>;
   cancelPreview(previewId: string): Promise<void>;
   approveImport(request: ApproveImportRequest): Promise<MemoryState>;
   forgetSource(sourceId: string): Promise<MemoryState>;
 }
 
 export const emptyMemoryState: MemoryState = {
-  storeSchemaVersion: 1,
+  storeSchemaVersion: 2,
   sourceCount: 0,
   eventCount: 0,
   signalCount: 0,
@@ -95,6 +131,10 @@ export const nativeMemoryClient: MemoryClient = {
   getState: () => invoke<MemoryState>("get_memory_state"),
   previewSource: (sourceId) =>
     invoke<ImportPreview>("preview_memory_source", { sourceId }),
+  listCodexThreads: () =>
+    invoke<CodexThreadCatalog>("list_codex_threads"),
+  previewCodexThread: (catalogId, candidateId) =>
+    invoke<ImportPreview>("preview_codex_thread", { catalogId, candidateId }),
   cancelPreview: (previewId) =>
     invoke<void>("cancel_memory_preview", { previewId }),
   approveImport: (request) =>

@@ -7,6 +7,8 @@
   "permissions": [
     "allow-list-memory-sources",
     "allow-preview-memory-source",
+    "allow-list-codex-threads",
+    "allow-preview-codex-thread",
     "allow-cancel-memory-preview",
     "allow-get-memory-state",
     "allow-approve-memory-import",

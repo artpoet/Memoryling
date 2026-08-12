@@ -23,8 +23,12 @@ const emptyState: CreatureRenderState = {
 const approvedState: CreatureRenderState = {
   ...emptyState,
   revision: revisionTwo,
-  fixtureState: "approved",
+  importState: "fixture-approved",
   marks: [{ id: "mark-1", style: "completion-star" }],
+};
+const threadApprovedState: CreatureRenderState = {
+  ...approvedState,
+  importState: "thread-approved",
 };
 const dismissedShell: PetShellState = {
   schemaVersion: 1,
@@ -75,6 +79,19 @@ function deferred<T>() {
 }
 
 describe("pet surface", () => {
+  test("reports one active work record without claiming durable-memory access", async () => {
+    const fixture = createClient(threadApprovedState);
+    render(<PetSurface client={fixture.client} />);
+    expect(
+      await screen.findByText("1 Codex work record active · durable memory off"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: /One Codex work record is active; durable memory access is off/,
+      }),
+    ).toBeInTheDocument();
+  });
+
   test("renders only the safe state and updates a completion star by revision", async () => {
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);
@@ -247,7 +264,7 @@ describe("pet surface", () => {
     render(<PetSurface client={fixture.client} />);
 
     expect(await screen.findByText("記憶存取關閉")).toBeInTheDocument();
-    expect(screen.getByText("按右鍵，再選擇開啟 Memoryling。")).toBeInTheDocument();
+    expect(await screen.findByText("按右鍵，再選擇開啟 Memoryling。")).toBeInTheDocument();
     expect(screen.getByTestId("pet-surface")).toHaveAttribute("data-motion", "reduced");
     await userEvent.click(screen.getByRole("button", { name: "知道了" }));
     expect(fixture.client.dismissOnboarding).toHaveBeenCalledTimes(1);

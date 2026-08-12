@@ -6,33 +6,33 @@ Memoryling's emotional value depends on access to sensitive context. Privacy is 
 
 ### 1. Local-first by default
 
-Raw agent memories and derived state stay on the user's device by default. No telemetry, cloud sync, or remote model request is currently implemented.
+Approved source content and derived state stay on the user's device by default. No telemetry, cloud sync, remote model request, or network transport is currently implemented. The experimental Codex work-record pilot launches only a fixed local executable and communicates over local stdio; it does not make thread history equivalent to durable memory.
 
 ### 2. Explicit, narrow consent
 
-Memoryling must explain which source it wants to read, which path or account is involved, and what categories of records will be imported. Consent to one source does not authorize another.
+Memoryling must explain which source it wants to read, which executable／account boundary is involved, and what categories of records will be imported. Consent to one source does not authorize another. The source v0.3.0 pilot permits one active approved source total and binds approval to a canonical scope hash; choosing another thread requires forgetting the current Memoryling copy and starting a fresh selection and consent flow.
 
-For the proposed growth system, one consent scope covers one exact source, its source-specific adapter version, allowed data categories, local derivation purposes, and consent／mapping versions. New records inside that exact scope may then update abstract local growth without per-record prompts. Another source requires another scope; a new category, purpose, or materially changed mapping requires a new consent revision. This never authorizes scanning another location or silently expanding use. The user must be able to inspect aggregate reasons, correct classification, disable derivation, revoke a scope, and forget its local downstream effects.
+The implemented schema-v1 consent scope covers one exact source, its source-specific adapter version, the allowlisted `user-confirmed-completion` category, the `local-creature-derivation` purpose, and consent／mapping versions. It authorizes only the selected import; automatic future-record intake, scope disable／re-enable, and content-derived growth remain future work. Another source requires another scope; a new category, purpose, or materially changed mapping requires a new consent revision. This never authorizes scanning another location or silently expanding use.
 
 ### 3. Read-only connectors
 
-Source adapters may read approved durable-memory records but must not alter, delete, reorganize, or “repair” the source agent's files.
+Source adapters may read only an explicitly selected, approved source and must not alter, delete, reorganize, or “repair” the source agent's files or threads. The Codex pilot is restricted to local stdio `thread/list` and `thread/read`; it cannot start, resume, rename, archive, delete, or otherwise mutate a thread.
 
 ### 4. Import preview
 
-Before the initial real-source scope is activated, users should see the proposed source, adapter version, data categories, purposes, initial record count／time range, and representative redacted samples. They can exclude initial records or cancel. Once that exact scope is active, later in-scope records may persist and derive automatically without another per-record preview; users instead retain aggregate inspection, correction, scope disable／revoke, and forgetting controls. Any scope expansion returns to preview and consent.
+Before the experimental work-record scope is activated, users see the source kind, adapter and exact CLI-version boundary, data category, purpose, bounded count／time metadata, excluded categories, character count, and a content hash. They do not see thread title, path, raw identifier, prompt, response, tool output, or selected final-answer text. They may cancel before persistence and must explicitly confirm that the selected thread represents completed work. The current implementation does not automatically ingest later records or expand the scope.
 
-The current pilot shows fictional fixture text. Redaction behavior for a real source must be designed and verified before private-data UAT.
+The fixture path still shows fictional fixture text. The Codex path uses a content-free redacted preview: `thread/list` creates only a short-lived opaque catalog, and `thread/read` is permitted only after one explicit selection. No private thread has been read for UAT; that remains a separately authorized exact-source gate.
 
 ### 5. Source lineage
 
-Every derived signal and world effect keeps machine-readable references to its source records and derivation version. “Why did this happen?” is a required control.
+Every derived signal and world effect keeps machine-readable references to its source records and derivation version. For the Codex pilot, externally visible lineage is content-free: only opaque hashes, source kind, adapter／mapping versions, scope hash／revision, timestamps, and exclusion reasons may cross the backend boundary. “Why did this happen?” remains a required control without revealing private source text.
 
 ### 6. Complete forgetting
 
 Deleting an imported source or record invalidates its dependent signals. Effects must be deleted or recomputed from the remaining sources.
 
-“Complete” means complete within Memoryling's imported records and supported downstream graph. It does not authorize changing the source agent's files or promise physically irrecoverable erasure from storage media, backups, or operating-system snapshots.
+“Complete” means complete within Memoryling's imported records and supported downstream graph. It does not authorize changing the source agent's files or threads and does not promise physically irrecoverable erasure from storage media, backups, or operating-system snapshots.
 
 ### 7. Bounded reminders
 
@@ -42,31 +42,35 @@ Reminder candidates do not become notifications automatically. Policy must enfor
 
 Real memories, tokens, credentials, private prompts, local databases, and identifiable logs must not appear in this repository, issues, CI, screenshots, or fixtures.
 
-## Current fixture-pilot evidence
+## Current local-source evidence
 
-The implemented first-memory pipeline has a deliberately narrower boundary than a real connector:
+The implemented first-memory pipeline has two deliberately narrow paths:
 
-- Its only source is one fictional Codex-shaped JSON resource bundled with the app. It cannot scan arbitrary paths or read a user's Codex tool-home.
-- Source preview state is held in Rust process memory and bound to a pending token. Previewing or canceling does not persist the fixture's source content; the desktop may still initialize an empty local schema.
-- Explicit approval stores the selected normalized text, timestamps, hashes, adapter metadata, and machine-readable lineage in `memoryling.sqlite3` under Tauri's app-local data directory.
-- Derivation is deterministic and local: the supported completion record creates one completion signal and one completion-star effect. No network client, telemetry, cloud sync, or remote model call is part of this path.
-- Forgetting runs in a local transaction: it removes the imported source and cascading normalized event, clears derived state, and recomputes effects from supported records that remain. The bundled fixture itself is read-only and is not changed or deleted.
+- The fixture source is one fictional Codex-shaped JSON resource bundled with the app. It cannot scan arbitrary paths or read a user's Codex tool-home.
+- Source v0.3.0 adds `codex-app-server-thread` v1 as an experimental work／thread-history pilot, not a durable-memory connector. OpenAI publishes no stable durable-memory export API or compatibility-guaranteed memory-file schema, so Memoryling does not parse `~/.codex/memories/` or any Codex-owned database, session, or rollout file.
+- Rust resolves only the fixed standard Codex Desktop executable, requires exactly `codex-cli 0.134.0`, and permits only local stdio `thread/list` and `thread/read`. There is no WebSocket, model call, telemetry, cloud sync, background watcher, startup scan, or runtime network request.
+- Listing is user-triggered and content-minimized. Raw thread IDs, titles, paths, prompts, responses, previews, and tool output remain Rust-only in a short-lived catalog. One explicit selection authorizes one read of the last completed turn's final answer; selected text never enters frontend IPC or the preview.
+- Preview state is held in Rust process memory and bound to short-lived catalog／preview handles. Previewing or canceling does not persist selected source content; the desktop may still initialize an empty local schema.
+- Explicit approval checks the canonical consent-scope hash, then stores the one selected normalized record, timestamps, hashes, adapter metadata, scope revision, and lineage in `memoryling.sqlite3` under Tauri's app-local data directory. SQLite schema v2 allows one approved source total.
+- Derivation is deterministic and local: the supported user-confirmed completion record creates one completion signal and one completion-star effect. Text content, record volume, tokens, elapsed time, and tool activity do not alter its weight.
+- Forgetting runs in a local transaction: it removes the imported source, consent scope, cascading normalized event, and downstream state, then recomputes from supported records that remain. The bundled fixture and original Codex thread are read-only and are not changed or deleted.
+- CLI version verification and App Server work share one 10-second deadline. Output is size-bounded, stderr is not surfaced, and timeout／failure cleanup is bounded so a child process cannot create an indefinite UI wait.
 - SQLite foreign keys and `secure_delete` are enabled, but this is an application-level deletion control, not a cryptographic secure-erasure guarantee.
 
-No user-owned agent memory has been imported or used for real-data UAT. The visible real-memory access state must remain off until a real connector and consent flow are verified.
+Synthetic contract coverage and a content-free live `thread/list` smoke exist for the exact pinned CLI. That smoke did not select a thread or call `thread/read`. No user-owned durable memory has been imported, and no private thread has been read for UAT. The visible durable-memory access state must therefore remain off; separately authorized exact-source private UAT would validate only the pinned experimental work-record pilot, not a production connector.
 
-The scoped automatic-derivation model described above is future design, not behavior of the current fixture pilot. It does not weaken the current import preview or explicit fixture approval flow, and it must pass a dedicated privacy review before real-source implementation.
+Automatic ongoing derivation, scope disable／re-enable, additional sources, and broader growth mappings remain future design. The v0.3.0 one-import scope does not weaken the current preview, explicit approval, completion confirmation, or forgetting controls.
 
 ## Implemented pet-surface display boundary
 
-The v0.2.0 floating-pet shell enforces this privacy contract; extended live accessibility and screen-sharing acceptance remain open:
+The source v0.3.0 floating-pet shell enforces this privacy contract; extended live accessibility and screen-sharing acceptance remain open. The previously verified v0.2.0 installer remains the unchanged packaged baseline:
 
 - The resident pet surface receives a whitelisted render-safe state, not the full memory or lineage DTO. It excludes normalized memory text, source paths or locators, private explanation content, and arbitrary record payloads.
-- Exact per-window app-command permissions plus Rust caller-label checks deny list／preview／cancel／full-state／approve／forget commands from the pet surface. Production-ACL and independent caller-defense invoke tests cover all six.
+- Exact per-window app-command permissions plus Rust caller-label checks deny fixture list／preview, Codex list／preview, cancel, full-state, approve, and forget commands from the pet surface. Production-ACL and independent caller-defense invoke tests cover all eight.
 - Pet reactions, native menu items, tray labels, window titles, onboarding, and operating-system surfaces must remain neutral; they cannot reveal names, projects, traits, or source summaries.
 - Cross-window events carry only opaque revisions or non-sensitive shell state. Each surface refetches a typed state limited to its purpose.
 - Closing the detail window, hiding the pet, quitting the app, and forgetting a source are distinct operations and must never be described as equivalent deletion.
-- The visible real-memory-off status remains on the pet surface until a real connector is verified. Native labels are authoritative; browser mode renders the honest detail preview and does not imitate persistence or resident-window behavior.
+- The visible durable-memory-off status remains on the pet surface until a supported real-memory connector is verified. The experimental work-record pilot is labeled separately. Native labels are authoritative; browser mode keeps connector access off and does not imitate persistence or resident-window behavior.
 - A screenshot／screen-sharing privacy mode and neutral growth-summary review are required before public testing with real memory-derived state.
 
 ## Before any network feature

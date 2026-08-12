@@ -22,6 +22,9 @@ const petCopy = {
   en: {
     label: "Memoryling. Memory access is off. Right-click for menu; drag to move.",
     accessOff: "Memory access off",
+    threadLabel:
+      "Memoryling. One Codex work record is active; durable memory access is off. Right-click for menu; drag to move.",
+    threadActive: "1 Codex work record active · durable memory off",
     onboardingTitle: "Meet your Memoryling",
     drag: "Drag me to move me.",
     menu: "Right-click me, then choose Open Memoryling.",
@@ -34,6 +37,9 @@ const petCopy = {
   "zh-TW": {
     label: "Memoryling。記憶存取關閉。按右鍵開啟選單；拖曳即可移動。",
     accessOff: "記憶存取關閉",
+    threadLabel:
+      "Memoryling。一筆 Codex 工作紀錄已啟用；durable memory 存取仍關閉。按右鍵開啟選單；拖曳即可移動。",
+    threadActive: "1 筆 Codex 工作紀錄已啟用 · durable memory 關閉",
     onboardingTitle: "認識你的 Memoryling",
     drag: "拖曳我來移動位置。",
     menu: "按右鍵，再選擇開啟 Memoryling。",
@@ -84,6 +90,7 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
   const hasCompletionStar = renderState.marks.some(
     (mark) => mark.style === "completion-star",
   );
+  const hasThreadImport = renderState.importState === "thread-approved";
 
   useEffect(() => {
     document.title = "Memoryling";
@@ -189,7 +196,7 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
     >
       <button
         aria-haspopup="menu"
-        aria-label={t.label}
+        aria-label={hasThreadImport ? t.threadLabel : t.label}
         className={`pet-button${reaction ? " pet-reacting" : ""}`}
         onClick={handleClick}
         onContextMenu={(event) => {
@@ -209,7 +216,9 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
         />
       </button>
 
-      <p className="pet-access-badge">{t.accessOff}</p>
+      <p className="pet-access-badge">
+        {hasThreadImport ? t.threadActive : t.accessOff}
+      </p>
 
       {onboardingVisible && (
         <section className="pet-onboarding" aria-labelledby="pet-onboarding-title">

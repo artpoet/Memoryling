@@ -4,21 +4,22 @@ AS_OF: 2026-08-12 (Asia/Taipei)
 
 ## Current milestone
 
-The v0.2.0 pet-first synthetic vertical slice is implemented and has passed automated, raw-native, and normally installed current-host Windows UAT. The next implementation milestone is one explicitly user-selected, supported Codex source with a Rust-owned picker and redacted preview; private-data UAT still requires a new exact-source authorization.
+The v0.3.0 source tree now contains a complete, version-bound experimental Codex work-record pilot on the verified v0.2.0 pet-first baseline. Official source evaluation found no stable Codex durable-memory export API or promised file schema, so this pilot uses local App Server thread history, is labeled separately from durable memory, and fails closed outside the exact tested CLI version. Private-data UAT still requires new authorization naming the exact work record and scope.
 
 Extended pet-shell environment acceptance and the WebView2-missing branch remain required before public distribution, but they do not justify rebuilding the completed shell. Do not begin the Codex for Open Source application before the recorded product, release, adoption, and maintainer-loop gates.
 
 ## Overall state
 
-- Stage: v0.2.0 with a complete fixture-only first-memory pipeline and pet-first Windows shell
+- Stage: v0.3.0 source-only experimental work-record pilot; v0.2.0 remains the last installed-UAT artifact
 - Product surface: bilingual transparent pet plus on-demand detail surface; browser stays an honest detail-only preview
 - Synthetic Codex-shaped source pipeline: implemented end to end
-- User-owned Codex memory access: not implemented
-- Local store: SQLite schema v1 under Tauri app-local data
+- Codex work-record pilot: implemented in source for explicit one-record selection; private-content UAT not performed
+- Codex durable-memory access: not implemented; no supported export API or stable third-party file contract is available
+- Local store: SQLite schema v2 under Tauri app-local data, including versioned consent-scope evidence
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: historical first-memory／packaging bundles and the v0.2.0 pet-first implementation pass GitHub Actions
-- Release: unsigned v0.2.0 Windows x64 current-user installer produced and normally installed current-host UAT completed; no signed or public release
+- CI: historical first-memory／packaging and v0.2.0 pet-first bundles pass; v0.3.0 Windows CI is pending the current push
+- Release: unsigned v0.2.0 Windows x64 current-user installer passed installed UAT; v0.3.0 has no packaged artifact or public release
 - Codex for Open Source readiness: product direction is relevant and the repository meets the basic public／maintainer form, but there is no public release, real-source proof, external adoption, or maintainer loop yet; do not submit until the recorded readiness gates are met
 - Creature growth design: user-confirmed biological／organic plus restrained sacred-premium direction, bounded variants, scoped automatic derivation, and long-term-versus-recent growth rules recorded; concept forms are reference vocabulary rather than a fixed roster, while the consent scope, classifiers, path profile, morphology-recipe compiler, genome, stages, renderer, and growth journal remain proposed and unimplemented
 - Desktop presence: transparent pet-only default with on-demand detail, native menu／tray／single-instance recovery, content-free position settings, and a Rust-owned two-window lifecycle implemented; extended multi-DPI／accessibility／shutdown acceptance remains open
@@ -47,14 +48,19 @@ Extended pet-shell environment acceptance and the WebView2-missing branch remain
 - made Rust own close／minimize／restore／hide transitions with tested rollback, TrayOnly handling, and content-free atomic shell settings／backup
 - added normalized work-area position persistence, bounds clamping, move debounce, topology polling, and automated 100–200%／negative-monitor geometry coverage
 - replaced shared default capabilities with exact `main`／`pet` capabilities, generated app-command permissions, and independent caller-label guards
-- proved both security layers by invoking all six sensitive memory commands from `pet`: production ACL and caller defense each reject before handler entry; `main` has a positive invoke path
+- proved both security layers by invoking all eight sensitive memory commands from `pet`: production ACL and caller defense each reject before handler entry; `main` has a positive invoke path
 - added the whitelisted `CreatureRenderState`, opaque deterministic revisions, approve／forget refresh events, race-safe subscription, and a pet code split that does not load full-memory APIs
 - fixed concurrent first-open SQLite migration by serializing version check, migration, and commit under one immediate transaction
 - completed raw-native fixture approve／restart／lineage／forget UAT plus a normal Explorer-launched v0.2.0 current-user install, installed-shortcut cold／resident single-instance recovery, pet↔detail smoke, explicit Quit, and retain-data uninstall
+- documented that Codex durable memories have no stable public export API／schema and selected a separately labeled, version-bound thread-history pilot in proposed ADR-0005
+- implemented a Rust-owned local App Server client pinned to `codex-cli 0.134.0`, one shared 10-second operation deadline, bounded fail-closed cleanup, and no-console／bounded-output process handling
+- added user-triggered content-minimized `thread/list`, Rust-only raw IDs, atomic one-catalog consumption, and one explicitly selected `thread/read` that accepts only the last completed turn's final answer
+- kept selected content out of frontend preview／logs, bound approval to a canonical consent-scope hash, enforced one active source, stored external consent in SQLite schema v2, and kept external lineage content-free
+- guarded late async results, concurrent source approval／forgetting, catalog／preview expiry, and detail reset; extended dual-layer pet denial tests from six to eight sensitive commands
 
 ## Product truth
 
-The local pipeline is real and persistent, but its only permitted input is a fictional resource bundled with the app. Memoryling does not scan or read the user's Codex tool-home, arbitrary files, credentials, prompts, or private memory. Browser preview keeps memory access off; after fixture approval the desktop still says real memory access is off.
+The fixture pipeline remains real and persistent. The v0.3.0 source additionally has an experimental work-record path: only after the user asks to browse does Rust list neutral, content-minimized candidates; only one explicitly selected completed record may be read; its content remains Rust-only until redacted preview and exact consent; and only Memoryling's local approved copy is forgotten. It does not scan tool-home／arbitrary files, parse `~/.codex/memories`, write to Codex, or make memory-content network requests. Durable／real-memory access remains visibly off, and browser mode never invokes the connector.
 
 The user-confirmed future growth direction allows many bounded variants within one living family, rather than a fixed pre-authored pet roster. The current concept forms only test family grammar, silhouette range, material language, and adjacent transitions. The information priority is observable Agent activity first, accumulated journey／outcomes second, and collaboration style third: activity alone controls the main silhouette and motion; journey gates permanent reshaping and controls maturity／milestones without selecting a silhouette; collaboration can add only a bounded local rhythm. Coarse content domain is a second layer limited to material, surface, or pattern accents and cannot select a species or sensitive personality label. A future real connector uses one narrow `SourceConsentScope` for one exact source, data categories, purposes, adapter version, and rule versions; new in-scope records may then be derived locally without per-record prompts. Another source needs another scope, while a category／purpose expansion needs a new consent revision. Recent use affects only expiring render hints. Permanent reshaping requires multiple deduplicated, independent, outcome-qualified evidence groups; calendar time, record volume, tokens, Agent count, and app-open time are not XP. The resulting lineage-backed profile compiles with identity, stage, and a finite module catalog into a deterministic `MorphologyRecipe`; correction, source disablement, or forgetting recomputes it. No Agent monitoring exists. Distant forms may differ greatly, but every adjacent change retains a versioned evolution bridge. The exact scope schema, evidence mapping, thresholds, module catalog, renderer, and visual limits remain proposed and unimplemented; this is not a claim about the current CSS creature, completion-star fixture, or exploratory ImageGen concepts.
 
@@ -80,12 +86,15 @@ The desktop is now pet-first: normal presence is one transparent floating creatu
 
 ## Verification evidence
 
-- PASS — 23 frontend tests cover native-label routing, browser honesty, pet／detail code splitting, whitelisted DTO sanitization, revision races and retry, onboarding, pointer／keyboard menu paths, drag recovery, fixture approve／lineage／forget, and bilingual boundaries
-- PASS — 29 Rust tests cover the strict fixture adapter, pending approval, schema and concurrent first-open migration, persistence／recomputation, shell settings recovery, position and 100–200% DPI geometry matrices, lifecycle rollback, TrayOnly behavior, and onboarding atomicity
-- PASS — production capabilities reject all six sensitive memory commands from `pet` before handler entry; an independent empty-authority invoke run proves the Rust caller-label defense rejects the same six; `main` has a positive production invoke
+- PASS — 28 frontend tests cover native-label routing, browser honesty, fixture and experimental work-record flows, redacted external lineage, exact consent binding, reset races, pet rendering, and bilingual boundaries
+- PASS — 39 Rust tests cover fixture and work-record parsing, process bounds／cleanup failures, consent migration／backfill, one-source enforcement, pending-token races, persistence／recomputation, ACL／caller guards, and pet-shell lifecycle／geometry; one private-read live smoke stays explicitly ignored
+- PASS — production capabilities reject all eight sensitive memory commands from `pet` before handler entry; an independent empty-authority invoke proves the caller-label defense rejects the same eight; `main` retains a positive invoke path
 - PASS — `npm run check`, `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings`
 - PASS — the pet entry bundle excludes full-memory client identifiers and detail UI; browser mode renders only the honest detail preview
 - PASS — restrictive CSP remains; broad `core:default` was replaced by exact `main`／`pet` capabilities, and the pet has no cross-window mutation permission
+- PASS — exact local `codex-cli 0.134.0` content-minimized live `thread/list` smoke returned only neutral candidates and left no Codex child process; it did not invoke `thread/read` or output IDs, titles, paths, summaries, or content
+- PASS — source v0.3.0 visible desktop smoke observed the transparent pet, native keyboard menu, detail surface, and bilingual work-record privacy／version disclosures; Browse was not selected and no private content was read
+- PENDING — one exact user-authorized private work-record preview／consent／approve／restart／redacted-lineage／forget UAT; no private record has been selected or read
 - PASS — `npm run build:windows` produced the v0.2.0 NSIS installer, release executable, and synthetic fixture resource
 - PASS — raw release UAT observed transparent pet-only launch, 360 × 430 Traditional Chinese onboarding → 320 × 320 dismissed bounds, native right-click and Shift+F10 menus, pet↔detail close／minimize lifecycle, explicit native Quit, and one-process relaunch
 - PASS — the raw fixture tour observed preview／consent／approve, persisted completion star after restart, all four lineage stages, forget, restart without ghost state, and approve／forget synchronization across surfaces
@@ -112,10 +121,11 @@ Remote evidence:
 - PASS — Windows CI for the packaging/icon source bundle: https://github.com/artpoet/Memoryling/actions/runs/31394540587
 - pet-first implementation commit: [`f48ec6f`](https://github.com/artpoet/Memoryling/commit/f48ec6fab2fd8ca26ab369d5972f4ae6d68b4075)
 - PASS — Windows CI for the v0.2.0 implementation bundle: https://github.com/artpoet/Memoryling/actions/runs/31603804040
+- PENDING — Windows CI for the v0.3.0 source bundle will be recorded after the implementation push
 
 ## Codex for Open Source readiness
 
-Memoryling can truthfully apply as a public MIT project maintained by `artpoet`, and its source-traceable／reversible Agent-memory architecture is relevant to the Codex ecosystem. It is not yet a competitive maintainer-program application: the public repository was created on 2026-08-10 and remains a young one-contributor project with no public Release or demonstrated external maintainer loop. The implemented product remains synthetic fixture-only.
+Memoryling can truthfully apply as a public MIT project maintained by `artpoet`, and its source-traceable／reversible architecture is relevant to the Codex ecosystem. It is not yet a competitive maintainer-program application: the repository remains young, has no public Release or demonstrated external maintainer loop, and the new work-record pilot has no authorized private-data UAT or packaged beta.
 
 The internal decision is **do not submit yet**. With the pet shell complete, prove one real-source sequence, close release-environment checks, publish an honest beta and demo, then demonstrate genuine external testing plus at least one public feedback／issue → fix → follow-up release maintainer loop. The complete program facts, dynamic evidence warning, readiness gates, application drafts, and API-credit privacy boundary live in [the Codex for Open Source readiness plan](docs/research/2026-08-12_codex-for-open-source-readiness.md). Suggested tester counts are internal credibility targets, not official OpenAI thresholds.
 
@@ -123,8 +133,8 @@ The internal decision is **do not submit yet**. With the pet shell complete, pro
 
 - the scaffold icons were replaced with generated test artwork, but the new artwork has not received public-release signoff
 - accessibility requires a dedicated keyboard and screen-reader audit
-- the adapter supports only the bundled synthetic v1 fixture; no user-owned Codex memory format is accepted
-- a Rust-owned native picker, strict external-file validation, and preview redaction remain future work
+- no stable Codex durable-memory API／schema is available; the work-record pilot is version-bound to exact CLI `0.134.0`, is not a production connector, and must fail closed on drift
+- private-record UAT remains pending exact source／scope authorization; source v0.3.0 has not been packaged, installed, signed, or publicly released
 - conversation model strategy remains intentionally open
 - the evolving-creature system has product drafts and proposed ADR-0004, but its `SourceConsentScope`, in-scope automatic classifier, recent-hint TTL, outcome-qualified durable-growth gates, final visual asset, path-profile mapping, lineage-bearing bounded `MorphologyRecipe` catalog and compatibility matrix, genome, multi-source growth graph, renderer, privacy mode, and accessibility acceptance remain unimplemented
 - no process, session, or Agent-presence monitoring exists; any future ephemeral presence adapter requires a separate product／privacy decision and explicit consent
@@ -135,13 +145,13 @@ The internal decision is **do not submit yet**. With the pet shell complete, pro
 
 ## Next bundle
 
-Resume the first user-selected Codex-source pilot as one narrow vertical slice: validate one stable supported format, add a Rust-owned picker scoped to one explicit file, show a redacted preview, bind one exact source／category／purpose consent, and keep the existing lineage／forget path. Private-data UAT requires a new user authorization naming the exact source; do not treat private `MEMORY.md` files as a public format specification, scan tool-home directories, or generalize arbitrary filesystem access.
+First unfinished gate: run the v0.3.0 pilot's private-data UAT only after the user names one exact Codex work record and authorizes the recorded read／local-storage／derivation scope. Then verify preview redaction, exact consent, restart persistence, content-free lineage, and complete local forgetting without printing or capturing the content. Do not list or read private records under a general “continue” instruction.
 
 In parallel with release preparation—not by rebuilding the completed pet shell—close the remaining live DPI／monitor／hitbox／Win+B／assistive-tech／shutdown matrix and the safe clean-environment WebView2 branch. Those gates block ADR-0003 acceptance and public-release claims, not the next synthetic-to-real implementation slice.
 
 The future Phase 2 bounded-variant growth direction is recorded in `docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md`, `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`, and proposed ADR-0004; it does not supersede the installer, pet-shell, and real-source gates above.
 
-After one real-source slice is proven, prepare the public-beta and maintainer-evidence track: README hero and short synthetic demo, verified GitHub Release and checksums, real external testers, honest adoption metrics, and at least one feedback／issue → fix → follow-up release loop. Refresh official terms and live GitHub evidence only when those gates are ready, then complete the application from the recorded drafts. Do not submit the current pre-release fixture-only state.
+After one authorized source slice is proven, prepare the public-beta and maintainer-evidence track: package and repeat installer UAT for that exact artifact, create a verified GitHub Release and checksums, recruit real external testers, record honest adoption, and complete at least one feedback／issue → fix → follow-up release loop. Refresh official terms and live evidence only when those gates are ready. Do not submit the application from the current pre-release state.
 
 ## Do not redo
 
@@ -152,6 +162,8 @@ After one real-source slice is proven, prepare the public-beta and maintainer-ev
 - do not recommend bypassing SmartScreen or weakening Windows security controls
 - do not add open-ended AI chat before the memory lineage path exists
 - do not describe the fixture pilot as access to the user's real Codex memories
+- do not call thread-history work records “Codex memories,” parse generated memory state, widen the exact CLI pin, or revive arbitrary file access without a new supported-format decision
+- do not rerun private `thread/read` without exact source authorization or claim that content-minimized catalog smoke is private-data UAT
 - do not add cloud sync, telemetry, or remote memory processing by assumption
 - do not implement the floating pet as a second independent creature state, expose full memory text to its surface, or treat a browser mock as native two-window verification
 - do not collapse growth into one fixed evolution line, classify raw text into a personality, or let runtime AI／unsaved randomness choose a permanent route

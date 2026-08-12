@@ -1,10 +1,12 @@
 use serde::{Deserialize, Serialize};
 
 pub const MEMORY_EVENT_SCHEMA_VERSION: i64 = 1;
-pub const STORE_SCHEMA_VERSION: i64 = 1;
+pub const STORE_SCHEMA_VERSION: i64 = 2;
 pub const DERIVATION_VERSION: i64 = 1;
 pub const CODEX_ADAPTER_ID: &str = "codex-durable-memory";
 pub const CODEX_ADAPTER_VERSION: i64 = 1;
+pub const CODEX_THREAD_ADAPTER_ID: &str = "codex-app-server-thread";
+pub const CODEX_THREAD_ADAPTER_VERSION: i64 = 1;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -23,8 +25,23 @@ pub struct PreviewRecord {
     pub id: String,
     pub source_timestamp: String,
     pub kind: String,
-    pub text_preview: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub text_preview: Option<String>,
+    pub character_count: usize,
     pub content_hash: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ConsentScopeV1 {
+    pub schema_version: u8,
+    pub revision: u8,
+    pub source_id: String,
+    pub adapter_id: String,
+    pub adapter_version: i64,
+    pub data_categories: Vec<String>,
+    pub purposes: Vec<String>,
+    pub read_only: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -52,6 +69,8 @@ pub struct ImportPreview {
     pub time_range: PreviewTimeRange,
     pub records: Vec<PreviewRecord>,
     pub access_scope: AccessScope,
+    pub consent_scope: ConsentScopeV1,
+    pub consent_scope_hash: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -60,6 +79,8 @@ pub struct ApproveImportRequest {
     pub preview_id: String,
     pub source_id: String,
     pub selected_record_ids: Vec<String>,
+    #[serde(default)]
+    pub consent_scope_hash: Option<String>,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -79,6 +100,25 @@ pub(crate) struct PreparedImport {
     pub source: SourceOption,
     pub source_content_hash: String,
     pub events: Vec<NormalizedMemoryEvent>,
+    pub consent_scope: ConsentScopeV1,
+    pub consent_scope_json: String,
+    pub consent_scope_hash: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct CodexThreadCandidate {
+    pub candidate_id: String,
+    pub display_name: String,
+    pub updated_at: String,
+    pub source_kind: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct CodexThreadCatalog {
+    pub catalog_id: String,
+    pub candidates: Vec<CodexThreadCandidate>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -92,8 +132,15 @@ pub struct LineageSource {
     pub adapter_version: i64,
     pub source_record_id: String,
     pub source_timestamp: String,
-    pub memory_text: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub memory_text: Option<String>,
+    pub content_redacted: bool,
+    pub character_count: usize,
     pub content_hash: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub consent_scope_hash: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub consent_revision: Option<u8>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -124,7 +171,7 @@ pub struct CreatureRenderState {
     pub schema_version: u8,
     pub revision: String,
     pub real_memory_access: RealMemoryAccess,
-    pub fixture_state: FixtureState,
+    pub import_state: ImportState,
     pub envelope: CreatureEnvelope,
     pub body_module: BodyModule,
     pub palette: CreaturePalette,
@@ -140,9 +187,10 @@ pub enum RealMemoryAccess {
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
-pub enum FixtureState {
+pub enum ImportState {
     Empty,
-    Approved,
+    FixtureApproved,
+    ThreadApproved,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]

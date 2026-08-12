@@ -20,6 +20,7 @@ const copy = {
   en: {
     prototype: "Memory access is off · no approved sources",
     prototypeActive: "Fixture pilot active · real memory access is off",
+    prototypeThreadActive: "1 Codex work record active · durable memory access is off",
     prototypeBrowser: "Browser preview · memory access is off",
     tagline: "Your agent memories, alive.",
     intro:
@@ -29,6 +30,8 @@ const copy = {
     creatureStateActive: "One approved memory is shaping me",
     approvedCreatureLine:
       "A completion star appeared because you approved one synthetic Codex memory.",
+    approvedThreadCreatureLine:
+      "A completion star appeared because you approved one Codex work record.",
     creatureLines: [
       "I woke up between the things you finished and the things still glowing.",
       "When memory access arrives, every mark on me will have a reason.",
@@ -57,8 +60,8 @@ const copy = {
       "Memoryling may decide when to speak, but it never decides your limits.",
     privacyLabel: "Local-first promise",
     privacyBody:
-      "The fixture pilot is read-only and local. It cannot scan your Codex files; raw memories, credentials, and private files are never silently uploaded.",
-    roadmap: "First local lineage slice available in desktop",
+      "Approved records stay local and read-only at the source. Codex durable memories remain disconnected; raw records, credentials, and private files are never silently uploaded.",
+    roadmap: "Local fixture and experimental work-record lineage available",
     brandHome: "Memoryling home",
     languageLabel: "Language",
     dashboardLabel: "Memoryling status dashboard",
@@ -72,6 +75,7 @@ const copy = {
   "zh-TW": {
     prototype: "記憶存取關閉 · 尚無核准來源",
     prototypeActive: "Fixture 試行中 · 真實記憶存取關閉",
+    prototypeThreadActive: "1 筆 Codex 工作紀錄已啟用 · durable memory 存取關閉",
     prototypeBrowser: "瀏覽器預覽 · 記憶存取關閉",
     tagline: "讓你的 Agent 記憶，長成一個生命。",
     intro:
@@ -80,6 +84,7 @@ const copy = {
     creatureState: "正在等待故事開始",
     creatureStateActive: "一筆核准記憶正在塑造我",
     approvedCreatureLine: "你核准了一筆合成 Codex 記憶，因此完成之星出現了。",
+    approvedThreadCreatureLine: "你核准了一筆 Codex 工作紀錄，因此完成之星出現了。",
     creatureLines: [
       "我在你完成的事，和那些還亮著的事之間醒來。",
       "未來我身上的每個變化，都必須有記憶可以解釋。",
@@ -107,8 +112,8 @@ const copy = {
     principle: "記憶獸可以決定何時開口，但永遠不能替你決定界線。",
     privacyLabel: "Local-first 承諾",
     privacyBody:
-      "目前的 fixture 試行僅在本機唯讀，不能掃描你的 Codex 檔案；原始記憶、憑證與私密檔案都不會被偷偷上傳。",
-    roadmap: "桌面版已具備第一條本機來源鏈",
+      "核准紀錄留在本機，來源維持唯讀；Codex durable memories 仍未連線，原始紀錄、憑證與私密檔案不會被偷偷上傳。",
+    roadmap: "桌面版已具備 fixture 與實驗性工作紀錄來源鏈",
     brandHome: "Memoryling 首頁",
     languageLabel: "語言",
     dashboardLabel: "Memoryling 狀態面板",
@@ -144,6 +149,8 @@ export function DetailSurface({
   const t = copy[locale];
   const activeMark = memoryState.marks[0];
   const hasApprovedMemory = Boolean(activeMark);
+  const hasApprovedThread =
+    activeMark?.lineage[0]?.adapterId === "codex-app-server-thread";
 
   useEffect(() => {
     if (!memoryClient.available) return;
@@ -190,15 +197,29 @@ export function DetailSurface({
 
   const creatureLine = useMemo(() => {
     const lines = hasApprovedMemory
-      ? [t.approvedCreatureLine, ...t.creatureLines]
+      ? [
+          hasApprovedThread
+            ? t.approvedThreadCreatureLine
+            : t.approvedCreatureLine,
+          ...t.creatureLines,
+        ]
       : t.creatureLines;
     return lines[lineIndex % lines.length];
-  }, [hasApprovedMemory, lineIndex, t.approvedCreatureLine, t.creatureLines]);
+  }, [
+    hasApprovedMemory,
+    hasApprovedThread,
+    lineIndex,
+    t.approvedCreatureLine,
+    t.approvedThreadCreatureLine,
+    t.creatureLines,
+  ]);
 
   const accessStatus = !memoryClient.available
     ? t.prototypeBrowser
     : hasApprovedMemory
-      ? t.prototypeActive
+      ? hasApprovedThread
+        ? t.prototypeThreadActive
+        : t.prototypeActive
       : t.prototype;
 
   async function resetPetGuide() {

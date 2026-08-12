@@ -4,9 +4,11 @@
 
 ## Read this first
 
-Memoryling v0.2.0 is currently a **pet-first, fixture-only Windows x64 test build**. Its native floating-pet shell and its local preview, approval, SQLite persistence, explanation, and forgetting path are functional for one fictional record bundled with the app.
+The only packaged Memoryling build with completed installation UAT is the **pet-first, fixture-only Windows x64 v0.2.0 test artifact**. Its native floating-pet shell and its local preview, approval, SQLite persistence, explanation, and forgetting path are functional for one fictional record bundled with the app.
 
-It does **not** read real Codex memory, scan a Codex tool-home, accept arbitrary files, or connect to a production memory source. The app must continue to show that real-memory access is off, including while the synthetic fixture pilot is active.
+It does **not** read real Codex memory, scan a Codex tool-home, accept arbitrary files, or connect to a production memory source. The app must continue to show that durable-memory access is off, including while the synthetic fixture pilot is active.
+
+Separately, the repository source tree is at v0.3.0 and implements a version-bound experimental **Codex work-record／thread-history** pilot for developer evaluation. It is not present in the tested v0.2.0 installer, is not a durable-memory connector, and has not received an authorized private-thread UAT. See [Development source only: experimental Codex work-record pilot](#development-source-only-experimental-codex-work-record-pilot).
 
 This test build is not a signed or public release-ready package.
 
@@ -51,6 +53,8 @@ The possible WebView2 prerequisite download is part of installation. The fixture
 On 2026-08-12, this exact v0.2.0 artifact passed an Explorer-launched current-user installation into the real per-user LocalAppData location. Normal Start menu and desktop shortcuts were present, and the HKCU uninstall registration reported version 0.2.0. A shortcut cold launch showed the pet first; a resident relaunch stayed single-instance, right-click → **Open Memoryling** opened the detail window, closing detail returned to the pet, and explicit **Quit Memoryling** left no running process. Uninstalling with **Delete the application data** clear removed the program, HKCU uninstall registration, shortcuts, and process while retaining `%LOCALAPPDATA%\app.memoryling.desktop`; only filesystem and registration metadata were inspected, never database content.
 
 An earlier agent-direct installer launch was affected by Windows virtualization. Its residue was removed and that attempt is excluded from product evidence. The WebView2-missing branch remains deferred until a safe disposable Windows x64 environment is available; the installed host runtime must not be removed merely to test it. This evidence does not make the unsigned build release-ready.
+
+The exact v0.2.0 artifact, size, hash, and completed install／lifecycle／retain-data uninstall evidence are a no-redo baseline. Do not rebuild or repeat that acceptance unless the artifact or relevant packaging behavior changes.
 
 ## Use the pet-first shell
 
@@ -100,6 +104,24 @@ The visible status must continue to separate the fixture pilot from real-memory 
 
 Forgetting removes the app's local imported copy and supported downstream graph. It does not modify or delete the read-only fixture bundled with the installed app, and it is not a physical secure-erasure guarantee.
 
+## Development source only: experimental Codex work-record pilot
+
+OpenAI does not currently publish a stable Codex durable-memory export API or a compatibility-guaranteed memory-file schema for this integration. The v0.3.0 source implementation therefore evaluates **Codex work records／thread history**, not “Codex memories,” through a narrow local App Server stdio boundary. The App Server host remains experimental and unsupported for production.
+
+This pilot is fail-closed and requires the standard local Codex Desktop CLI to report exactly `codex-cli 0.134.0`. It does not claim compatibility with earlier or later CLI versions. Its intended developer flow is:
+
+1. Launch the current source build and explicitly choose **Browse local Codex work records**. The app does not list anything at startup or in the background.
+2. Review the content-minimized catalog. Candidates have neutral labels and bounded source／time metadata; they do not reveal thread titles, summaries, repository paths, raw identifiers, prompts, responses, or tool output.
+3. Explicitly select one candidate. Only then may the backend call local stdio `thread/read` for that one thread.
+4. If the thread is complete, the backend considers only the final `agentMessage` whose phase is `final_answer` from the last completed turn. User prompts, commentary, reasoning, commands, tool output, and other items are excluded.
+5. Review the redacted preview and exact consent scope. The preview reports bounded counts, source／time metadata, proposed completion-event count, and excluded data categories; it never displays the selected thread text.
+6. Confirm that the selected work is complete and give exact consent. Only then may that final-answer content be normalized and persisted in Memoryling's app-local SQLite database. It is not returned through frontend IPC or shown in the UI.
+7. Use **Forget** to remove Memoryling's local imported copy, lineage, and supported downstream effects. It never edits, archives, deletes, or otherwise changes the original Codex thread.
+
+The adapter is read-only. It accepts no arbitrary path, does not scan Codex durable-memory files, makes no model or external network call, performs no source write, and permits only one approved source at a time. A different source requires forgetting the current Memoryling copy and completing a new browse, selection, preview, consent, and import flow.
+
+Durable-memory access must remain visibly off. As of 2026-08-12, private-thread UAT has neither been authorized nor performed. Do not browse or read a private thread for acceptance until the user explicitly names the source／thread scope; even a later successful UAT would validate only this pinned experimental pilot, not a production connector or Phase 1 completion.
+
 ## Local data and uninstall behavior
 
 Memoryling's current-user app data is stored under:
@@ -108,7 +130,7 @@ Memoryling's current-user app data is stored under:
 
 The folder can include:
 
-- `memoryling.sqlite3`, containing approved normalized fixture text, hashes, lineage, and derived state;
+- `memoryling.sqlite3`, containing approved normalized fixture text, hashes, lineage, and derived state; a v0.3.0 development source build can also retain the one selected final answer as normalized text, but only after the explicit pilot consent described above;
 - `desktop-shell-v1.json` and a possible `desktop-shell-v1.json.bak`, containing only local shell settings such as onboarding, always-on-top, and safe pet position state;
 - WebView runtime data such as `EBWebView`.
 
@@ -120,7 +142,8 @@ Do not share, attach, print, or commit a real local database. Although the curre
 
 ## Troubleshooting boundaries
 
-- **The app says real-memory access is off:** expected. This build has no real connector.
+- **The app says durable-memory access is off:** expected. The tested v0.2.0 installer has no real source connector, and the v0.3.0 source pilot reads explicitly selected work history rather than Codex durable memory.
+- **The Codex work browser says the CLI version is unsupported:** expected fail-closed behavior unless the standard local Codex Desktop CLI reports exactly `codex-cli 0.134.0`. Do not bypass the pin or point the app at an arbitrary executable.
 - **The browser preview stays in the detail layout:** expected. Browser mode does not imitate the native floating pet, context menu, tray, single-instance lifecycle, SQLite, or persistence.
 - **WebView2 installation fails:** stop and retry only through the trusted installer and a trusted network or obtain WebView2 through an official Microsoft channel. Do not use an unknown third-party runtime download.
 - **Windows blocks the unsigned installer:** do not weaken system protections. Verify the artifact through the project owner or wait for a signed, release-ready build.
@@ -131,13 +154,14 @@ Do not share, attach, print, or commit a real local database. Although the curre
 From the repository root:
 
     npm install
-    npm run build:windows
+    npm run check
+    npm run tauri dev
 
-The supported installer artifact is generated at:
+The only installer with completed native UAT remains the existing v0.2.0 artifact at:
 
     src-tauri\target\release\bundle\nsis\Memoryling_0.2.0_x64-setup.exe
 
-The command builds the frontend, compiles the Tauri application, bundles the synthetic fixture resource, and creates the current-user NSIS installer. Before sharing any rebuilt artifact, rerun the project checks and native installer click-through, then recheck the checksum and CI evidence for that exact file. Do not substitute the raw release executable for the installer.
+`npm run build:windows` builds the current source version and therefore creates a new, source-versioned, unverified artifact; it does not reproduce the exact tested v0.2.0 file above. Do not describe any rebuilt artifact as supported until its exact bytes have passed the required native installer click-through and its size, checksum, and CI evidence have been recorded. Do not substitute the raw release executable for an installer.
 
 ## Test artwork status
 
