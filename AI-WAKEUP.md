@@ -39,7 +39,7 @@ Implemented now:
 - interactive creature plus honestly labeled concept event and bounded-initiative panels
 - versioned normalized memory-event schema, a fixed-resource adapter v1 for one bundled synthetic fixture, and SQLite schema v2 consent scopes
 - explicit fixture-source selection, in-memory preview token, record selection, and consent gate
-- local SQLite v1 store under Tauri app-local data with source lineage
+- local SQLite v2 store under Tauri app-local data with consent scope and source lineage
 - deterministic completion signal and explainable completion-star world effect
 - transactional source forgetting followed by deterministic recomputation
 - visible real-memory access remains off; fixture approval is reported separately as a local synthetic pilot

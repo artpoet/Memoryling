@@ -18,7 +18,7 @@ Extended pet-shell environment acceptance and the WebView2-missing branch remain
 - Local store: SQLite schema v2 under Tauri app-local data, including versioned consent-scope evidence
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: historical first-memory／packaging and v0.2.0 pet-first bundles pass; v0.3.0 Windows CI is pending the current push
+- CI: historical first-memory／packaging, v0.2.0 pet-first, and v0.3.0 work-record bundles pass GitHub Actions
 - Release: unsigned v0.2.0 Windows x64 current-user installer passed installed UAT; v0.3.0 has no packaged artifact or public release
 - Codex for Open Source readiness: product direction is relevant and the repository meets the basic public／maintainer form, but there is no public release, real-source proof, external adoption, or maintainer loop yet; do not submit until the recorded readiness gates are met
 - Creature growth design: user-confirmed biological／organic plus restrained sacred-premium direction, bounded variants, scoped automatic derivation, and long-term-versus-recent growth rules recorded; concept forms are reference vocabulary rather than a fixed roster, while the consent scope, classifiers, path profile, morphology-recipe compiler, genome, stages, renderer, and growth journal remain proposed and unimplemented
@@ -121,7 +121,8 @@ Remote evidence:
 - PASS — Windows CI for the packaging/icon source bundle: https://github.com/artpoet/Memoryling/actions/runs/31394540587
 - pet-first implementation commit: [`f48ec6f`](https://github.com/artpoet/Memoryling/commit/f48ec6fab2fd8ca26ab369d5972f4ae6d68b4075)
 - PASS — Windows CI for the v0.2.0 implementation bundle: https://github.com/artpoet/Memoryling/actions/runs/31603804040
-- PENDING — Windows CI for the v0.3.0 source bundle will be recorded after the implementation push
+- work-record implementation commit: [`1d1d918`](https://github.com/artpoet/Memoryling/commit/1d1d9180a518f27c6340b2280370dec7f9226014)
+- PASS — Windows CI for the v0.3.0 source bundle: https://github.com/artpoet/Memoryling/actions/runs/31612662676
 
 ## Codex for Open Source readiness
 
