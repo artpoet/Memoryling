@@ -58,11 +58,12 @@ Exit condition: one approved Codex memory can create one explainable, removable 
 
 ## Phase 2 — A life that continues
 
-Design foundation recorded: the user confirmed the biological／organic plus restrained sacred-premium direction and the goal of content-responsive routes. The [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) and proposed [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md) propose a deterministic, lineage-aware branch-and-blend implementation. Distant stages and routes may diverge, while each adjacent stage or reroute retains a versioned, understandable evolution bridge. Permanent growth comes only from approved memory-derived data; time supplies reversible presentation state. This is design evidence, not implemented Phase 2 functionality or an accepted route schema.
+Design foundation recorded: the user confirmed the biological／organic plus restrained sacred-premium direction and a content-responsive space with many variants. The current concept forms are vocabulary and adjacent-bridge references, not a fixed pre-authored pet roster. The [evolving creature system draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md) and proposed [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md) propose a deterministic, lineage-aware weighted profile compiled into bounded `MorphologyRecipe` variants. Distant forms may diverge, while each adjacent stage or recipe change retains a versioned, understandable evolution bridge. Permanent growth comes only from approved durable Agent-activity evidence; no live monitoring exists, and any future separately consented presence state remains reversible. This is design evidence, not implemented Phase 2 functionality or an accepted schema.
 
 - [ ] persistent creature traits and visual marks
 - [ ] versioned identity core, growth contributions, recomputable creature genome, and evolution stages
-- [ ] versioned, lineage-aware `EvolutionPathProfile` with multiple content-derived routes, bounded blending, and deterministic rerouting
+- [ ] versioned, lineage-aware `EvolutionPathProfile` as a weighted influence vector, with deterministic recipe recomputation
+- [ ] finite versioned module catalog, compatibility matrix, visual-slot caps, and quantized `MorphologyRecipe` compiler for many bounded variants
 - [ ] deterministic EvolutionBridge records and adjacent-stage continuity acceptance
 - [ ] layered local renderer with no runtime image-generation dependency
 - [ ] multi-day story event state machine
@@ -72,8 +73,9 @@ Design foundation recorded: the user confirmed the biological／organic plus res
 - [ ] reduced-motion, keyboard, screen-reader, high-contrast, and 200% zoom acceptance for automatic evolution
 - [ ] screenshot／streaming privacy mode and neutral growth-summary behavior before public testing
 - [ ] a local source-detail unlock gate for Growth Journal explanations before exposing private record details
+- [ ] any optional live-presence adapter remains separately consented, content-free, TTL-bound, memory-only, and unable to mutate permanent growth
 
-Exit condition: the creature demonstrates continuity across restarts, explains every persistent change, and produces different but understandable routes from different synthetic approved-memory profiles; forgetting support recomputes or removes the route without ghost modules or runtime model calls.
+Exit condition: the creature demonstrates continuity across restarts, explains every persistent change, and produces many distinguishable but bounded and understandable variants from a synthetic approved-activity profile matrix; forgetting recomputes the recipe without ghost modules, live Agent presence does not mutate permanent form, and rendering makes no runtime model call.
 
 ## Phase 3 — Useful initiative
 
