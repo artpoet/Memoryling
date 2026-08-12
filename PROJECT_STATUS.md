@@ -17,7 +17,7 @@ Extended pet-shell environment acceptance and the WebView2-missing branch remain
 - Local store: SQLite schema v1 under Tauri app-local data
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: historical first-memory／packaging bundles pass GitHub Actions; current v0.2.0 local gates pass, and this bundle requires its own pushed-HEAD Actions result before remote closeout
+- CI: historical first-memory／packaging bundles and the v0.2.0 pet-first implementation pass GitHub Actions
 - Release: unsigned v0.2.0 Windows x64 current-user installer produced and normally installed current-host UAT completed; no signed or public release
 - Codex for Open Source readiness: product direction is relevant and the repository meets the basic public／maintainer form, but there is no public release, real-source proof, external adoption, or maintainer loop yet; do not submit until the recorded readiness gates are met
 - Creature growth design: user-confirmed biological／organic plus restrained sacred-premium direction, bounded variants, scoped automatic derivation, and long-term-versus-recent growth rules recorded; concept forms are reference vocabulary rather than a fixed roster, while the consent scope, classifiers, path profile, morphology-recipe compiler, genome, stages, renderer, and growth journal remain proposed and unimplemented
@@ -110,6 +110,8 @@ Remote evidence:
 - PASS — Windows CI for that implementation commit: https://github.com/artpoet/Memoryling/actions/runs/31380474307
 - packaging/icon commit: [`2aead61`](https://github.com/artpoet/Memoryling/commit/2aead6133d31578239ea49e04c9a95509c05911a)
 - PASS — Windows CI for the packaging/icon source bundle: https://github.com/artpoet/Memoryling/actions/runs/31394540587
+- pet-first implementation commit: [`f48ec6f`](https://github.com/artpoet/Memoryling/commit/f48ec6fab2fd8ca26ab369d5972f4ae6d68b4075)
+- PASS — Windows CI for the v0.2.0 implementation bundle: https://github.com/artpoet/Memoryling/actions/runs/31603804040
 
 ## Codex for Open Source readiness
 
