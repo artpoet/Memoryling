@@ -2,18 +2,18 @@
 
 **你的 Agent 記得；你的 Memoryling 活著。**
 
-Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。在已設定的專案中，只要說：
+Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並打開 Windows App，再回到已設定的專案說：
 
 > **運作 Memoryling**
 
-目前的 Agent 只使用它原本獲准讀取的脈絡，編譯成一份小型寵物更新，自動啟動或叫回已安裝的寵物，並等待本機套用完成。普通流程裡，使用者全程留在 Agent 對話即可；接著由 Memoryling 持續管理外觀、雙語對話、冷卻、期限、安靜時段與每日額度。
+寵物打開後會自己顯示這句發動提醒。目前的 Agent 只使用它原本獲准讀取的脈絡，編譯成一份小型寵物更新，提交給已開啟的 App，並等待本機套用完成；接著由 Memoryling 持續管理外觀、雙語對話、冷卻、期限、安靜時段與每日額度。
 
 [English](README.md) · [產品願景](docs/PRODUCT_VISION.md) · [架構](docs/ARCHITECTURE.md) · [隱私](docs/PRIVACY_PRINCIPLES.md)
 
 ## 它有什麼不同
 
 - **由 Agent 運作：** 語意理解留在使用者原本選擇的 Agent。
-- **對話優先：** Agent 會提交更新並打開寵物，不需要手動啟動 App 或通過設定頁。
+- **清楚的安裝版入口：** 使用者正常打開 EXE；寵物會在首次啟動與待機時教你 Agent 發動語。
 - **App 不自行呼叫 AI API：** 普通寵物不需要 API key，也不會自行發出模型請求。
 - **本機持續生活：** App 負責狀態、時機、呈現與使用者控制。
 - **最小化交接：** 更新包只有生成後的寵物狀態與雜湊引用，不含原始記憶、prompt、路徑、祕密或 reasoning。
@@ -23,11 +23,13 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。在已設定�
 ## 運作方式
 
 ```text
-「運作 Memoryling」
+安裝並打開 Memoryling
+  → 寵物顯示「運作 Memoryling」發動提醒
+  → 使用者在目前 Agent 專案說「運作 Memoryling」
   → Agent 讀取原本已授權的記憶＋近期工作＋專案脈絡
   → Agent skill 編譯 protocol-v1 JSON
-  → 本機工具確認已安裝 App 並寫入唯一收件匣檔案
-  → 工具啟動或叫回寵物
+  → 本機工具確認相容寵物已開啟
+  → 工具寫入唯一收件匣檔案並等待套用
   → Rust 驗證並只保留最新操作
   → 寵物依本機確定性規則改變外觀與說話
 ```
@@ -42,7 +44,7 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。在已設定�
 - 每次操作 3–12 組英文／繁體中文對話卡
 - 開啟、點擊與有限環境觸發
 - 唯一檔案收件匣輪詢，以及大小、symlink、schema、ID 嚴格檢查
-- 提交後自動冷啟動，或透過 single-instance 叫回既有寵物
+- pet-first 手動啟動、持續顯示的雙語發動提醒與 single-instance recovery
 - 本機清除控制與權威快照替換語意
 - 合成資料 Rust、React 與提交工具測試
 

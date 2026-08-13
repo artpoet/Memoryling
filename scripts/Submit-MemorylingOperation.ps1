@@ -3,7 +3,10 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Path,
     [string]$ExecutablePath,
-    [switch]$SkipLaunch
+    [ValidateRange(1, 30)]
+    [int]$WaitSeconds = 15,
+    [switch]$SkipAppReadyCheck,
+    [switch]$SkipConfirmation
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,6 +27,49 @@ function Test-Timestamp([object]$Value) {
     if ($Value -isnot [string]) { return $false }
     $parsed = [DateTimeOffset]::MinValue
     return [DateTimeOffset]::TryParse($Value, [ref]$parsed)
+}
+
+function Test-CompatibleMemorylingExecutable([string]$Candidate) {
+    try {
+        $resolved = (Resolve-Path -LiteralPath $Candidate -ErrorAction Stop).Path
+        $item = Get-Item -LiteralPath $resolved -ErrorAction Stop
+        if ($item.PSIsContainer -or $item.Name -ne 'Memoryling.exe') { return $null }
+        $version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($resolved)
+        if ($version.ProductName -ne 'Memoryling') { return $null }
+        $numericVersion = [Version]::new(
+            [Math]::Max(0, $version.FileMajorPart),
+            [Math]::Max(0, $version.FileMinorPart),
+            [Math]::Max(0, $version.FileBuildPart),
+            [Math]::Max(0, $version.FilePrivatePart)
+        )
+        if ($numericVersion -lt [Version]'0.6.0.0') { return $null }
+        return $resolved
+    } catch {
+        return $null
+    }
+}
+
+function Assert-MemorylingIsOpen {
+    $expected = $null
+    if (-not [string]::IsNullOrWhiteSpace($ExecutablePath)) {
+        $expected = Test-CompatibleMemorylingExecutable $ExecutablePath
+        if ($null -eq $expected) {
+            throw 'Memoryling 0.6.0 or newer is not open. Open the installed desktop app, then use the activation phrase again.'
+        }
+    }
+
+    foreach ($process in @(Get-Process -Name 'Memoryling' -ErrorAction SilentlyContinue)) {
+        try {
+            if ([string]::IsNullOrWhiteSpace($process.Path)) { continue }
+            $running = Test-CompatibleMemorylingExecutable $process.Path
+            if ($null -eq $running) { continue }
+            if ($null -eq $expected -or $running -eq $expected) { return }
+        } catch {
+            # Protected or stale process metadata is not proof that the App is ready.
+        }
+    }
+
+    throw 'Memoryling 0.6.0 or newer is not open. Open the installed desktop app, then use the activation phrase again.'
 }
 
 function Test-ExactProperties([object]$Value, [string[]]$Required, [string[]]$Optional = @()) {
@@ -106,13 +152,8 @@ if ([string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
     throw "Memoryling local app data directory is unavailable."
 }
 
-$launcherPath = Join-Path $PSScriptRoot 'Start-Memoryling.ps1'
-if (-not $SkipLaunch) {
-    $resolveArguments = @{ ResolveOnly = $true }
-    if (-not [string]::IsNullOrWhiteSpace($ExecutablePath)) {
-        $resolveArguments.ExecutablePath = $ExecutablePath
-    }
-    & $launcherPath @resolveArguments | Out-Null
+if (-not $SkipAppReadyCheck) {
+    Assert-MemorylingIsOpen
 }
 
 $inboxDirectory = Join-Path $env:LOCALAPPDATA 'app.memoryling.desktop\agent-inbox'
@@ -130,12 +171,19 @@ try {
     }
 }
 
-if (-not $SkipLaunch) {
-    $launchArguments = @{ InboxPath = $targetPath }
-    if (-not [string]::IsNullOrWhiteSpace($ExecutablePath)) {
-        $launchArguments.ExecutablePath = $ExecutablePath
+if (-not $SkipConfirmation) {
+    $deadline = [DateTimeOffset]::Now.AddSeconds($WaitSeconds)
+    while ([DateTimeOffset]::Now -lt $deadline) {
+        if (-not (Test-Path -LiteralPath $targetPath)) {
+            Write-Output ("Memoryling operation {0} was applied with {1} dialogue cards." -f $package.operationId, @($package.dialogues).Count)
+            return
+        }
+        Start-Sleep -Milliseconds 250
     }
-    & $launcherPath @launchArguments
+    if (Test-Path -LiteralPath $targetPath) {
+        Remove-Item -LiteralPath $targetPath -Force
+    }
+    throw 'Memoryling is open, but the operation was not confirmed within the local wait limit. The unconfirmed inbox item was removed.'
 }
 
 Write-Output ("Submitted Memoryling operation {0} with {1} dialogue cards." -f $package.operationId, @($package.dialogues).Count)

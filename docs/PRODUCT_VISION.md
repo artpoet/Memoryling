@@ -4,7 +4,7 @@
 
 Memoryling turns the memory and recent work already understood by a person's AI Agent into a small, persistent desktop life.
 
-The user does not configure another AI service or open the App first. In a project they say `運作 Memoryling` or `Run Memoryling`; the Agent creates a privacy-minimized pet update, wakes the installed pet, waits for local application, and continues reporting in the same conversation.
+The user does not configure another AI service. They install and open Memoryling normally; the pet tells them to return to the current Agent project and say `運作 Memoryling` or `Run Memoryling`. The Agent creates a privacy-minimized update for the already-running pet, waits for local application, and reports in the same conversation.
 
 ## The operating model
 
@@ -12,14 +12,14 @@ Memoryling is deliberately half Agent and half app:
 
 - **Agent understands.** It uses only context it is already authorized to read: relevant durable memory, recent work, current conversation, and project SSOT.
 - **Agent compiles.** It converts that context into a bounded activity profile, hashed evidence references, and 3–12 bilingual dialogue cards.
-- **Agent delivers.** It submits the package, starts or recalls the installed pet, and confirms bounded local application without exposing content or paths.
+- **Agent delivers.** It verifies that the compatible pet is open, submits the package, and confirms bounded local application without exposing content or paths.
 - **App lives.** It persists only the current compiled state, renders appearance accents, and chooses dialogue through deterministic triggers, expiry, cooldown, quiet hours, and budgets.
 
 The app never needs to scan Agent memory or call an AI API for the core experience. The Agent never controls notification timing or silently expands app permissions.
 
 ## The experience
 
-The first Memoryling appears directly without a blocking setup screen. After the slogan, the Agent opens or recalls it; it may gain an activity-colored aura, a milestone mark, and a deck of short thoughts grounded in the shape of recent work without quoting it. Clicking the pet requests another eligible line from the local rule engine. Ambient lines are rare and stay silent during quiet hours.
+The first Memoryling appears directly without a blocking setup screen and visibly teaches the activation phrase. The reminder stays available while the pet has no Agent operation. After the slogan, the already-open pet may gain an activity-colored aura, a milestone mark, and a deck of short thoughts grounded in the shape of recent work without quoting it. Clicking the pet requests another eligible line from the local rule engine. Ambient lines are rare and stay silent during quiet hours.
 
 Later versions can add:
 
@@ -46,10 +46,11 @@ This full growth system remains planned. Protocol v1 currently implements activi
 ## The product wedge
 
 ```text
-user slogan
+installed EXE launch and visible phrase reminder
+  → user slogan in the current Agent project
   → authorized Agent understanding
   → bounded operation package
-  → automatic local pet wake
+  → already-open local pet applies it
   → local deterministic life rules
   → appearance, dialogue, story, or reminder
 ```

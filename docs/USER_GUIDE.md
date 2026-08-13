@@ -12,34 +12,32 @@ Use only synthetic context unless you have explicit authorization for a real Age
 
 除非已明確取得真實 Agent 專案授權，否則只使用合成脈絡；不要貼出或提交真實操作包。
 
-## Conversation-first start／由對話啟動
+## Installed-App start／由安裝版 App 啟動
 
 ```powershell
 npm install
 npm run tauri dev
 ```
 
-The ordinary user does not open Memoryling first. Say the slogan in the configured Agent conversation; the Agent submits the update and starts or recalls the installed pet. There is no blocking first-run setup screen. Initial language follows the OS locale and remains changeable in detail view.
+The ordinary user installs and opens Memoryling first. The pet appears without a blocking setup page and tells the user which activation phrase to enter in the current Agent project. Initial language follows the OS locale and remains changeable in detail view.
 
-普通使用者不必先開 Memoryling。在已設定的 Agent 對話喊出口號即可；Agent 會提交更新並啟動或叫回已安裝的寵物。沒有阻擋流程的首次設定頁；初始語言依作業系統語系決定，之後仍可在詳細頁切換。
+普通使用者先安裝並打開 Memoryling。寵物會直接出現，不經過阻擋流程的設定頁，並提醒使用者要在目前 Agent 專案輸入哪一句發動語。初始語言依作業系統語系決定，之後仍可在詳細頁切換。
 
 ## Operate from the Agent／由 Agent 運作
 
-1. Open this repository in Codex, Claude Code, or another AGENTS-compatible environment.
-2. Let the Agent read `AGENTS.md` and the wake-up chain.
-3. Say **`Run Memoryling`** or **`運作 Memoryling`**.
-4. The Agent reads `skills/memoryling-operation/SKILL.md`, uses only already-authorized context, creates a temporary protocol-v1 package, and runs the local helper itself.
-5. The helper verifies Memoryling 0.6.0 or newer, submits the package, starts or recalls the pet, waits for local application, and reports in the same conversation.
+1. Install and open Memoryling through the Windows EXE, shortcut, or Start menu; keep the pet running.
+2. Open the project you want to use in Codex, Claude Code, or another AGENTS-compatible environment.
+3. Let the Agent read `AGENTS.md` and the wake-up chain.
+4. Enter the phrase shown by the pet: **`Run Memoryling`** or **`運作 Memoryling`**.
+5. The Agent reads `skills/memoryling-operation/SKILL.md`, uses only already-authorized context, creates a temporary protocol-v1 package, and runs the local helper itself.
+6. The helper verifies that Memoryling 0.6.0 or newer is already running, submits without launching a process, waits for local application, and reports in the same conversation.
 
-1. 在 Codex、Claude Code 或其他支援 AGENTS 的環境開啟本 repo。
-2. 讓 Agent 先讀 `AGENTS.md` 與喚醒文件鏈。
-3. 說 **`運作 Memoryling`** 或 **`Run Memoryling`**。
-4. Agent 會讀 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存 protocol-v1 更新包，並自行執行本機工具。
-5. 工具確認 Memoryling 0.6.0 以上版本、提交更新、啟動或叫回寵物、等待本機套用，最後在同一段對話回報。
-
-To show the existing pet without updating it, say **`Show Memoryling`** or **`叫出 Memoryling`**. Wake-only performs no memory read and creates no package.
-
-若只想顯示既有寵物、不更新內容，說 **`叫出 Memoryling`** 或 **`Show Memoryling`**。Wake-only 不讀取記憶，也不建立更新包。
+1. 透過 Windows EXE、捷徑或開始功能表安裝並打開 Memoryling，讓寵物保持執行。
+2. 在 Codex、Claude Code 或其他支援 AGENTS 的環境開啟想使用的專案。
+3. 讓 Agent 先讀 `AGENTS.md` 與喚醒文件鏈。
+4. 輸入寵物畫面顯示的發動語：**`運作 Memoryling`** 或 **`Run Memoryling`**。
+5. Agent 會讀 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存 protocol-v1 更新包，並自行執行本機工具。
+6. 工具確認 Memoryling 0.6.0 以上版本已開啟、不啟動任何程式，提交更新並等待本機套用，最後在同一段對話回報。
 
 The phrase authorizes one bounded pet update only. It does not authorize new private sources, cloud connectors, external AI calls, email, browser accounts, credentials, or changes to Agent memory.
 
@@ -71,9 +69,9 @@ To test only the app inbox without Agent context:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -Path examples/agent-operation-v1.synthetic.json
 ```
 
-The helper validates the package, verifies the installed App, writes the exact inbox, opens the pet, and prints only bounded status plus the operation ID and dialogue count:
+Open Memoryling first. The helper validates the package, verifies the running App, writes the exact inbox, waits for application, and prints only bounded status plus the operation ID and dialogue count:
 
-工具會驗證更新包與已安裝 App、寫入唯一收件匣並打開寵物；只輸出有限狀態、operation ID 與對話數量：
+請先打開 Memoryling。工具會驗證更新包與正在執行的 App、寫入唯一收件匣並等待套用；只輸出有限狀態、operation ID 與對話數量：
 
 ```text
 %LOCALAPPDATA%\app.memoryling.desktop\agent-inbox\operation-v1.json

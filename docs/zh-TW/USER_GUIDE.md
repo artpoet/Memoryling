@@ -8,24 +8,23 @@ v0.6.0 是 Agent-operated 的原始碼垂直切片；最後完成安裝 UAT 的 
 
 除非已取得明確授權，否則只使用合成資料。不要貼出、輸出或提交由真實 Agent 記憶衍生的操作包。
 
-## 由對話啟動
+## 由安裝版 App 啟動
 
 ```powershell
 npm install
 npm run tauri dev
 ```
 
-普通使用者不需要先開 App。直接在已設定的 Agent 對話喊出口號；Agent 會提交更新並啟動或叫回已安裝的寵物。沒有阻擋流程的首次設定頁；初始語言依作業系統語系決定，之後仍可切換。
+普通使用者先透過 EXE 安裝並打開 App。寵物會直接出現，不經過阻擋流程的設定頁，並在畫面提醒要回到目前 Agent 專案輸入哪一句發動語；初始語言依作業系統語系決定，之後仍可切換。
 
 ## 喊出口號
 
-1. 在 Codex、Claude Code 或其他支援 AGENTS 的環境開啟本 repo。
-2. 讓 Agent 讀取 `AGENTS.md` 與喚醒文件鏈。
-3. 說 **`運作 Memoryling`**、**`執行 Memoryling`** 或 **`Run Memoryling`**。
-4. Agent 會依 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存更新包並自行執行本機提交工具。
-5. 工具確認相容 App、提交更新、啟動或叫回寵物、等待本機套用，最後在同一段對話回報。
-
-只想顯示既有寵物、不更新內容時，說 **`叫出 Memoryling`** 或 **`Show Memoryling`**。Wake-only 不讀記憶，也不建立更新包。
+1. 透過 Windows EXE、捷徑或開始功能表安裝並打開 Memoryling，讓寵物保持執行。
+2. 在 Codex、Claude Code 或其他支援 AGENTS 的環境開啟想使用的專案。
+3. 讓 Agent 讀取 `AGENTS.md` 與喚醒文件鏈。
+4. 輸入寵物顯示的發動語：**`運作 Memoryling`**、**`執行 Memoryling`** 或 **`Run Memoryling`**。
+5. Agent 會依 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存更新包並自行執行本機提交工具。
+6. 工具確認相容 App 已開啟，不啟動任何程式；提交更新、等待本機套用，最後在同一段對話回報。
 
 這個口號只授權一次有限寵物更新；不代表授權新私人來源、雲端 connector、外部 AI 呼叫、信箱、登入帳號、憑證或 Agent 記憶寫入。
 
@@ -44,7 +43,7 @@ npm run tauri dev
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -Path examples/agent-operation-v1.synthetic.json
 ```
 
-工具會確認 Memoryling 0.6.0 以上版本，然後提交、打開寵物並等待套用；只輸出有限狀態、operation ID 與對話數。App 成功處理後會刪除收件匣檔案。不合規資料會被拒絕並移除，不會顯示內容。
+請先打開 Memoryling。工具會確認正在執行的是 Memoryling 0.6.0 以上版本，然後提交並等待套用，不會啟動 App；只輸出有限狀態、operation ID 與對話數。App 成功處理後會刪除收件匣檔案。不合規資料會被拒絕並移除，不會顯示內容。
 
 ## 替換與清除
 

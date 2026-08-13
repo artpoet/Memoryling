@@ -8,26 +8,27 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ### Added
 
-- conversation-first wake-only phrases that show the existing pet without reading memory or creating an operation
-- `Start-Memoryling.ps1` with exact installed-App resolution, minimum-version checks, bounded launch, and optional inbox-consumption confirmation
+- accepted ADR-0010 for an installed-App entry that visibly teaches the Agent activation phrase
+- first-run and persistent idle-pet reminders for `Run Memoryling`／`運作 Memoryling`
 
 ### Changed
 
-- normal Agent operation now validates the installed App before submission, opens or recalls the pet automatically, and reports completion in the same conversation
+- normal Agent operation now requires the compatible pet to be open, submits without launching any process, and reports completion in the same conversation
 - cold launch goes directly to the pet with OS-locale selection; the blocking first-run setup screen and its Tauri commands were removed
 - single-instance relaunch returns to the existing pet instead of opening the detail window
 
 ### Security and privacy
 
-- wake-only grants no memory access; launcher discovery is limited to an explicit path, exact running process, current-user uninstall registration, and exact current-user install candidates
-- missing or stale App fails before an operation package is written; helpers never print the executable path or package content
+- opening the App grants no memory access; only the activation phrase authorizes one bounded update
+- a closed, mismatched, or stale App fails before an operation package is written; an unconfirmed inbox item is removed after the bounded wait; submission never launches a process or prints executable paths or package content
 
 ### Validated
 
 - full frontend／Rust checks, Rust formatting, Clippy, JSON parsing, and official skill validation pass
-- missing App fails before write, a mismatched binary is rejected, and isolated `-SkipLaunch` submission remains available for test harnesses
-- a freshly built v0.6.0 release binary consumed the synthetic operation and displayed the native pet; wake-only relaunch preserved one process and one pet window
-- English／Traditional Chinese browser inspection confirms conversation-first copy, honest native boundary, no horizontal overflow, and no warning／error logs
+- closed App fails before write, a mismatched binary is rejected, and isolated no-launch submission remains available for test harnesses
+- the freshly built release pet consumed the synthetic operation without changing process count or PID
+- Computer Use observed the Traditional Chinese first-run activation reminder and detailed three-step flow
+- English／Traditional Chinese browser inspection confirms installed-App copy, honest native boundary, and no horizontal overflow
 
 ## [0.6.0] - 2026-08-13
 

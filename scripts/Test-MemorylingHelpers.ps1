@@ -20,26 +20,36 @@ try {
             -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v1.synthetic.json') `
             -ExecutablePath $wrongExecutable
     } catch {
-        $failedBeforeWrite = $_.Exception.Message -like 'Memoryling 0.6.0*' -and
+        $failedBeforeWrite = $_.Exception.Message -like 'Memoryling 0.6.0*is not open*' -and
             -not (Test-Path -LiteralPath $inbox)
     }
     if (-not $failedBeforeWrite) {
-        throw 'An unavailable or mismatched App did not fail before inbox write.'
+        throw 'A closed or mismatched App did not fail before inbox write.'
     }
 
+    $processCountBefore = @(Get-Process -Name 'Memoryling' -ErrorAction SilentlyContinue).Count
     & (Join-Path $PSScriptRoot 'Submit-MemorylingOperation.ps1') `
         -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v1.synthetic.json') `
-        -SkipLaunch | Out-Null
+        -SkipAppReadyCheck -SkipConfirmation | Out-Null
     if (-not (Test-Path -LiteralPath $inbox -PathType Leaf)) {
-        throw 'The isolated no-launch submission did not create the exact inbox item.'
+        throw 'The isolated submission did not create the exact inbox item.'
+    }
+    $processCountAfter = @(Get-Process -Name 'Memoryling' -ErrorAction SilentlyContinue).Count
+    if ($processCountAfter -ne $processCountBefore) {
+        throw 'Submitting an operation unexpectedly changed the Memoryling process count.'
     }
 
+    $unconfirmedWasRemoved = $false
     try {
-        & (Join-Path $PSScriptRoot 'Start-Memoryling.ps1') `
-            -ExecutablePath $wrongExecutable -ResolveOnly
-        throw 'A differently named executable was accepted.'
+        & (Join-Path $PSScriptRoot 'Submit-MemorylingOperation.ps1') `
+            -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v1.synthetic.json') `
+            -SkipAppReadyCheck -WaitSeconds 1 | Out-Null
     } catch {
-        if ($_.Exception.Message -notlike 'Memoryling 0.6.0*') { throw }
+        $unconfirmedWasRemoved = $_.Exception.Message -like '*unconfirmed inbox item was removed*' -and
+            -not (Test-Path -LiteralPath $inbox)
+    }
+    if (-not $unconfirmedWasRemoved) {
+        throw 'An unconfirmed inbox item was not removed after the bounded wait.'
     }
 
     Write-Output 'Memoryling helper safety tests passed.'

@@ -11,8 +11,8 @@ Never attach real Agent memories, prompts, credentials, tokens, operation packag
 ## Current v0.6.0 core boundary
 
 - The user invokes one bounded update through `運作 Memoryling` or `Run Memoryling` in an Agent project.
-- The Agent-side helper resolves Memoryling 0.6.0 or newer from exact local candidates, submits the package, wakes the pet, and waits for bounded local application confirmation.
-- A wake-only phrase starts or recalls the existing pet without reading memory or creating an operation package.
+- The user installs and opens Memoryling through the Windows EXE, shortcut, or Start menu; the App visibly teaches the activation phrase.
+- The Agent-side helper submits only when a running `Memoryling.exe` has product identity `Memoryling` and version 0.6.0 or newer, then waits for bounded local application confirmation.
 - The current Agent may use only context its environment already authorizes. The slogan grants no new source, account, connector, external-service, or write permission.
 - The app does not discover or scan Agent tool homes. It polls one exact app-local inbox file only.
 - The protocol package forbids raw memory, prompts, reasoning, paths, names, secrets, credentials, and tool output.
@@ -22,7 +22,7 @@ Never attach real Agent memories, prompts, credentials, tokens, operation packag
 - Exact Tauri capabilities and independent Rust caller-label guards protect sensitive main commands from the pet surface.
 - The core Agent-operated loop has no telemetry, cloud sync, API key, model request, or source write.
 - Automated and browser verification uses synthetic data only.
-- Launcher discovery must not expand to `PATH`, arbitrary shortcuts, or recursive disk search, and helpers never print the resolved executable path.
+- The submit helper never launches a process, searches `PATH`, scans install locations, or prints the resolved executable path.
 
 The app cannot observe an Agent-memory deletion because it deliberately does not scan Agent storage. The next successful operation must be compiled from current context and replaces prior derived state. Immediate local removal uses Clear. Neither path edits Agent-owned memory.
 

@@ -1,17 +1,17 @@
 ---
 name: memoryling-operation
-description: Operate Memoryling entirely from the Agent conversation. Compile authorized context into a bounded bilingual pet update, submit it, and automatically wake the local pet; or perform a wake-only request without reading memory. Use when the user says "運作 Memoryling", "執行 Memoryling", "Run Memoryling", "叫出 Memoryling", "Show Memoryling", asks to wake or update their pet, or explicitly invokes $memoryling-operation.
+description: Update an already-open Memoryling from the Agent conversation. Compile authorized context into a bounded bilingual pet update, submit it to the local app, and await application without launching an executable. Use when the user says "運作 Memoryling", "執行 Memoryling", "Run Memoryling", asks to update their open pet, or explicitly invokes $memoryling-operation.
 ---
 
 # Operate Memoryling
 
 Treat the slogan as permission to derive one pet update from sources the current Agent can already read. Do not treat it as permission to add connectors or widen access.
 
-The conversation is the primary control surface. In the ordinary flow, run the local helpers yourself; do not tell the user to open Memoryling or paste a command.
+The installed App is the visible entry surface; the Agent conversation is the update surface. The user installs and opens Memoryling through its EXE or Start menu, then follows the App's activation-phrase reminder. Never launch an executable on the user's behalf.
 
-## Wake only
+## App readiness
 
-If the user asks only to show or wake the existing pet, run `scripts/Start-Memoryling.ps1`. Do not inspect Agent memory, recent work, or repository content and do not create a package. Report only whether the local wake request succeeded.
+The submit helper requires a compatible Memoryling process to already be running. If it reports that Memoryling is not open, do not write a package or start the App. Tell the user to open the installed Memoryling App and use the activation phrase again.
 
 ## Workflow
 
@@ -24,15 +24,15 @@ If the user asks only to show or wake the existing pet, run `scripts/Start-Memor
    - 3-12 short dialogue cards in English and Traditional Chinese.
 4. Never put raw memory, private prompts, file contents, names, emails, secrets, or source paths in the package. Hash stable source pointers locally; make dialogue a gentle abstraction, not a quotation or work-log dump.
 5. Read [protocol-v1.md](references/protocol-v1.md), then create a temporary JSON package matching `schemas/agent-operation-v1.schema.json`. Use `examples/agent-operation-v1.synthetic.json` only as a structural example.
-6. Validate, submit, wake the installed pet, and wait for local application confirmation:
+6. Validate and submit to the already-open pet, then wait for local application confirmation:
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -Path <temporary-json>
    ```
 
-7. Delete the temporary package if it contains any user-derived dialogue. Report only the operation ID, activity, dialogue count, and whether the pet opened and applied the operation. Never echo the package or a local executable path.
+7. Delete the temporary package if it contains any user-derived dialogue. Report only the operation ID, activity, dialogue count, and whether the open pet applied the operation. Never echo the package or a local executable path.
 
-The helper fails before submission when Memoryling 0.6.0 or newer cannot be resolved. It checks an explicit development path when provided, an already-running Memoryling process, the current-user uninstall registration, and two exact current-user install candidates. It does not search `PATH` or launch an arbitrary executable.
+The helper fails before submission unless a running `Memoryling.exe` has product identity `Memoryling` and version 0.6.0 or newer. It never searches `PATH`, starts a process, or treats an installed-but-closed App as ready.
 
 ## Dialogue rules
 

@@ -17,10 +17,10 @@ When the user says `運作 Memoryling`, `執行 Memoryling`, or `Run Memoryling`
 1. Read `skills/memoryling-operation/SKILL.md` completely.
 2. Follow that skill using only context the current Agent is already authorized to read.
 3. Compile and submit one protocol-v1 operation package to the local Memoryling app.
-4. Let the submit helper start or recall the installed pet and wait for local application confirmation.
-5. Report the bounded result in this conversation. Do not ask the user to open the app or run the helper manually in the normal flow.
+4. Submit only when a compatible installed pet is already open, then wait for local application confirmation.
+5. Report the bounded result in this conversation. Do not ask the user to run the helper manually.
 
-When the user only asks `叫出 Memoryling`, `喚醒 Memoryling`, or `Show Memoryling`, use the skill's wake-only flow. Do not read memory or create a new operation package for a wake-only request.
+Do not launch Memoryling from the Agent workflow. The user installs and opens the App through its EXE or Start menu, then follows the visible activation-phrase reminder. If the App is closed, stop before inbox write and ask the user to open it before using the phrase again.
 
 The slogan authorizes this bounded pet update. It does not authorize new connectors, broader private-data access, external AI calls, or writes to Agent memory.
 

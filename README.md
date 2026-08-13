@@ -2,18 +2,18 @@
 
 **Your Agent remembers. Your Memoryling lives.**
 
-Memoryling is a local-first desktop pet for people who already work with AI Agents. In a configured project, say:
+Memoryling is a local-first desktop pet for people who already work with AI Agents. Install and open the Windows app, then return to a configured project and say:
 
 > **Run Memoryling**
 
-The current Agent uses only context it is already authorized to read, compiles a small pet update, starts or recalls the installed pet, and waits for local application. Memoryling then carries that update forward through appearance, bilingual dialogue, cooldowns, expiry, quiet hours, and daily limits. The user stays in the Agent conversation throughout the ordinary flow.
+The open pet shows this activation reminder itself. The current Agent then uses only context it is already authorized to read, compiles a small pet update, submits it to the running App, and waits for local application. Memoryling carries that update forward through appearance, bilingual dialogue, cooldowns, expiry, quiet hours, and daily limits.
 
 [繁體中文](README.zh-TW.md) · [Product vision](docs/PRODUCT_VISION.md) · [Architecture](docs/ARCHITECTURE.md) · [Privacy](docs/PRIVACY_PRINCIPLES.md)
 
 ## Why it is different
 
 - **Agent-operated:** semantic understanding happens in the Agent the user already chose.
-- **Conversation-first:** the Agent submits the update and opens the pet; no manual app launch or setup screen is required.
+- **Clear installed-App entry:** the user opens the EXE normally; the pet teaches the Agent activation phrase on first run and while idle.
 - **No app-side AI API:** the ordinary pet needs no API key and makes no model request.
 - **Local persistent life:** the app owns state, timing, rendering, and user controls.
 - **Privacy-minimized handoff:** packages contain generated pet state and hashed references, never raw memories, prompts, paths, secrets, or reasoning.
@@ -23,11 +23,13 @@ The current Agent uses only context it is already authorized to read, compiles a
 ## How it works
 
 ```text
-“Run Memoryling”
+Install and open Memoryling
+  → pet shows “Run Memoryling” activation reminder
+  → user says “Run Memoryling” in the current Agent project
   → Agent reads already-authorized memory + recent work + project context
   → Agent skill compiles protocol-v1 JSON
-  → local helper verifies the installed app and writes one exact inbox file
-  → helper starts or recalls the pet
+  → local helper verifies the compatible pet is already running
+  → helper writes one exact inbox file and waits for application
   → Rust validates and stores the newest operation
   → pet appearance and dialogue follow deterministic local rules
 ```
@@ -42,7 +44,7 @@ The project entrypoint recognizes `Run Memoryling`, `運作 Memoryling`, and `�
 - 3–12 English／Traditional Chinese dialogue cards per operation
 - on-open, click, and bounded ambient triggers
 - exact-file inbox polling with strict size, symlink, schema, and identity checks
-- automatic cold launch or single-instance pet recovery after submission
+- pet-first manual launch, persistent bilingual activation reminder, and single-instance recovery
 - local clear control and authoritative replacement semantics
 - synthetic Rust, React, and submit-helper coverage
 

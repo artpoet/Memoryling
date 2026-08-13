@@ -1,6 +1,6 @@
 # ADR-0009: Agent conversation is the primary control surface and wakes the pet
 
-- Status: Accepted
+- Status: Superseded by [ADR-0010](0010-installed-app-teaches-agent-activation.md)
 - Date: 2026-08-13
 - Extends: [ADR-0008](0008-agent-operated-memoryling-protocol.md)
 - Related: [ADR-0003](0003-pet-first-two-window-desktop-shell.md)

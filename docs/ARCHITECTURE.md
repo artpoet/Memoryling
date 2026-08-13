@@ -2,22 +2,25 @@
 
 ## Status
 
-AS_OF: 2026-08-13. Source version 0.6.0 implements the Agent-operated vertical slice in [ADR-0008](adr/0008-agent-operated-memoryling-protocol.md) plus the conversation-first wake contract in [ADR-0009](adr/0009-conversation-first-pet-wake.md). The last installed-UAT artifact remains v0.2.0; no v0.6.0 packaged acceptance is claimed.
+AS_OF: 2026-08-13. Source version 0.6.0 implements the Agent-operated vertical slice in [ADR-0008](adr/0008-agent-operated-memoryling-protocol.md) plus the installed-App activation contract in [ADR-0010](adr/0010-installed-app-teaches-agent-activation.md). The last installed-UAT artifact remains v0.2.0; no v0.6.0 packaged acceptance is claimed.
 
 ## System shape
 
 ```text
-User says “Run Memoryling” in an Agent project
+User installs and opens Memoryling through the Windows EXE
+  │ pet shows the activation phrase while idle
+  ▼
+User says “Run Memoryling” in the current Agent project
   │
   ▼
 Project Agent skill
   reads only already-authorized context
   compiles protocol-v1 JSON
   rejects raw/private source payloads
-  │ resolves compatible installed app before submission
+  │ confirms compatible app is already running before submission
   ▼
 %LOCALAPPDATA%\app.memoryling.desktop\agent-inbox\operation-v1.json
-  │ atomic handoff + cold launch or single-instance pet wake
+  │ atomic handoff to the already-running pet
   │ exact-file polling; 64 KiB cap; no symlinks
   ▼
 Rust protocol validator
@@ -40,7 +43,7 @@ The semantic boundary ends at the package. Memoryling does not discover tool hom
 | Honor the Agent environment's existing authorization | Current Agent |
 | Produce activity, journey, evidence hashes, and dialogue | Agent skill |
 | Validate size, schema, enums, IDs, timestamps, and bounds | Submit helper and Rust |
-| Resolve the trusted installed binary, wake the pet, and await inbox consumption | Agent-side local helpers |
+| Verify a trusted compatible pet is already running and await inbox consumption | Agent-side local helper |
 | Persist current pet state and dialogue counters | Rust + SQLite |
 | Choose eligible dialogue | Local deterministic rule engine |
 | Enforce quiet hours, cooldowns, expiry, and daily budget | Local deterministic rule engine |
@@ -64,9 +67,9 @@ The package is a lossy derived artifact. Dialogue may evoke the work but must no
 
 ## Inbox, launch, and failure semantics
 
-Before writing, the PowerShell submit helper requires Memoryling 0.6.0 or newer. `Start-Memoryling.ps1` resolves only an explicit development path, an existing exact-name Memoryling process, the current-user uninstall registration, or exact current-user install candidates. It rejects another filename, product identity, stale version, arbitrary `PATH` resolution, and unexpected inbox paths.
+Before writing, the PowerShell submit helper requires an already-running Memoryling 0.6.0 or newer process. It accepts only `Memoryling.exe` with product identity `Memoryling`; a development-only explicit path must also match a running process. It rejects another filename, product identity, stale version, a closed App, and arbitrary `PATH` resolution.
 
-The submit helper validates without printing package content, serializes UTF-8 without BOM, and renames a temporary file inside the inbox directory. It then starts the resolved executable. Cold launch displays the pet directly; a resident second launch uses Tauri single-instance recovery to return to the existing pet. The helper waits at most 15 seconds for the exact inbox item to be consumed, then reports a bounded outcome to the Agent conversation.
+The submit helper validates without printing package content, serializes UTF-8 without BOM, and renames a temporary file inside the inbox directory. It never starts a process. The helper waits at most 15 seconds for the exact inbox item to be consumed, then reports a bounded outcome to the Agent conversation. If the App is not open, it fails before inbox write; if consumption is not confirmed in time, it removes the exact unconfirmed item so no update can apply unexpectedly on a later launch.
 
 Rust polls the exact file every five seconds and also checks immediately when its worker starts. It accepts only a non-symlink regular file from 1 byte through 64 KiB. Invalid JSON or protocol data is deleted and recorded as a bounded error code. A successful package is applied transactionally and the inbox file is removed. Re-sending the same operation ID and digest is idempotent; reusing an ID with another digest fails. A new valid operation is an authoritative snapshot that atomically replaces the prior operation, evidence, dialogue, and usage state.
 
@@ -96,7 +99,7 @@ Only the newest operation is retained. `clear_agent_operation` deletes the curre
 
 ## Desktop trust boundary
 
-Rust owns the `pet` and `main` windows, tray, context menu, position persistence, single-instance recovery, and Quit. Cold launch and single-instance recovery both end pet-first; no blocking setup window is required. Exact Tauri capabilities and independent caller guards protect sensitive main commands. The pet can fetch only its render DTO, advance dialogue, move, dismiss onboarding, and open native UI. Revision events contain only an opaque hash.
+Rust owns the `pet` and `main` windows, tray, context menu, position persistence, single-instance recovery, and Quit. Manual cold launch and resident relaunch both end pet-first; no blocking setup window is required. The first-run guide and idle pet visibly teach the activation phrase. Exact Tauri capabilities and independent caller guards protect sensitive main commands. The pet can fetch only its render DTO, advance dialogue, move, dismiss onboarding, and open native UI. Revision events contain only an opaque hash.
 
 Browser preview has no native inbox or persistence. It always states that memory access is off and performs no Agent operation.
 
@@ -110,7 +113,7 @@ Protocol v1 activity accents and milestone marks are intentionally small. Perman
 
 ## Open decisions
 
-1. Cross-project skill discovery and installer experience, including packaged launcher resolution.
+1. Cross-project skill discovery and installer experience, including running-App handoff from arbitrary projects.
 2. A safe operation preview before submission without surfacing private source text.
 3. Packaged v0.6.0 native acceptance and migration from older local databases.
 4. Whether compatibility connectors should be removed or moved to a separate experimental build.

@@ -6,10 +6,10 @@ Memoryling's value depends on sensitive context. Privacy is therefore part of th
 
 Memoryling v0.6.0 is **Agent-operated and local-first**:
 
-- the user invokes it with `運作 Memoryling` or `Run Memoryling` inside an Agent project;
+- the user installs and opens the App normally, then invokes one update with `運作 Memoryling` or `Run Memoryling` inside an Agent project;
 - the current Agent may use only context it is already authorized to read;
 - the app receives one bounded derived package through an exact local inbox file;
-- the Agent-side helper starts or recalls only a locally resolved Memoryling 0.6.0-or-newer executable;
+- the Agent-side helper submits only when a compatible Memoryling 0.6.0-or-newer process is already running and never starts an executable;
 - the app does not scan Codex, Claude, or another Agent's files;
 - the app does not call an AI API for the core pet loop;
 - no telemetry or cloud sync is present.
@@ -40,7 +40,7 @@ Hashing is not permission to include a secret. Reference hashes identify stable 
 
 1. The project Agent skill states the authorization and minimization rules.
 2. The PowerShell submit helper validates structure and bounds without echoing content.
-3. The launcher resolves exact local candidates, rejects stale or differently named binaries, and never prints the executable path.
+3. The submit helper accepts only an exact compatible running process, rejects a closed, stale, or differently named binary, and never prints the executable path.
 4. Rust revalidates a strict unknown-field-denying schema.
 5. The inbox accepts one exact non-symlink regular file capped at 64 KiB.
 6. SQLite stores only the newest operation.
@@ -49,7 +49,7 @@ Hashing is not permission to include a secret. Reference hashes identify stable 
 
 Automated tests and committed examples use synthetic data only. Real Agent memories, private prompts, local databases, and identifiable screenshots must not enter this repository, issues, CI logs, or release evidence.
 
-A wake-only request does not authorize memory or recent-work reads. Installed-app resolution may inspect only exact process executable metadata, current-user uninstall registration, and documented current-user candidates; it is not permission for a broad disk or `PATH` search.
+Opening the App does not authorize memory or recent-work reads. The activation phrase authorizes the bounded update. App-readiness validation may inspect only exact running-process executable metadata; it is not permission for install-location, disk, or `PATH` search.
 
 ## Replacement and forgetting
 

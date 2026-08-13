@@ -27,11 +27,11 @@ const petCopy = {
     operationLabel:
       "Memoryling has an Agent-made update. Right-click for menu; drag to move; click to talk.",
     operationActive: "Agent operation applied · app memory scanning off",
-    onboardingTitle: "Meet your Memoryling",
+    onboardingTitle: "Memoryling is open",
     drag: "Drag me to move me.",
     menu: "Right-click me, then choose Open Memoryling.",
     recovery: "If I hide, find me from the system tray.",
-    operate: "In your Agent project, say “Run Memoryling” to update me.",
+    operate: "Return to your Agent project and enter the activation phrase: “Run Memoryling”.",
     privacy: "The app never scans Agent memory or calls AI by itself.",
     skip: "Got it",
     loading: "Waking up locally",
@@ -43,11 +43,11 @@ const petCopy = {
     operationLabel:
       "Memoryling 已收到 Agent 產生的更新。按右鍵開啟選單；拖曳可移動；點一下可交談。",
     operationActive: "Agent 運作已套用 · App 不掃描記憶",
-    onboardingTitle: "認識你的 Memoryling",
+    onboardingTitle: "Memoryling 已打開",
     drag: "拖曳我來移動位置。",
     menu: "按右鍵，再選擇開啟 Memoryling。",
     recovery: "找不到我時，可以從系統匣叫我回來。",
-    operate: "在你的 Agent 專案中說「運作 Memoryling」來更新我。",
+    operate: "回到你目前工作的 Agent 專案，輸入發動語：「運作 Memoryling」。",
     privacy: "App 不會自行掃描 Agent 記憶，也不會自行呼叫 AI。",
     skip: "知道了",
     loading: "正在本機醒來",
@@ -238,11 +238,13 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
         {hasAgentOperation ? t.operationActive : t.accessOff}
       </p>
 
-      {renderState.dialogue && !onboardingVisible && (
+      {!onboardingVisible && (renderState.dialogue || !hasAgentOperation) && (
         <p className="pet-dialogue" role="status">
-          {locale === "zh-TW"
-            ? renderState.dialogue.textZhTw
-            : renderState.dialogue.textEn}
+          {renderState.dialogue
+            ? locale === "zh-TW"
+              ? renderState.dialogue.textZhTw
+              : renderState.dialogue.textEn
+            : t.operate}
         </p>
       )}
 

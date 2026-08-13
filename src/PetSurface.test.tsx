@@ -144,6 +144,9 @@ describe("pet surface", () => {
         name: /waiting for an Agent operation/i,
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/enter the activation phrase: “Run Memoryling”/i),
+    ).toBeInTheDocument();
   });
 
   test("renders only the safe state and updates a completion star by revision", async () => {
@@ -482,6 +485,9 @@ describe("pet surface", () => {
     expect(
       await screen.findByText("按右鍵，再選擇開啟 Memoryling。"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「運作 Memoryling」。"),
+    ).toBeInTheDocument();
     expect(screen.getByTestId("pet-surface")).toHaveAttribute(
       "data-motion",
       "reduced",
@@ -489,8 +495,11 @@ describe("pet surface", () => {
     await userEvent.click(screen.getByRole("button", { name: "知道了" }));
     expect(fixture.client.dismissOnboarding).toHaveBeenCalledTimes(1);
     await waitFor(() =>
-      expect(screen.queryByText("認識你的 Memoryling")).not.toBeInTheDocument(),
+      expect(screen.queryByText("Memoryling 已打開")).not.toBeInTheDocument(),
     );
+    expect(
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「運作 Memoryling」。"),
+    ).toBeInTheDocument();
   });
 
   test("cleans up both native listeners", async () => {
