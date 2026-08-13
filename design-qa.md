@@ -1,24 +1,25 @@
 # Memoryling procedural seed visual QA
 
 - Source visual truth: `C:\Users\user\AppData\Local\Temp\memoryling-approved-seed-crop.png`
-- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v2-eye-corrected.png`
-- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-eye-spacing-three-way.png`
-- Focused face comparison: the three-way comparison isolates the eye-size／spacing correction at sufficient resolution; a second crop was not needed
+- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-teardrop-round-bottom-final.png`
+- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-ai-vs-programmatic-v3-shell.png`
+- Focused silhouette comparison: the full comparison presents the source concept and renderer at equal display height; a second crop is not needed
 - State: seed-stage pet, neutral resting frame, no completion mark
 - Viewport: implementation rendered headlessly at 320 × 320 CSS px and device scale 1
-- Dimensions: source 190 × 230 px; source creature crop 104 × 150 px; implementation 320 × 320 px with a 206 × 289 px alpha crop
-- Normalization: both creature crops were aspect-fit into equal 250 × 280 comparison regions; the face comparison uses equal display regions while preserving each crop's aspect ratio
+- Dimensions: source concept crop 190 × 230 px; implementation 320 × 320 px
+- Normalization: both creatures are shown at equal display height with aspect ratio preserved
 
 ## Findings
 
-- No actionable P0／P1／P2 mismatch remains for the requested cute facial proportions. The paired eyes now retain the original `rx=10／ry=14` size and move inward by only one viewBox unit per eye (`94／146` → `95／145`), restoring central breathing room while keeping the face slightly more cohesive. Their vertical centers and blink remain synchronized.
-- The eye-to-mouth distance, memory-core prominence, outward sprouts, and side plates now follow the accepted reference's composition. Four continuous program-generated plates replace the detached necklace-like lower petals.
+- No actionable P0／P1／P2 mismatch remains for the requested silhouette correction. Renderer v3 replaces the rounded egg apex with the concept's visible upper point and closes the lower shell through a broad multi-control-point arc rather than a single center point.
+- The plates still wrap the cheeks and meet near the center, but now stop above the outer shell's lowest contour. This prevents the plate seam from visually turning the whole body into a pointed-bottom egg／inverted teardrop.
+- The previously corrected eye size, spacing, vertical synchronization, memory-core prominence, and outward sprouts are intentionally unchanged in this silhouette pass.
 - The procedural renderer remains smoother and less faceted than the AI reference. This is an accepted P3 difference: the production creature must remain deterministic, layer-addressable program-generated SVG rather than a raster asset.
 
 ## Required fidelity surfaces
 
 - Fonts and typography: not applicable to the creature-only comparison; pet status typography is unchanged.
-- Spacing and layout rhythm: the face occupies the same upper-middle region and the plates meet at the base without clipping. The 320 × 320 compact envelope remains unchanged.
+- Spacing and layout rhythm: the face occupies the same upper-middle region; the pointed apex sits between the sprouts, while the plate junction remains visibly above the rounded shell base. The 320 × 320 compact envelope remains unchanged.
 - Colors and tokens: violet body, indigo eyes, mint core, pale-lilac plates, and restrained glow remain consistent with the accepted concept family.
 - Image quality and asset fidelity: the implementation is vector-sharp and transparent. No generated raster, embedded `<image>`, or runtime bitmap is used; the accepted AI image is reference-only by explicit product decision.
 - Copy and content: no creature copy changed; the required access-off text remains outside the renderer.
@@ -32,9 +33,11 @@
 4. Pass 2 fix settled the eye centers at x=96／144 with larger ellipses, enlarged the memory core, widened the sprouts, and replaced the lower cluster with four continuous side／inner plates that meet at the base.
 5. Post-fix full and focused comparisons show no remaining P0／P1／P2 proportion mismatch.
 6. User review correctly identified that pass 2 still felt worse because inward movement and eye enlargement compounded each other. The corrected pass restored the original eye size and reduced inward movement to one unit per side; a three-way background render confirms the central space is restored while the improved plates and facial height remain.
+7. User review then identified the larger structural drift: the concept is pointed／teardrop-like on top with a rounded lower arc, while renderer v2 still read as an egg. A red-light path assertion failed against the old shell before implementation.
+8. Renderer v3 introduced the pointed apex and wider lower shell. The first review found the inner plates still dragged the silhouette into a center point, so their junction was raised above the outer-shell base. The final equal-height comparison confirms that the shell now owns a continuous rounded bottom contour.
 
 ## Follow-up polish
 
-- P3: future renderer work could add deterministic faceted highlight planes to the shell and plates, without changing the accepted face geometry or importing a raster pet asset.
+- P3: future renderer work could add deterministic faceted highlight planes and slightly more irregular biological edges, without changing the accepted v3 shell geometry or importing a raster pet asset.
 
 final result: passed

@@ -24,7 +24,7 @@ export function ProceduralMemorySeed({
       aria-hidden="true"
       className="memory-seed-renderer"
       data-body-module={bodyModule}
-      data-renderer="procedural-svg-v2"
+      data-renderer="procedural-svg-v3"
       data-stage={stage}
       data-testid="memoryling-seed-renderer"
       focusable="false"
@@ -69,7 +69,7 @@ export function ProceduralMemorySeed({
         </filter>
       </defs>
 
-      <ellipse cx="120" cy="225" fill="#4e388d" opacity="0.12" rx="63" ry="11" />
+      <ellipse cx="120" cy="229" fill="#4e388d" opacity="0.12" rx="66" ry="11" />
 
       <g className="seed-sprouts" fill={`url(#${leafGradient})`}>
         <path d="M108 56C91 52 77 36 79 13C98 16 115 35 108 56Z" />
@@ -81,11 +81,11 @@ export function ProceduralMemorySeed({
       <g filter={`url(#${bodyGlow})`}>
         <path
           className="seed-shell"
-          d="M120 42C84 42 61 72 54 116C47 160 62 205 93 222C109 231 131 231 147 222C178 205 193 160 186 116C179 72 156 42 120 42Z"
+          d="M120 37C109 49 88 52 72 69C55 87 48 116 49 150C50 188 73 215 103 226C114 230 126 230 137 226C167 215 190 188 191 150C192 116 185 87 168 69C152 52 131 49 120 37Z"
           fill={`url(#${bodyGradient})`}
         />
         <path
-          d="M83 67C67 86 61 117 64 145"
+          d="M84 65C66 82 58 112 59 146"
           fill="none"
           opacity="0.2"
           stroke="#f4efff"
@@ -93,7 +93,7 @@ export function ProceduralMemorySeed({
           strokeWidth="7"
         />
         <path
-          d="M165 77C179 105 180 144 168 175"
+          d="M166 73C181 101 182 143 171 177"
           fill="none"
           opacity="0.13"
           stroke="#2d1c67"
@@ -124,12 +124,12 @@ export function ProceduralMemorySeed({
       </g>
 
       <g className="seed-petals" stroke="#d8caff" strokeOpacity="0.2" strokeWidth="1">
-        <path className="seed-side-plate" d="M55 129C73 143 94 171 112 214C91 209 71 194 60 173C53 159 51 142 55 129Z" fill={`url(#${leafGradient})`} />
-        <path className="seed-side-plate" d="M185 129C167 143 146 171 128 214C149 209 169 194 180 173C187 159 189 142 185 129Z" fill={`url(#${leafGradient})`} />
-        <path className="seed-inner-plate" d="M76 173C96 181 112 198 120 225C99 218 82 199 76 173Z" fill={`url(#${petalGradient})`} />
-        <path className="seed-inner-plate" d="M164 173C144 181 128 198 120 225C141 218 158 199 164 173Z" fill={`url(#${petalGradient})`} />
-        <path d="M61 144C76 157 92 178 105 202" fill="none" opacity="0.34" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />
-        <path d="M179 144C164 157 148 178 135 202" fill="none" opacity="0.28" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />
+        <path className="seed-side-plate" d="M51 128C70 142 94 174 113 219C91 214 70 198 58 176C50 161 47 142 51 128Z" fill={`url(#${leafGradient})`} />
+        <path className="seed-side-plate" d="M189 128C170 142 146 174 127 219C149 214 170 198 182 176C190 161 193 142 189 128Z" fill={`url(#${leafGradient})`} />
+        <path className="seed-inner-plate" d="M73 174C93 181 108 198 120 219C99 217 81 199 73 174Z" fill={`url(#${petalGradient})`} />
+        <path className="seed-inner-plate" d="M167 174C147 181 132 198 120 219C141 217 159 199 167 174Z" fill={`url(#${petalGradient})`} />
+        <path d="M58 143C75 157 92 181 106 207" fill="none" opacity="0.34" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />
+        <path d="M182 143C165 157 148 181 134 207" fill="none" opacity="0.28" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />
       </g>
 
       <g fill="#cbb9ff" opacity="0.36">

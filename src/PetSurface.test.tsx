@@ -122,13 +122,13 @@ describe("pet surface", () => {
     expect(fixture.client.getRenderState).toHaveBeenCalledTimes(2);
   });
 
-  test("renders the approved seed-stage egg body module", async () => {
+  test("renders the approved seed-stage programmatic body module", async () => {
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);
 
     const renderer = await screen.findByTestId("memoryling-seed-renderer");
     expect(renderer.tagName).toBe("svg");
-    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v2");
+    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v3");
     expect(renderer).toHaveAttribute("data-stage", "seed");
     expect(renderer).toHaveAttribute(
       "data-body-module",
@@ -136,6 +136,19 @@ describe("pet surface", () => {
     );
     expect(renderer.querySelectorAll("path").length).toBeGreaterThan(10);
     expect(renderer.querySelector("image")).not.toBeInTheDocument();
+
+    const shell = renderer.querySelector(".seed-shell");
+    expect(shell).toHaveAttribute(
+      "d",
+      "M120 37C109 49 88 52 72 69C55 87 48 116 49 150C50 188 73 215 103 226C114 230 126 230 137 226C167 215 190 188 191 150C192 116 185 87 168 69C152 52 131 49 120 37Z",
+    );
+
+    const innerPlates = renderer.querySelectorAll(".seed-inner-plate");
+    expect(innerPlates).toHaveLength(2);
+    expect(Array.from(innerPlates, (plate) => plate.getAttribute("d"))).toEqual([
+      "M73 174C93 181 108 198 120 219C99 217 81 199 73 174Z",
+      "M167 174C147 181 132 198 120 219C141 217 159 199 167 174Z",
+    ]);
 
     const pairedEyes = renderer.querySelector(".seed-eyes");
     expect(pairedEyes).not.toBeNull();

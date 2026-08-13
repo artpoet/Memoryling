@@ -95,7 +95,7 @@ The shell is “two surfaces, one life”: Rust owns the transparent `pet`, on-d
 - src/useCreatureRenderState.ts — race-safe render-state subscription and refresh
 - src/App.css and src/PetSurface.css — detail and transparent pet visual systems
 - src/ProceduralMemorySeed.tsx and src/CreatureBody.css — layered runtime SVG memory-seed renderer and motion
-- docs/design/creature-visual-baseline.md — accepted egg-shaped memory-seed baseline and visual drift guard
+- docs/design/creature-visual-baseline.md — accepted pointed-teardrop／rounded-base memory-seed baseline and visual drift guard
 - src/FirstMemoryFlow.tsx — source selection, preview, consent, lineage, and forgetting UI
 - src/memoryClient.ts — typed Tauri command boundary
 - src/DailyScoutPanel.tsx and dailyScoutClient.ts — bilingual BYOK, context consent, status, cited insight, and controls
