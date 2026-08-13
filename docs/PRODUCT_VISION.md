@@ -4,7 +4,7 @@
 
 Memoryling turns the memory and recent work already understood by a person's AI Agent into a small, persistent desktop life.
 
-The user does not configure another AI service. In a project they say `運作 Memoryling` or `Run Memoryling`; the Agent creates a privacy-minimized pet update, and the local app carries that life forward.
+The user does not configure another AI service or open the App first. In a project they say `運作 Memoryling` or `Run Memoryling`; the Agent creates a privacy-minimized pet update, wakes the installed pet, waits for local application, and continues reporting in the same conversation.
 
 ## The operating model
 
@@ -12,13 +12,14 @@ Memoryling is deliberately half Agent and half app:
 
 - **Agent understands.** It uses only context it is already authorized to read: relevant durable memory, recent work, current conversation, and project SSOT.
 - **Agent compiles.** It converts that context into a bounded activity profile, hashed evidence references, and 3–12 bilingual dialogue cards.
+- **Agent delivers.** It submits the package, starts or recalls the installed pet, and confirms bounded local application without exposing content or paths.
 - **App lives.** It persists only the current compiled state, renders appearance accents, and chooses dialogue through deterministic triggers, expiry, cooldown, quiet hours, and budgets.
 
 The app never needs to scan Agent memory or call an AI API for the core experience. The Agent never controls notification timing or silently expands app permissions.
 
 ## The experience
 
-The first Memoryling is quiet and visibly waiting. After the slogan, it may gain an activity-colored aura, a milestone mark, and a deck of short thoughts grounded in the shape of recent work without quoting it. Clicking the pet requests another eligible line from the local rule engine. Ambient lines are rare and stay silent during quiet hours.
+The first Memoryling appears directly without a blocking setup screen. After the slogan, the Agent opens or recalls it; it may gain an activity-colored aura, a milestone mark, and a deck of short thoughts grounded in the shape of recent work without quoting it. Clicking the pet requests another eligible line from the local rule engine. Ambient lines are rare and stay silent during quiet hours.
 
 Later versions can add:
 
@@ -48,6 +49,7 @@ This full growth system remains planned. Protocol v1 currently implements activi
 user slogan
   → authorized Agent understanding
   → bounded operation package
+  → automatic local pet wake
   → local deterministic life rules
   → appearance, dialogue, story, or reminder
 ```
@@ -57,13 +59,14 @@ The differentiator is not a chat widget or memory dashboard. It is a companion w
 ## Design principles
 
 1. **One phrase, not another setup ritual.**
-2. **Life, not dashboard.**
-3. **Agent semantics, app persistence.**
-4. **Explainable magic.**
-5. **Bounded initiative.**
-6. **Local, replaceable derived state.**
-7. **Forgetting and clear controls must work.**
-8. **Honest prototypes and compatibility labels.**
+2. **Conversation first; pet next.**
+3. **Life, not dashboard.**
+4. **Agent semantics, app persistence.**
+5. **Explainable magic.**
+6. **Bounded initiative.**
+7. **Local, replaceable derived state.**
+8. **Forgetting and clear controls must work.**
+9. **Honest prototypes and compatibility labels.**
 
 ## First user and success
 

@@ -25,13 +25,7 @@ fn read_valid(path: &Path) -> Option<ShellSettings> {
     }
     let bytes = fs::read(path).ok()?;
     let value = serde_json::from_slice::<serde_json::Value>(&bytes).ok()?;
-    let legacy_without_setup = value.get("setupComplete").is_none();
-    let mut settings = serde_json::from_value::<ShellSettings>(value).ok()?;
-    if legacy_without_setup {
-        // Any existing settings file proves the app already ran before the
-        // first-run creation flow existed. Do not interrupt upgraded users.
-        settings.setup_complete = true;
-    }
+    let settings = serde_json::from_value::<ShellSettings>(value).ok()?;
     if !settings.is_valid() {
         return None;
     }
@@ -147,7 +141,7 @@ mod tests {
     }
 
     #[test]
-    fn legacy_settings_skip_new_first_run_without_losing_preferences() {
+    fn legacy_settings_ignore_removed_setup_gate_without_losing_preferences() {
         let nonce = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("clock should be valid")
@@ -165,7 +159,6 @@ mod tests {
         .expect("legacy settings should write");
 
         let settings = load(&path).expect("legacy settings should migrate in memory");
-        assert!(settings.setup_complete);
         assert!(settings.onboarding_dismissed);
         assert!(!settings.always_on_top);
         fs::remove_dir_all(directory).expect("temporary settings should be removable");

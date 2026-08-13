@@ -3,7 +3,6 @@ import "./App.css";
 import memorylingIcon from "./assets/memoryling-icon.png";
 import AgentOperationPanel from "./AgentOperationPanel";
 import CreatureBody from "./CreatureBody";
-import ProductSetup from "./ProductSetup";
 import {
   nativeDetailEventClient,
   nativeDetailShellClient,
@@ -16,12 +15,6 @@ import {
   nativeMemoryClient,
   type MemoryClient,
 } from "./memoryClient";
-import {
-  completeProductSetupState,
-  nativeProductSetupClient,
-  type ProductSetupClient,
-  type ProductSetupState,
-} from "./productSetupClient";
 
 const copy = {
   en: {
@@ -133,7 +126,6 @@ interface AppProps {
   detailEvents?: DetailEventClient;
   detailShell?: DetailShellClient;
   browserPreview?: boolean;
-  productSetupClient?: ProductSetupClient;
 }
 
 export function DetailSurface({
@@ -141,36 +133,15 @@ export function DetailSurface({
   detailEvents = nativeDetailEventClient,
   detailShell = nativeDetailShellClient,
   browserPreview = !memoryClient.available,
-  productSetupClient = nativeProductSetupClient,
 }: AppProps) {
   const [locale, setLocale] = useStoredLocale();
   const [lineIndex, setLineIndex] = useState(0);
   const [eventSnoozed, setEventSnoozed] = useState(false);
   const [memoryState, setMemoryState] = useState(emptyMemoryState);
   const [guideResetStatus, setGuideResetStatus] = useState<"success" | "failed" | null>(null);
-  const [productSetupState, setProductSetupState] =
-    useState<ProductSetupState | null>(() =>
-      productSetupClient.available ? null : completeProductSetupState,
-    );
   const refreshGeneration = useRef(0);
   const t = copy[locale];
   const hasAgentOperation = memoryState.agentOperation?.state === "applied";
-
-  useEffect(() => {
-    if (!productSetupClient.available) return;
-    let active = true;
-    void productSetupClient
-      .getState()
-      .then((state) => {
-        if (active) setProductSetupState(state);
-      })
-      .catch(() => {
-        if (active) setProductSetupState(completeProductSetupState);
-      });
-    return () => {
-      active = false;
-    };
-  }, [productSetupClient]);
 
   useEffect(() => {
     if (!memoryClient.available) return;
@@ -248,25 +219,6 @@ export function DetailSurface({
 
   async function clearAgentOperation() {
     setMemoryState(await memoryClient.clearAgentOperation());
-  }
-
-  if (productSetupState === null) {
-    return (
-      <main className="product-setup-loading" role="status">
-        Memoryling
-      </main>
-    );
-  }
-
-  if (!browserPreview && !productSetupState.setupComplete) {
-    return (
-      <ProductSetup
-        locale={locale}
-        onComplete={() => setProductSetupState(completeProductSetupState)}
-        onLocaleChange={setLocale}
-        setupClient={productSetupClient}
-      />
-    );
   }
 
   return (

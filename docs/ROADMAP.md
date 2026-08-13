@@ -25,9 +25,12 @@ The verified v0.2.0 installer is a historical no-redo baseline. It does not prov
 ## Phase 1 — Agent-operated Memoryling
 
 - [x] accept [ADR-0008](adr/0008-agent-operated-memoryling-protocol.md)
+- [x] accept conversation-first wake behavior in [ADR-0009](adr/0009-conversation-first-pet-wake.md)
 - [x] add project trigger phrases and `memoryling-operation` Agent skill
 - [x] define strict JSON Schema and a synthetic example
 - [x] add a no-echo PowerShell validator and atomic local inbox submission
+- [x] make submission start／recall the installed pet and await bounded application confirmation
+- [x] remove the blocking first-run setup gate and make cold／single-instance launch pet-first
 - [x] poll one exact non-symlink inbox file with a 64 KiB cap
 - [x] add SQLite schema v5 for operation, hashed evidence, dialogue, counters, and runtime
 - [x] apply each package as an authoritative replacement; duplicate ID＋digest is idempotent
@@ -42,7 +45,7 @@ The verified v0.2.0 installer is a historical no-redo baseline. It does not prov
 - [ ] install or discover the skill from arbitrary user projects without copying unsafe governance
 - [ ] test the slogan in one explicitly authorized non-private sandbox Agent project
 
-Exit condition: from an Agent project, one phrase can create and replace a bounded local pet update; the app persists and speaks it without scanning Agent storage or making an AI request; clear removes it; packaged Windows behavior is accepted.
+Exit condition: from an Agent project, one phrase can create and replace a bounded local pet update and visibly wake the installed pet; the app persists and speaks it without scanning Agent storage or making an AI request; clear removes it; packaged Windows behavior is accepted.
 
 **Current status: source vertical slice implemented; packaged acceptance remains open.**
 
@@ -72,7 +75,7 @@ Permanent change requires multiple independent, outcome-qualified evidence group
 
 The old BYOK Daily Scout remains compatibility source code, not the current core roadmap. Any network revival needs a new product decision and privacy review.
 
-## Phase 4 — Conversation
+## Phase 4 — Optional semantic conversation with the pet
 
 - [ ] explicit provider and privacy decision
 - [ ] local-context assembly with redaction controls
@@ -80,7 +83,7 @@ The old BYOK Daily Scout remains compatibility source code, not the current core
 - [ ] bilingual grounded conversation
 - [ ] explanation and correction for remembered claims
 
-Conversation must remain optional; the pet's persistent life cannot depend on a continuous chat API.
+This future in-pet semantic conversation is distinct from the current Agent conversation used as the control surface. It must remain optional; the pet's persistent life cannot depend on a continuous chat API.
 
 ## Public beta and OSS evidence track
 

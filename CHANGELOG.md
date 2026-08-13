@@ -6,7 +6,28 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ## [Unreleased]
 
-No unreleased changes recorded.
+### Added
+
+- conversation-first wake-only phrases that show the existing pet without reading memory or creating an operation
+- `Start-Memoryling.ps1` with exact installed-App resolution, minimum-version checks, bounded launch, and optional inbox-consumption confirmation
+
+### Changed
+
+- normal Agent operation now validates the installed App before submission, opens or recalls the pet automatically, and reports completion in the same conversation
+- cold launch goes directly to the pet with OS-locale selection; the blocking first-run setup screen and its Tauri commands were removed
+- single-instance relaunch returns to the existing pet instead of opening the detail window
+
+### Security and privacy
+
+- wake-only grants no memory access; launcher discovery is limited to an explicit path, exact running process, current-user uninstall registration, and exact current-user install candidates
+- missing or stale App fails before an operation package is written; helpers never print the executable path or package content
+
+### Validated
+
+- full frontend／Rust checks, Rust formatting, Clippy, JSON parsing, and official skill validation pass
+- missing App fails before write, a mismatched binary is rejected, and isolated `-SkipLaunch` submission remains available for test harnesses
+- a freshly built v0.6.0 release binary consumed the synthetic operation and displayed the native pet; wake-only relaunch preserved one process and one pet window
+- English／Traditional Chinese browser inspection confirms conversation-first copy, honest native boundary, no horizontal overflow, and no warning／error logs
 
 ## [0.6.0] - 2026-08-13
 

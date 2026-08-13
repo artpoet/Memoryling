@@ -22,10 +22,9 @@ use crate::{
     memory::{self, CreatureRenderState},
 };
 
-pub(crate) use lifecycle::{handle_window_event, open_detail_and_finish_onboarding};
+pub(crate) use lifecycle::{handle_window_event, return_to_pet};
 use model::{
-    ContextMenuTrigger, CreatureStateChanged, DetailReset, PetShellState, ProductSetupState,
-    ShellMode, ShellSettings,
+    ContextMenuTrigger, CreatureStateChanged, DetailReset, PetShellState, ShellMode, ShellSettings,
 };
 
 const MENU_OPEN: &str = "shell.open";
@@ -97,15 +96,7 @@ pub(crate) fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         .get_webview_window("main")
         .and_then(|main| main.is_visible().ok())
         .unwrap_or(false);
-    if !settings.setup_complete {
-        let main = app
-            .get_webview_window("main")
-            .ok_or("Memoryling could not find its detail window.")?;
-        main.show()?;
-        main.set_focus()?;
-        let _ = pet.hide();
-        set_mode(app.handle(), ShellMode::MainOpen);
-    } else if main_is_visible {
+    if main_is_visible {
         set_mode(app.handle(), ShellMode::MainOpen);
     } else {
         position::restore_pet_position(app.handle()).map_err(std::io::Error::other)?;
@@ -240,29 +231,6 @@ pub(crate) fn get_pet_shell_state(
         .lock()
         .map(|settings| settings.public_state())
         .map_err(|_| "Memoryling could not access its desktop settings.".to_string())
-}
-
-#[tauri::command]
-pub(crate) fn get_product_setup_state(
-    _caller: MainCaller,
-    state: State<'_, DesktopShellState>,
-) -> Result<ProductSetupState, String> {
-    state
-        .settings
-        .lock()
-        .map(|settings| settings.product_setup_state())
-        .map_err(|_| "Memoryling could not access its desktop settings.".to_string())
-}
-
-#[tauri::command]
-pub(crate) fn complete_product_setup(
-    _caller: MainCaller,
-    app: AppHandle,
-) -> Result<ProductSetupState, String> {
-    update_settings(&app, |settings| settings.setup_complete = true)?;
-    let state = shell_settings_snapshot(&app).product_setup_state();
-    let _ = lifecycle::return_to_pet(&app);
-    Ok(state)
 }
 
 #[tauri::command]

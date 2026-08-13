@@ -1,4 +1,4 @@
 interface:
   display_name: "Memoryling Operation"
-  short_description: "Compile Agent context into a local pet update"
-  default_prompt: "Use $memoryling-operation to run Memoryling from my authorized Agent context."
+  short_description: "Update and wake the local pet from Agent chat"
+  default_prompt: "Use $memoryling-operation to update and automatically wake Memoryling from my authorized Agent context."

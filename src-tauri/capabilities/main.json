@@ -26,8 +26,6 @@
     "allow-mark-daily-insight-read",
     "allow-open-daily-scout-link",
     "allow-reset-pet-onboarding",
-    "allow-get-product-setup-state",
-    "allow-complete-product-setup",
     "core:event:allow-listen",
     "core:event:allow-unlisten"
   ]

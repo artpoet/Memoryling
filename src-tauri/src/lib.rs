@@ -10,7 +10,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            let _ = desktop_shell::open_detail_and_finish_onboarding(app);
+            let _ = desktop_shell::return_to_pet(app);
         }))
         .manage(memory::PendingImports::default())
         .manage(daily_scout::DailyScoutService::default())
@@ -39,8 +39,6 @@ pub fn run() {
             daily_scout::open_daily_scout_link,
             desktop_shell::show_pet_context_menu,
             desktop_shell::get_pet_shell_state,
-            desktop_shell::get_product_setup_state,
-            desktop_shell::complete_product_setup,
             desktop_shell::dismiss_pet_onboarding,
             desktop_shell::start_pet_dragging,
             desktop_shell::reset_pet_onboarding

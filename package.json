@@ -13,7 +13,8 @@
     "tauri": "tauri",
     "build:windows": "tauri build --bundles nsis --ci",
     "test": "vitest run",
-    "check": "npm run test && npm run build && cargo test --manifest-path src-tauri/Cargo.toml && cargo check --manifest-path src-tauri/Cargo.toml"
+    "test:helpers": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Test-MemorylingHelpers.ps1",
+    "check": "npm run test && npm run test:helpers && npm run build && cargo test --manifest-path src-tauri/Cargo.toml && cargo check --manifest-path src-tauri/Cargo.toml"
   },
   "dependencies": {
     "react": "^19.1.0",

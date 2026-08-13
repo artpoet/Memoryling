@@ -24,8 +24,6 @@ pub const APP_COMMANDS: &[&str] = &[
     "open_daily_scout_link",
     "show_pet_context_menu",
     "get_pet_shell_state",
-    "get_product_setup_state",
-    "complete_product_setup",
     "dismiss_pet_onboarding",
     "start_pet_dragging",
     "reset_pet_onboarding",
@@ -54,8 +52,6 @@ pub const MAIN_COMMANDS: &[&str] = &[
     "mark_daily_insight_read",
     "open_daily_scout_link",
     "reset_pet_onboarding",
-    "get_product_setup_state",
-    "complete_product_setup",
 ];
 
 #[allow(dead_code)]

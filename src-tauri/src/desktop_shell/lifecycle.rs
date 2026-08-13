@@ -490,6 +490,21 @@ mod tests {
     }
 
     #[test]
+    fn agent_relaunch_returns_an_open_detail_surface_to_the_existing_pet() {
+        let mut surfaces = FakeSurfaces::main_first(None);
+        let outcome = run_return_to_pet(&mut surfaces);
+        assert_eq!(outcome.mode, ShellMode::PetVisible);
+        assert_eq!(outcome.failure, None);
+        assert_eq!(
+            surfaces.operations,
+            [SurfaceOperation::PetShow, SurfaceOperation::MainHide]
+        );
+        assert!(!surfaces.main_visible);
+        assert!(surfaces.pet_visible);
+        surfaces.assert_one_recoverable_surface();
+    }
+
+    #[test]
     fn every_single_transition_failure_keeps_one_recoverable_surface() {
         for failure in [
             SurfaceOperation::MainUnminimize,

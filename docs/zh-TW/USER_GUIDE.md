@@ -8,22 +8,24 @@ v0.6.0 是 Agent-operated 的原始碼垂直切片；最後完成安裝 UAT 的 
 
 除非已取得明確授權，否則只使用合成資料。不要貼出、輸出或提交由真實 Agent 記憶衍生的操作包。
 
-## 啟動
+## 由對話啟動
 
 ```powershell
 npm install
 npm run tauri dev
 ```
 
-第一次設定只選擇語言並說明 Agent 路徑，不會要求 API key。寵物會先顯示「等待 Agent 運作／記憶存取關閉」。
+普通使用者不需要先開 App。直接在已設定的 Agent 對話喊出口號；Agent 會提交更新並啟動或叫回已安裝的寵物。沒有阻擋流程的首次設定頁；初始語言依作業系統語系決定，之後仍可切換。
 
 ## 喊出口號
 
 1. 在 Codex、Claude Code 或其他支援 AGENTS 的環境開啟本 repo。
 2. 讓 Agent 讀取 `AGENTS.md` 與喚醒文件鏈。
 3. 說 **`運作 Memoryling`**、**`執行 Memoryling`** 或 **`Run Memoryling`**。
-4. Agent 會依 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存更新包並執行本機提交工具。
-5. App 約每五秒檢查一次唯一收件匣檔案。
+4. Agent 會依 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存更新包並自行執行本機提交工具。
+5. 工具確認相容 App、提交更新、啟動或叫回寵物、等待本機套用，最後在同一段對話回報。
+
+只想顯示既有寵物、不更新內容時，說 **`叫出 Memoryling`** 或 **`Show Memoryling`**。Wake-only 不讀記憶，也不建立更新包。
 
 這個口號只授權一次有限寵物更新；不代表授權新私人來源、雲端 connector、外部 AI 呼叫、信箱、登入帳號、憑證或 Agent 記憶寫入。
 
@@ -42,7 +44,7 @@ npm run tauri dev
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -Path examples/agent-operation-v1.synthetic.json
 ```
 
-工具只輸出 operation ID 與對話數；App 成功處理後會刪除收件匣檔案。不合規資料會被拒絕並移除，不會顯示內容。
+工具會確認 Memoryling 0.6.0 以上版本，然後提交、打開寵物並等待套用；只輸出有限狀態、operation ID 與對話數。App 成功處理後會刪除收件匣檔案。不合規資料會被拒絕並移除，不會顯示內容。
 
 ## 替換與清除
 

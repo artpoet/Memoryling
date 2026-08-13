@@ -10,5 +10,6 @@
 | [0006](0006-optional-byok-daily-memory-scout.md) | Optional BYOK Daily Memory Scout | Proposed |
 | [0007](0007-codex-agent-memory-auto-sync.md) | Codex Agent memory as primary read-only auto-sync source | Superseded as primary by ADR-0008 |
 | [0008](0008-agent-operated-memoryling-protocol.md) | Agent compiles authorized context; local app owns persistent life | Accepted |
+| [0009](0009-conversation-first-pet-wake.md) | Agent conversation is the primary control surface and wakes the pet | Accepted |
 
 New ADRs should record context, decision, consequences, rejected alternatives, and privacy impact. Supersede earlier ADRs rather than rewriting their history.

@@ -6,13 +6,14 @@ Memoryling is a local-first desktop pet for people who already work with AI Agen
 
 > **Run Memoryling**
 
-The current Agent uses only context it is already authorized to read, compiles a small pet update, and hands it to the local app. Memoryling then carries that update forward through appearance, bilingual dialogue, cooldowns, expiry, quiet hours, and daily limits.
+The current Agent uses only context it is already authorized to read, compiles a small pet update, starts or recalls the installed pet, and waits for local application. Memoryling then carries that update forward through appearance, bilingual dialogue, cooldowns, expiry, quiet hours, and daily limits. The user stays in the Agent conversation throughout the ordinary flow.
 
 [繁體中文](README.zh-TW.md) · [Product vision](docs/PRODUCT_VISION.md) · [Architecture](docs/ARCHITECTURE.md) · [Privacy](docs/PRIVACY_PRINCIPLES.md)
 
 ## Why it is different
 
 - **Agent-operated:** semantic understanding happens in the Agent the user already chose.
+- **Conversation-first:** the Agent submits the update and opens the pet; no manual app launch or setup screen is required.
 - **No app-side AI API:** the ordinary pet needs no API key and makes no model request.
 - **Local persistent life:** the app owns state, timing, rendering, and user controls.
 - **Privacy-minimized handoff:** packages contain generated pet state and hashed references, never raw memories, prompts, paths, secrets, or reasoning.
@@ -25,7 +26,8 @@ The current Agent uses only context it is already authorized to read, compiles a
 “Run Memoryling”
   → Agent reads already-authorized memory + recent work + project context
   → Agent skill compiles protocol-v1 JSON
-  → local submit helper writes one exact inbox file
+  → local helper verifies the installed app and writes one exact inbox file
+  → helper starts or recalls the pet
   → Rust validates and stores the newest operation
   → pet appearance and dialogue follow deterministic local rules
 ```
@@ -40,6 +42,7 @@ The project entrypoint recognizes `Run Memoryling`, `運作 Memoryling`, and `�
 - 3–12 English／Traditional Chinese dialogue cards per operation
 - on-open, click, and bounded ambient triggers
 - exact-file inbox polling with strict size, symlink, schema, and identity checks
+- automatic cold launch or single-instance pet recovery after submission
 - local clear control and authoritative replacement semantics
 - synthetic Rust, React, and submit-helper coverage
 

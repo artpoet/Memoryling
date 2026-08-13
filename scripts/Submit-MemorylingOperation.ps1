@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [string]$Path
+    [string]$Path,
+    [string]$ExecutablePath,
+    [switch]$SkipLaunch
 )
 
 $ErrorActionPreference = "Stop"
@@ -104,6 +106,15 @@ if ([string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
     throw "Memoryling local app data directory is unavailable."
 }
 
+$launcherPath = Join-Path $PSScriptRoot 'Start-Memoryling.ps1'
+if (-not $SkipLaunch) {
+    $resolveArguments = @{ ResolveOnly = $true }
+    if (-not [string]::IsNullOrWhiteSpace($ExecutablePath)) {
+        $resolveArguments.ExecutablePath = $ExecutablePath
+    }
+    & $launcherPath @resolveArguments | Out-Null
+}
+
 $inboxDirectory = Join-Path $env:LOCALAPPDATA 'app.memoryling.desktop\agent-inbox'
 $targetPath = Join-Path $inboxDirectory 'operation-v1.json'
 $temporaryPath = Join-Path $inboxDirectory ('.operation-v1-' + [guid]::NewGuid().ToString('N') + '.tmp')
@@ -117,6 +128,14 @@ try {
     if (Test-Path -LiteralPath $temporaryPath) {
         Remove-Item -LiteralPath $temporaryPath -Force
     }
+}
+
+if (-not $SkipLaunch) {
+    $launchArguments = @{ InboxPath = $targetPath }
+    if (-not [string]::IsNullOrWhiteSpace($ExecutablePath)) {
+        $launchArguments.ExecutablePath = $ExecutablePath
+    }
+    & $launcherPath @launchArguments
 }
 
 Write-Output ("Submitted Memoryling operation {0} with {1} dialogue cards." -f $package.operationId, @($package.dialogues).Count)

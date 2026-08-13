@@ -12,7 +12,6 @@ import {
   type MemoryClient,
   type MemoryState,
 } from "./memoryClient";
-import type { ProductSetupClient } from "./productSetupClient";
 
 const operationState: MemoryState = {
   ...emptyMemoryState,
@@ -72,12 +71,6 @@ const detailShell: DetailShellClient = {
   })),
 };
 
-const completeSetupClient: ProductSetupClient = {
-  available: false,
-  getState: vi.fn(async () => ({ schemaVersion: 1 as const, setupComplete: true })),
-  complete: vi.fn(async () => ({ schemaVersion: 1 as const, setupComplete: true })),
-};
-
 describe("Agent-operated Memoryling detail surface", () => {
   test("renders the applied operation without exposing a direct memory connector", async () => {
     const user = userEvent.setup();
@@ -88,7 +81,6 @@ describe("Agent-operated Memoryling detail surface", () => {
         detailEvents={createDetailEvents().client}
         detailShell={detailShell}
         memoryClient={memoryClient}
-        productSetupClient={completeSetupClient}
       />,
     );
 
@@ -114,7 +106,6 @@ describe("Agent-operated Memoryling detail surface", () => {
         detailEvents={createDetailEvents().client}
         detailShell={detailShell}
         memoryClient={memoryClient}
-        productSetupClient={completeSetupClient}
       />,
     );
 
@@ -132,7 +123,6 @@ describe("Agent-operated Memoryling detail surface", () => {
         detailEvents={createDetailEvents().client}
         detailShell={detailShell}
         memoryClient={{ ...createMemoryClient(), available: false }}
-        productSetupClient={completeSetupClient}
       />,
     );
 
@@ -153,7 +143,6 @@ describe("Agent-operated Memoryling detail surface", () => {
         detailEvents={events.client}
         detailShell={detailShell}
         memoryClient={memoryClient}
-        productSetupClient={completeSetupClient}
       />,
     );
     await waitFor(() => expect(memoryClient.getState).toHaveBeenCalledTimes(1));
@@ -161,29 +150,6 @@ describe("Agent-operated Memoryling detail surface", () => {
     act(() => events.emitRevision());
     expect(await screen.findByText("Latest Agent operation applied")).toBeInTheDocument();
     expect(memoryClient.getState).toHaveBeenCalledTimes(2);
-  });
-
-  test("finishes first-run setup without asking for an API key", async () => {
-    const user = userEvent.setup();
-    const setupClient: ProductSetupClient = {
-      available: true,
-      getState: vi.fn(async () => ({ schemaVersion: 1 as const, setupComplete: false })),
-      complete: vi.fn(async () => ({ schemaVersion: 1 as const, setupComplete: true })),
-    };
-    render(
-      <DetailSurface
-        browserPreview={false}
-        detailEvents={createDetailEvents().client}
-        detailShell={detailShell}
-        memoryClient={createMemoryClient()}
-        productSetupClient={setupClient}
-      />,
-    );
-
-    expect(await screen.findByText(/Run Memoryling/)).toBeInTheDocument();
-    expect(screen.queryByLabelText(/API key/i)).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Wake up my Memoryling" }));
-    expect(await screen.findByText("Waiting for the next Agent operation")).toBeInTheDocument();
   });
 
   test("resets the pet guide with honest success reporting", async () => {
@@ -199,7 +165,6 @@ describe("Agent-operated Memoryling detail surface", () => {
         detailEvents={createDetailEvents().client}
         detailShell={{ resetOnboarding }}
         memoryClient={createMemoryClient()}
-        productSetupClient={completeSetupClient}
       />,
     );
 
