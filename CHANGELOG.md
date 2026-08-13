@@ -9,10 +9,40 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 ### Planned
 
 - Separately authorized exact-source private-thread UAT for the pinned experimental work-record pilot
-- Packaged v0.3.0 synthetic compatibility UAT; the verified v0.2.0 installer remains the historical no-redo artifact
+- Packaged v0.4.0 synthetic compatibility UAT; the verified v0.2.0 installer remains the historical no-redo artifact
+- Explicitly authorized paid Daily Scout smoke using only reviewed coarse context, followed by packaged native acceptance
 - A production-supported, user-selected Codex durable-memory export／API or supported successor interface, followed by a fresh privacy review
 - Native reminder delivery with quiet hours and daily budgets
 - Remaining packaged pet-shell acceptance for accessibility, 125–200% and mixed DPI, monitor／taskbar topology changes, tray keyboard recovery, and Windows session shutdown
+
+## [0.4.0] - 2026-08-13
+
+> Unreleased, source-only development milestone. It has no accepted v0.4.0 installer, private-thread UAT, or real paid API smoke. Daily Memory Scout is optional and off by default; the verified fixture-only v0.2.0 installer remains the packaged no-redo baseline.
+
+### Added
+
+- Optional bilingual Daily Memory Scout panel that explains its value, keeps the ordinary pet API-free, previews the exact coarse outbound work context, links to official OpenAI key／quickstart pages, and exposes enable, disable, connection test, key deletion, local-history deletion, and full-reset controls
+- Proposed ADR-0006 plus a purpose-specific consent contract fixing provider, model, source, allowed categories, context compiler, 3,000-character cap, and automatic once-daily send behavior
+- Deterministic Rust context compiler for one approved Codex work record; only allowlisted work domains, public tool／model names, generic goals, non-sensitive constraints, dates, and fixed insight categories can leave the device
+- Windows Credential Manager BYOK storage through a Rust-only credential abstraction; the saved key never returns to the WebView or enters SQLite／JSON／localStorage
+- Fixed OpenAI Responses API client using pinned `gpt-5.6-terra`, required Web Search, `store: false`, bounded output, timeout handling, provider-error classes, explicit current-update／fallback-tip classification, and annotation-only HTTPS citations
+- SQLite migration 0003 and schema v3 settings, daily attempt ledger, cited insight, source-lineage, read, clear, and source-forget invalidation records
+- App-running scheduler and transactional one-attempt-per-local-date guard; failures do not automatically retry and missed dates are not replayed
+- Neutral `off`／`waiting`／`ready` pet DTO so private insight text and citations stay on the full detail surface
+
+### Security
+
+- Kept synthetic fixtures, raw prompt／answer text, paths, repository URLs, thread and record IDs, arbitrary private phrases, credentials, provider error bodies, and model-written plaintext URLs out of the outbound context and clickable result surface
+- Fixed endpoint, Authorization header, model, tool, and instructions in Rust; external webpages are treated as untrusted content and no shell, local file, remote MCP, account login, or external write tool is available
+- Extended exact main-only Tauri capabilities and the independent caller-label guard to all ten Daily Scout commands; the pet surface can receive only a neutral readiness state
+- Routed official and citation links through a Rust-validated Tauri opener: official URLs are fixed, while a result link must already exist in the local citation table before the system browser can open it
+- Preserved the daily attempt ledger when local history or supporting data is removed, preventing deletion from enabling a second paid attempt on the same date
+
+### Validated locally
+
+- 32 frontend tests pass, including consent gating, immediate key-field clearing, browser-off behavior, bilingual context／result controls, annotation-derived links, and neutral pet readiness
+- 45 Rust tests pass with one explicitly ignored live catalog test, including context minimization, explicit low-value fallback labeling, Web Search／citation validation, schema migration, daily success and failure idempotency, source invalidation, and exact capability separation
+- Production TypeScript／Vite build and Rust compile pass. No real OpenAI key was read, stored, printed, or called during acceptance
 
 ## [0.3.0] - 2026-08-12
 

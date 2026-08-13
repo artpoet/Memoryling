@@ -7,14 +7,15 @@ use super::{
     adapter::stable_id,
     model::{
         BodyModule, CreatureEnvelope, CreatureMark, CreatureMotion, CreaturePalette,
-        CreatureRenderMark, CreatureRenderMarkStyle, CreatureRenderState, ImportState,
-        LineageSource, MemoryState, PreparedImport, RealMemoryAccess, CODEX_THREAD_ADAPTER_ID,
-        DERIVATION_VERSION, STORE_SCHEMA_VERSION,
+        CreatureRenderMark, CreatureRenderMarkStyle, CreatureRenderState, DailyScoutRenderState,
+        ImportState, LineageSource, MemoryState, PreparedImport, RealMemoryAccess,
+        CODEX_THREAD_ADAPTER_ID, DERIVATION_VERSION, STORE_SCHEMA_VERSION,
     },
 };
 
 const MIGRATION_0001: &str = include_str!("../../migrations/0001_first_memory.sql");
 const MIGRATION_0002: &str = include_str!("../../migrations/0002_source_consent_scope.sql");
+const MIGRATION_0003: &str = include_str!("../../migrations/0003_daily_memory_scout.sql");
 
 pub(crate) struct MemoryStore {
     path: PathBuf,
@@ -169,6 +170,7 @@ impl MemoryStore {
             .map_err(|error| local_store_error("begin forgetting", error))?;
 
         clear_derivations(&transaction)?;
+        crate::daily_scout::store::invalidate_daily_scout_for_source(&transaction, source_id)?;
         let deleted = transaction
             .execute(
                 "DELETE FROM source_imports WHERE source_id = ?1",
@@ -187,7 +189,7 @@ impl MemoryStore {
         Ok(state)
     }
 
-    fn open_connection(&self) -> Result<Connection, String> {
+    pub(crate) fn open_connection(&self) -> Result<Connection, String> {
         if let Some(parent) = self.path.parent() {
             fs::create_dir_all(parent).map_err(|_| {
                 "Memoryling could not create its local app-data directory.".to_string()
@@ -214,9 +216,15 @@ impl MemoryStore {
             .map_err(|error| local_store_error("read schema version", error))?;
         match version {
             0 => migration
-                .execute_batch(&format!("{MIGRATION_0001}\n{MIGRATION_0002}"))
+                .execute_batch(&format!(
+                    "{MIGRATION_0001}\n{MIGRATION_0002}\n{MIGRATION_0003}"
+                ))
                 .map_err(|error| local_store_error("apply schema migrations", error))?,
-            1 => migrate_v1_to_v2(&migration)?,
+            1 => {
+                migrate_v1_to_v2(&migration)?;
+                migrate_v2_to_v3(&migration)?;
+            }
+            2 => migrate_v2_to_v3(&migration)?,
             STORE_SCHEMA_VERSION => {}
             _ => return Err("The local Memoryling database schema is not supported.".to_string()),
         }
@@ -226,6 +234,12 @@ impl MemoryStore {
 
         Ok(connection)
     }
+}
+
+fn migrate_v2_to_v3(transaction: &Transaction<'_>) -> Result<(), String> {
+    transaction
+        .execute_batch(MIGRATION_0003)
+        .map_err(|error| local_store_error("apply Daily Memory Scout migration", error))
 }
 
 fn migrate_v1_to_v2(transaction: &Transaction<'_>) -> Result<(), String> {
@@ -490,9 +504,37 @@ fn creature_render_state_from_connection(
     } else {
         "completion-star"
     };
+    let daily_scout_enabled = connection
+        .query_row(
+            "SELECT enabled FROM daily_scout_settings WHERE singleton_id = 1",
+            [],
+            |row| row.get::<_, i64>(0),
+        )
+        .optional()
+        .map_err(|error| local_store_error("read render-safe Daily Scout state", error))?
+        == Some(1);
+    let unread_insight_count = connection
+        .query_row(
+            "SELECT COUNT(*) FROM daily_insights WHERE read_at IS NULL",
+            [],
+            |row| row.get::<_, i64>(0),
+        )
+        .map_err(|error| local_store_error("read render-safe Daily Scout message", error))?;
+    let daily_scout_state = if unread_insight_count > 0 {
+        DailyScoutRenderState::Ready
+    } else if daily_scout_enabled {
+        DailyScoutRenderState::Waiting
+    } else {
+        DailyScoutRenderState::Off
+    };
+    let daily_scout_revision_value = match daily_scout_state {
+        DailyScoutRenderState::Off => "scout-off",
+        DailyScoutRenderState::Waiting => "scout-waiting",
+        DailyScoutRenderState::Ready => "scout-ready",
+    };
     let revision = Sha256::digest(
         format!(
-            "2|off|{import_revision_value}|compact|baseline|violet-mint|calm|{marks_revision_value}"
+            "3|off|{import_revision_value}|compact|baseline|violet-mint|calm|{marks_revision_value}|{daily_scout_revision_value}"
         )
         .as_bytes(),
     )
@@ -501,7 +543,7 @@ fn creature_render_state_from_connection(
     .collect();
 
     Ok(CreatureRenderState {
-        schema_version: 2,
+        schema_version: 3,
         revision,
         real_memory_access: RealMemoryAccess::Off,
         import_state,
@@ -509,6 +551,7 @@ fn creature_render_state_from_connection(
         body_module: BodyModule::Baseline,
         palette: CreaturePalette::VioletMint,
         motion: CreatureMotion::Calm,
+        daily_scout_state,
         marks,
     })
 }

@@ -81,6 +81,25 @@ html[data-surface="pet"] *::after {
   letter-spacing: 0.02em;
 }
 
+.pet-scout-ready {
+  position: absolute;
+  right: 14px;
+  bottom: 54px;
+  left: 14px;
+  z-index: 2;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(130, 231, 197, 0.48);
+  border-radius: 14px;
+  color: #eafff8;
+  background: rgba(24, 40, 43, 0.95);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+  font-size: 12px;
+  font-weight: 720;
+  line-height: 1.35;
+  text-align: center;
+}
+
 .pet-surface-onboarding {
   align-content: start;
   padding: 8px;
@@ -159,6 +178,7 @@ html[data-surface="pet"] *::after {
 
 @media (forced-colors: active) {
   .pet-access-badge,
+  .pet-scout-ready,
   .pet-onboarding {
     border: 2px solid CanvasText;
     color: CanvasText;

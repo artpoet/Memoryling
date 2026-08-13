@@ -8,7 +8,7 @@
 
 它**不會**讀取真實 Codex 記憶、不會掃描 Codex tool-home、不接受任意檔案，也沒有連接正式記憶來源。即使合成 fixture 試行正在運作，App 仍必須顯示「持久記憶存取關閉」。
 
-另外，Repo source tree 已進入 v0.3.0，並為開發者評估實作了綁定特定版本的實驗性 **Codex 工作紀錄／thread history** 試行。它不在已測試的 v0.2.0 安裝器內、不是持久記憶 connector，也尚未執行獲授權的私人 thread UAT。詳見[僅供開發版 source 使用：實驗性 Codex 工作紀錄試行](#僅供開發版-source-使用實驗性-codex-工作紀錄試行)。
+另外，Repo source tree 已進入 v0.4.0，包含綁定特定版本的實驗性 **Codex 工作紀錄／thread history** 試行，以及選配的**每日記憶情報**。兩者都不在已測試的 v0.2.0 安裝器內；私人紀錄、付費 API 與 v0.4.0 打包版驗收都還沒有完成證據。
 
 這個測試版尚未簽章，也不是已可公開發布的正式安裝包。
 
@@ -106,7 +106,7 @@ Memoryling 會把核准後的正規化 fixture 紀錄與來源鏈存入 App 本�
 
 ## 僅供開發版 source 使用：實驗性 Codex 工作紀錄試行
 
-OpenAI 目前並未針對這項整合公開穩定的 Codex 持久記憶匯出 API，或具有相容性保證的記憶檔案 schema。因此，v0.3.0 source implementation 透過狹窄的本機 App Server stdio 邊界評估的是 **Codex 工作紀錄／thread history**，不是「Codex 記憶」。App Server host 本身仍屬實驗性，也不支援 production workload。
+OpenAI 目前並未針對這項整合公開穩定的 Codex 持久記憶匯出 API，或具有相容性保證的記憶檔案 schema。因此，v0.4.0 source implementation 透過狹窄的本機 App Server stdio 邊界評估的是 **Codex 工作紀錄／thread history**，不是「Codex 記憶」。App Server host 本身仍屬實驗性，也不支援 production workload。
 
 這項試行採 fail-closed，並要求標準本機 Codex Desktop CLI 必須完全回報 `codex-cli 0.134.0`；它不宣稱支援更早或更晚的 CLI 版本。開發版預期流程如下：
 
@@ -122,6 +122,18 @@ adapter 為唯讀，不接受任意路徑、不掃描 Codex 持久記憶檔案�
 
 持久記憶存取必須持續顯示為關閉。截至 2026-08-12，私人 thread UAT 尚未獲得授權，也尚未執行。在使用者明確指定來源／thread 範圍前，不得為驗收而瀏覽或讀取私人 thread；即使日後 UAT 通過，也只代表這個固定版本的實驗性試行獲得驗證，不代表正式 connector 或 Phase 1 已完成。
 
+## 僅供開發版 source 使用：選配的每日記憶情報
+
+v0.4.0 source 的詳細視窗新增精簡的**每日記憶情報**面板；普通寵物不需要 API。啟用流程如下：
+
+1. 先核准一筆受支援的 Codex 工作紀錄；合成 fixture 永遠不會送出。
+2. 貼上個人的 OpenAI API key，安全儲存到 Windows Credential Manager。欄位會立即清空，已存 key 不能再次顯示；畫面提供官方申請與說明捷徑。
+3. 檢查畫面顯示的粗略工作摘要。它可能包含工作類別、公開工具／模型名稱、通用目標、非敏感限制與日期；不包含 prompt／answer 原文、路徑、repo 網址、thread ID、憑證或任意私密句子。
+4. 選擇 08:00–21:59 的時間，接受費用／保存告知後開啟。只在 Memoryling 運行時，每個本機日期最多嘗試一次 Web Search；當天失敗不自動重試，也不補跑錯過日期。
+5. 寵物顯示「找到情報」後開啟詳細視窗。精簡卡只顯示短訊息、為何適合、搜尋時間與最多三個由 citation annotation 取得的來源。
+
+此里程碑只支援 OpenAI。Rust 固定 `gpt-5.6-terra`、官方 endpoint、Web Search 與 `store: false`。API 可能產生費用，一般 OpenAI 濫用監控資料仍可能保留最長 30 天。**關閉**只停止未來嘗試；**清除本機情報**、**刪除 key**與完整重設是分開控制。遺忘支援來源會移除相依情報並停用這份同意。目前尚未以真實付費請求作為驗收證據。
+
 ## 本機資料與解除安裝
 
 Memoryling 的目前使用者 App 資料位於：
@@ -130,7 +142,8 @@ Memoryling 的目前使用者 App 資料位於：
 
 這個資料夾可能包含：
 
-- `memoryling.sqlite3`：核准後的正規化 fixture 文字、hash、來源鏈與衍生狀態；v0.3.0 開發版 source build 也可能保留唯一選取的 final answer 正規化文字，但只會發生在完成上述明確同意之後；
+- `memoryling.sqlite3`：核准後的正規化 fixture／工作紀錄文字、hash、來源鏈、衍生狀態，以及啟用時的每日情報設定、嘗試狀態、附來源情報與來源鏈；
+- OpenAI API key 另外存放在 Windows Credential Manager，不在這個資料夾；
 - `desktop-shell-v1.json` 與可能存在的 `desktop-shell-v1.json.bak`：只包含 onboarding、always-on-top 與安全 pet 位置等本機 shell 設定；
 - `EBWebView` 等 WebView runtime 資料。
 
@@ -142,7 +155,9 @@ Memoryling 的目前使用者 App 資料位於：
 
 ## 疑難排解邊界
 
-- **App 顯示「持久記憶存取關閉」：**這是正確狀態；已測試的 v0.2.0 安裝器沒有真實來源 connector，而 v0.3.0 source 試行讀取的是使用者明確選取的工作紀錄，不是 Codex 持久記憶。
+- **App 顯示「持久記憶存取關閉」：**這是正確狀態；已測試的 v0.2.0 安裝器沒有真實來源 connector，而 v0.4.0 source 試行讀取的是使用者明確選取的工作紀錄，不是 Codex 持久記憶。
+- **每日記憶情報不能開啟：**請先存 key、核准一筆支援的工作紀錄、檢查外送脈絡並同意。Browser preview 與合成 fixture 會刻意保持關閉。
+- **今天搜尋失敗：**今天不會自動重試。請檢查 API 帳戶或連線，等下一個本機日期再試；不要靠刪除歷史強迫第二次付費嘗試。
 - **Codex 工作紀錄瀏覽器顯示 CLI 版本不受支援：**除非標準本機 Codex Desktop CLI 完全回報 `codex-cli 0.134.0`，否則這是預期的 fail-closed 行為。不要繞過 pin，也不要把 App 指向任意執行檔。
 - **瀏覽器預覽維持詳細版面：**這是正確狀態；browser mode 不會假裝有原生浮動 pet、context menu、系統匣、single-instance lifecycle、SQLite 或持久化。
 - **WebView2 安裝失敗：**只透過可信任安裝器與可信任網路重試，或從 Microsoft 官方管道取得 WebView2；不要使用不明第三方 runtime 下載。

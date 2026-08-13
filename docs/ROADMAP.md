@@ -117,16 +117,27 @@ Design foundation recorded: the user confirmed the biological／organic plus res
 
 Exit condition: synthetic fixtures prove that `SourceConsentScope` blocks unapproved source／category／purpose expansion; A／C／B and secondary-domain evidence stay within their assigned influence limits; multiple deduplicated outcome-qualified groups—not time or usage volume—gate permanent reshape; forget, correction, and scope disable deterministically rederive all downstream state; every persistent recipe change has an understandable `EvolutionBridge`; and rendering makes no runtime model call.
 
-**Exit status: not met.** Source v0.3.0 persists only the narrow import consent scope; reusable ongoing scope behavior, A／B／C evidence lanes, outcome gate, ephemeral hint, recipe compiler, bridge records, and correction／disable recomputation remain proposed and do not exist in the current runtime.
+**Exit status: not met.** Source v0.4.0 persists only the narrow import consent scope; reusable ongoing scope behavior, A／B／C evidence lanes, outcome gate, ephemeral hint, recipe compiler, bridge records, and correction／disable recomputation remain proposed and do not exist in the current runtime.
 
 ## Phase 3 — Useful initiative
+
+Daily Memory Scout source slice:
+
+- [x] optional OpenAI BYOK setup with an official key link, Windows Credential Manager, and a clearly unchanged API-free ordinary pet
+- [x] visible allowlisted coarse-context preview, purpose-specific consent hash, Rust-only fixed endpoint／model／Web Search, `store: false`, and annotation-derived citations
+- [x] one attempt per local date while the app runs, honest failure without same-day automatic retry, and no missed-day replay
+- [x] compact bilingual pet message／source card plus neutral pet ready state, turn-off, clear-history, delete-key, reset, and source-forget invalidation
+- [x] synthetic frontend／Rust coverage for outbound minimization, citation validation, daily idempotency, ACL separation, and deletion behavior
+- [ ] explicitly authorized paid smoke using reviewed synthetic／coarse context; never infer consent from a generic continuation request
+- [ ] packaged v0.4.0 native UAT for enable／restart-no-rerun／result／disable／key-delete without capturing the key or private content
+- [ ] synthetic quality evaluation broad enough to judge relevance and low-value fallback before beta claims
 
 - [ ] reminder-candidate derivation
 - [ ] quiet hours, daily budget, urgency, snooze, and global off
 - [ ] native desktop notifications
 - [ ] feedback loop for “helpful,” “not now,” and “never remind me of this”
 
-Exit condition: reminders remain within hard limits and all notifications trace to approved source memories.
+Exit condition: useful initiative remains within hard limits, every message traces to approved source context and cited evidence, and reminders／notifications satisfy their separate quiet-hour and budget controls.
 
 ## Phase 4 — Conversation
 

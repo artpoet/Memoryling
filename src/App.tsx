@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import memorylingIcon from "./assets/memoryling-icon.png";
 import CreatureBody from "./CreatureBody";
+import DailyScoutPanel from "./DailyScoutPanel";
 import FirstMemoryFlow from "./FirstMemoryFlow";
 import {
   nativeDetailEventClient,
@@ -10,6 +11,10 @@ import {
   type DetailShellClient,
 } from "./creatureClient";
 import { useStoredLocale } from "./locale";
+import {
+  nativeDailyScoutClient,
+  type DailyScoutClient,
+} from "./dailyScoutClient";
 import {
   emptyMemoryState,
   nativeMemoryClient,
@@ -24,7 +29,7 @@ const copy = {
     prototypeBrowser: "Browser preview · memory access is off",
     tagline: "Your agent memories, alive.",
     intro:
-      "A small desktop life that grows from the work, ideas, and promises your AI agents remember.",
+      "A small desktop life that grows from what your AI agents remember—and, only if you opt in, helps your current work with one useful daily insight.",
     creatureName: "Your first Memoryling",
     creatureState: "Listening for a beginning",
     creatureStateActive: "One approved memory is shaping me",
@@ -79,7 +84,7 @@ const copy = {
     prototypeBrowser: "瀏覽器預覽 · 記憶存取關閉",
     tagline: "讓你的 Agent 記憶，長成一個生命。",
     intro:
-      "一個住在桌面的微小生命，從 AI Agent 記得的工作、點子與承諾中逐漸成長。",
+      "一個從 AI Agent 記憶長大的桌面生命；只有你選擇開啟時，牠也會每天帶回一則對目前工作有用的情報。",
     creatureName: "你的第一隻記憶獸",
     creatureState: "正在等待故事開始",
     creatureStateActive: "一筆核准記憶正在塑造我",
@@ -128,6 +133,7 @@ const copy = {
 
 interface AppProps {
   memoryClient?: MemoryClient;
+  dailyScoutClient?: DailyScoutClient;
   detailEvents?: DetailEventClient;
   detailShell?: DetailShellClient;
   browserPreview?: boolean;
@@ -135,6 +141,7 @@ interface AppProps {
 
 export function DetailSurface({
   memoryClient = nativeMemoryClient,
+  dailyScoutClient = nativeDailyScoutClient,
   detailEvents = nativeDetailEventClient,
   detailShell = nativeDetailShellClient,
   browserPreview = !memoryClient.available,
@@ -144,6 +151,7 @@ export function DetailSurface({
   const [eventSnoozed, setEventSnoozed] = useState(false);
   const [memoryState, setMemoryState] = useState(emptyMemoryState);
   const [detailResetRevision, setDetailResetRevision] = useState(0);
+  const [dailyScoutRefreshRevision, setDailyScoutRefreshRevision] = useState(0);
   const [guideResetStatus, setGuideResetStatus] = useState<"success" | "failed" | null>(null);
   const refreshGeneration = useRef(0);
   const t = copy[locale];
@@ -169,7 +177,10 @@ export function DetailSurface({
     }
 
     void detailEvents
-      .onRenderRevision(() => void refreshMemoryState())
+      .onRenderRevision(() => {
+        setDailyScoutRefreshRevision((value) => value + 1);
+        void refreshMemoryState();
+      })
       .then((unlisten) => {
         if (active) revisionUnlisten = unlisten;
         else unlisten();
@@ -179,6 +190,7 @@ export function DetailSurface({
       .onDetailReset(() => {
         if (!active) return;
         setDetailResetRevision((value) => value + 1);
+        setDailyScoutRefreshRevision((value) => value + 1);
         void refreshMemoryState();
       })
       .then((unlisten) => {
@@ -330,6 +342,12 @@ export function DetailSurface({
         memoryState={memoryState}
         onMemoryStateChange={setMemoryState}
         resetRevision={detailResetRevision}
+      />
+
+      <DailyScoutPanel
+        client={dailyScoutClient}
+        locale={locale}
+        refreshRevision={dailyScoutRefreshRevision}
       />
 
       <section className="dashboard" aria-label={t.dashboardLabel}>

@@ -1,7 +1,7 @@
 mod adapter;
 mod codex_thread;
-mod model;
-mod store;
+pub(crate) mod model;
+pub(crate) mod store;
 
 use std::{
     collections::HashMap,

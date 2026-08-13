@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 pub const MEMORY_EVENT_SCHEMA_VERSION: i64 = 1;
-pub const STORE_SCHEMA_VERSION: i64 = 2;
+pub const STORE_SCHEMA_VERSION: i64 = 3;
 pub const DERIVATION_VERSION: i64 = 1;
 pub const CODEX_ADAPTER_ID: &str = "codex-durable-memory";
 pub const CODEX_ADAPTER_VERSION: i64 = 1;
@@ -176,7 +176,16 @@ pub struct CreatureRenderState {
     pub body_module: BodyModule,
     pub palette: CreaturePalette,
     pub motion: CreatureMotion,
+    pub daily_scout_state: DailyScoutRenderState,
     pub marks: Vec<CreatureRenderMark>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum DailyScoutRenderState {
+    Off,
+    Waiting,
+    Ready,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]

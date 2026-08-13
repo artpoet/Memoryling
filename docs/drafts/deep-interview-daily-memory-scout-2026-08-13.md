@@ -4,7 +4,9 @@
 > 輪數：6
 > 最終模糊度：9%
 > 狀態：正常收斂
-> 文件狀態：產品／技術規劃草案，不代表已實作、已啟用網路或已接受新的隱私邊界
+> 文件狀態：產品／技術規格正本。v0.4.0 source 已完成受限實作；仍不代表已執行真實付費請求、私人紀錄 UAT 或打包版驗收
+
+> 實作註記（2026-08-13）：ADR-0006、SQLite v3、Windows Credential Manager BYOK、Rust-only OpenAI Web Search、每日一次 guard、雙語精簡 UI、來源失效與 synthetic 測試均已落地。尚未實作的擴張項目（例如有幫助／不太有用回饋、30 組品質 eval、原生通知與公開 beta）仍維持規劃狀態。
 
 ## 結論
 
@@ -567,13 +569,8 @@ Exit：不能以 mock／browser 測試取代 packaged native proof，也不能�
 
 </details>
 
-## 下一個產品決策點
+## 下一個驗收決策點
 
-這份文件先固定產品方向與 MVP 邊界，但不授權實作或 live API 呼叫。下一步應先審查並決定：
+使用者已接受一般 API retention 告知、Windows Credential Manager BYOK、App 運行時每天最多一次且失敗不自動重試，以及先用 synthetic 證明狀態機的方向；v0.4.0 source 已依 ADR-0006 實作。這份接受不等於授權讀取任一私人紀錄、取用任何既有 secret，或執行付費 live request。
 
-1. 是否接受一般 OpenAI API 最長 30 天濫用監控保存的外送邊界；
-2. 是否接受 Windows Credential Manager 作為第一版 BYOK 保存方式；
-3. 是否接受「App 運行時、每天最多一次、失敗不自動重試」的費用上限；
-4. 是否接受先做完全 synthetic Bundle 1，再接一次明確授權的付費 live smoke。
-
-四項都接受後，再建立 Proposed ADR 與實作計畫；在此之前，Memoryling 的 runtime network／privacy 現況不變。
+下一個需要另行明確授權的 gate 是：使用一份畫面可檢查、沒有私人原文的 coarse context 與使用者自己的 API key，執行一次真實付費 smoke；之後才是打包 v0.4.0 的原生 UAT。若沒有這項授權，synthetic 測試保持為目前最終證據。

@@ -454,6 +454,16 @@ mod tests {
                 "get_memory_state",
                 "approve_memory_import",
                 "forget_memory_source",
+                "get_daily_scout_state",
+                "save_openai_api_key",
+                "test_openai_api_key",
+                "configure_daily_scout",
+                "disable_daily_scout",
+                "delete_openai_api_key",
+                "clear_daily_scout_history",
+                "reset_daily_scout",
+                "mark_daily_insight_read",
+                "open_daily_scout_link",
             ]
         );
         let sensitive = expected_permissions(SENSITIVE_MEMORY_COMMANDS);

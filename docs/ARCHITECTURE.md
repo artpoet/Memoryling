@@ -2,7 +2,7 @@
 
 ## Status
 
-This document separates the intended product architecture from the subset implemented as of 2026-08-12. The source tree is now v0.3.0: it keeps the v0.2.0 pet-first fixture pipeline and adds a version-bound, experimental Codex work／thread-history pilot. The pilot is not Codex durable memory and is not a production connector. OpenAI currently publishes no stable durable-memory export API or compatibility-guaranteed memory-file schema, so Memoryling does not parse or scan Codex tool-home memory files. The previously verified v0.2.0 installer remains the packaged no-redo baseline; no v0.3.0 installer or private-thread UAT is claimed.
+This document separates the intended product architecture from the subset implemented as of 2026-08-13. The source tree is now v0.4.0: it keeps the v0.2.0 pet-first fixture pipeline, the version-bound experimental Codex work／thread-history pilot, and adds an opt-in BYOK Daily Memory Scout. The pilot is not Codex durable memory or a production connector. Daily Scout is a separate, explicit network boundary and does not change the ordinary local-pet path. The verified v0.2.0 installer remains the packaged no-redo baseline; no v0.4.0 installer, private-thread UAT, or paid live API smoke is claimed.
 
 ## System shape
 
@@ -14,7 +14,8 @@ This document separates the intended product architecture from the subset implem
         → normalized local memory events
         → derivation engine
         → lineage-aware local store
-        → creature state, stories, conversations, reminders
+        ├─→ creature state, stories, conversations, reminders
+        └─→ optional coarse-context compiler → OpenAI Web Search → cited daily insight
         → bilingual Tauri UI
 
 Both implemented source paths produce only one deterministic, user-confirmed completion event and one completion-star effect. The bundled fixture is test infrastructure. The Codex work-record path is a source-only compatibility pilot around an experimental local host, not evidence of a supported Codex memory interface or production readiness.
@@ -24,16 +25,31 @@ Both implemented source paths produce only one deterministic, user-confirmed com
 | Layer | Responsibility | Current state |
 |---|---|---|
 | Desktop shell | Native window, lifecycle, notifications | 0.2.0 pre-creates transparent `pet` and hidden `main` windows; Rust owns native menu, tray, single-instance recovery, show／hide／focus, close／minimize／restore compensation, explicit Quit, and pet position recovery |
-| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual pet and detail surfaces plus fixture selection, experimental Codex work-record selection, redacted preview, consent, lineage, forgetting, one-time onboarding, reduced-motion handling, and a visible durable-memory-off state in desktop and browser |
+| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual pet and detail surfaces plus fixture／work-record selection, redacted preview, consent, lineage, forgetting, Daily Scout setup／result controls, one-time onboarding, reduced-motion handling, and a visible durable-memory-off state in desktop and browser |
 | Source adapters | Read an explicitly selected local source without mutating it | Fixture adapter v1 reads one fixed bundled JSON resource; experimental `codex-app-server-thread` v1 uses only local App Server stdio `thread/list` and `thread/read` behind an exact CLI version pin, without direct Codex tool-home access |
 | Import gate | Preview scope, explain access, obtain consent | Implemented for the fixture and the experimental one-thread pilot; source content and raw identifiers remain in Rust, while the UI receives only a redacted, scope-bound preview |
 | Normalizer | Convert source records into a versioned local event schema | Schema v1 supports the fixture's `completion` record only |
 | Derivation engine | Produce traits, tensions, story hooks, reminder candidates | One deterministic `completion` signal and `completion-star` world effect only |
-| Local store | Persist normalized events, consent scopes, derived effects, lineage, and settings | SQLite schema v2 stores one approved source, its canonical consent scope, normalized event, and lineage under Tauri app-local data; external lineage for the thread pilot is content-free, while shell preferences and pet position use a separate atomic JSON file |
+| Local store | Persist normalized events, consent scopes, derived effects, lineage, and settings | SQLite schema v3 stores one approved source plus Daily Scout consent, once-per-date attempts, insights, citations, and source lineage under Tauri app-local data; the OpenAI key stays outside SQLite in Windows Credential Manager |
+| Daily Scout | Compile minimized approved-work context and optionally fetch one cited insight | Source v0.4.0: Rust-only fixed OpenAI Responses API／Web Search boundary, pinned model, `store: false`, one attempt per local date, and no background service; off by default |
 | Conversation layer | Ground dialogue in approved local context | Not implemented; provider decision open |
 | Reminder policy | Enforce quiet hours, budget, urgency, and snooze state | UI concept only |
 
-## Experimental Codex work-record pilot in source v0.3.0
+## Optional Daily Memory Scout in source v0.4.0
+
+Proposed [ADR-0006](adr/0006-optional-byok-daily-memory-scout.md) defines this separate online path. It is available only after the user saves a BYOK OpenAI key, reviews the outbound summary, accepts the purpose-specific consent, and chooses a time from 08:00 through 21:59. The ordinary pet works unchanged with no key and no network request.
+
+1. The local compiler accepts only the one approved `codex-app-server-thread` source. It scans at most 12 normalized completion events for a fixed keyword allowlist and emits only coarse work domains, public tool／model labels, generic goals, non-sensitive constraints, evidence dates, and fixed insight categories. It never emits raw normalized text, prompt／answer content, path, repository URL, record or thread ID, person／client name, credential, or arbitrary extracted phrase. Synthetic fixture data is ineligible.
+2. The detail UI displays that exact coarse context before enablement. Consent binds provider `openai`, model `gpt-5.6-terra`, source IDs, categories, purpose, compiler version, automatic daily send, and a 3,000-character maximum. A context or source-scope change disables the feature until renewed consent.
+3. The API key crosses frontend IPC once as a password-field command, is immediately cleared from React state, and is stored through `keyring-core` in Windows Credential Manager. It is never returned to the WebView or placed in SQLite, JSON settings, localStorage, logs, fixtures, or repository state.
+4. Rust owns a fixed `https://api.openai.com/v1/responses` client. The request pins `gpt-5.6-terra`, `store: false`, low reasoning／verbosity, one required `web_search` tool, output limits, and instructions treating webpages as untrusted. The WebView cannot select the endpoint, authorization header, model, tools, or prompt.
+5. A SQLite immediate transaction reserves one attempt for the current local date before the HTTP call. The monotonic date guard prevents duplicate paid searches across restarts, retries, or clock rollback. Failure consumes the date and is shown honestly; missed days are not replayed. A lightweight in-process scheduler checks after startup and every 15 minutes only while Memoryling runs.
+6. A result is accepted only if the response contains a completed Web Search call, bounded message text, and at least one HTTPS `url_citation` annotation. Up to three annotation-derived links are persisted. Model-written plaintext URLs do not become links. Rust opens only the two fixed OpenAI setup URLs or an exact URL already persisted in the citation table; no general opener capability is exposed to the WebView. The floating pet receives only `off`／`waiting`／`ready`; full message and citations stay on `main`.
+7. Turning off stops future attempts without forcing history deletion. Clear-history, delete-key, and full reset are separate controls. Forgetting the supporting source deletes dependent insights and disables Daily Scout in the same transaction; the attempt ledger remains so deletion cannot buy a second search that day.
+
+The current proof is synthetic and content-free: OpenAI response parsing, citation rejection, context minimization, schema migration, credential abstraction, success／failure once-per-date behavior, ACL separation, and bilingual UI flows have automated coverage. A real API request would be paid and may involve ordinary OpenAI abuse-monitoring retention, so it remains an explicit acceptance gate rather than an inferred pass.
+
+## Experimental Codex work-record pilot introduced in source v0.3.0
 
 Official OpenAI documentation exposes the documented `thread/list` and `thread/read` method names without requiring the opt-in `experimentalApi` capability, but it still labels the overall App Server command／transport experimental and unsupported for production. Memoryling therefore treats this integration as a version-bound work／thread-history pilot, never as durable-memory access. The supporting evidence and decision boundary are recorded in the [Codex source-format evaluation](research/2026-08-12_codex-source-format-evaluation.md) and proposed [ADR-0005](adr/0005-codex-thread-history-source-pilot.md).
 
@@ -65,7 +81,7 @@ one Tauri process
 
 Both WebViews are pre-created hidden; Rust setup shows only `pet`, avoiding handler-time WebView construction. The pet is transparent, undecorated, skip-taskbar, non-closable, always-on-top by default, and resizes from the 360 × 430 logical onboarding envelope to the 320 × 320 compact envelope while preserving its screen anchor. Rust owns show, hide, focus, `main` `CloseRequested` interception, pending-preview reset, native menu, tray, position recovery, and explicit Quit. Lifecycle transitions use compensating rollback so a failed second window operation leaves one recoverable surface rather than two visible windows or none.
 
-The build uses `tauri_build::AppManifest::commands` and exact local-only `main`／`pet` capabilities; neither surface inherits `core:default`, remote scopes, wildcards, or deny-pattern ambiguity. Fixture list／preview, Codex list／preview, cancel, full-state, approve, and forget are `main`-only and also require a `MainCaller` whose WebView and native-window labels both match. `pet` receives only render-safe state, shell state, menu, onboarding, and `start_pet_dragging` app commands plus event listen／unlisten. The drag command acts only on the caller's pet window, so pet JavaScript cannot select and drag `main` through a generic core window API. A production-authority invoke harness denies all eight sensitive commands at the ACL layer, and a separate empty-authority harness proves the caller guard denies the same eight before handler body entry; a `main` list invoke is the positive control.
+The build uses `tauri_build::AppManifest::commands` and exact local-only `main`／`pet` capabilities; neither surface inherits `core:default`, remote scopes, wildcards, or deny-pattern ambiguity. Fixture／Codex content commands and all Daily Scout management／network commands are `main`-only and also require a `MainCaller` whose WebView and native-window labels both match. `pet` receives only render-safe state, shell state, menu, onboarding, and its guarded drag command plus event listen／unlisten. The drag command acts only on the caller's pet window, so pet JavaScript cannot select and drag `main` through a generic core window API. Production-authority and empty-authority invoke harnesses prove both ACL and caller-label denial across the full sensitive-command manifest; a `main` list invoke is the positive control.
 
 `CreatureRenderState` contains only bounded appearance parameters, neutral fixture state, opaque mark IDs, and a 64-hex revision. Approve and forget emit the same content-free `{revision}` notification to both surfaces, which then refetch their typed state; event-delivery failure does not roll back a committed memory transaction. No memory text, path, locator, explanation, source identity, or content hash enters pet IPC, native menu labels, tray labels, window titles, or operating-system notifications. Closing details cancels any pending preview in Rust before hiding because hiding a WebView does not unmount it; minimizing preserves the preview.
 
@@ -75,7 +91,7 @@ Pet position is stored in a content-free JSON record with monitor identity, work
 
 ### 0.2.0 verification snapshot
 
-- Historical v0.2.0 automated evidence: 23 frontend tests and 29 Rust tests passed. That snapshot covered concurrent first-open migration, lifecycle compensation, position／anchor recovery, content-minimized DTOs, exact capabilities, and the then-current six-command denial layers. Source v0.3.0 extends both denial layers to eight commands; its current automated and content-free compatibility evidence is recorded separately from the unchanged installer baseline.
+- Historical v0.2.0 automated evidence: 23 frontend tests and 29 Rust tests passed. That snapshot covered concurrent first-open migration, lifecycle compensation, position／anchor recovery, content-minimized DTOs, exact capabilities, and the then-current six-command denial layers. Source v0.3.0 extended both layers to eight memory commands; source v0.4.0 also covers all ten Daily Scout commands. This current evidence remains separate from the unchanged installer baseline.
 - Native and packaged evidence: transparent pet／first-run onboarding, pointer and focused-keyboard native menu paths, close／minimize／restore, single-instance recovery, explicit native Quit, raw movement／second-monitor observation, and core pet／main state transitions pass on the current Windows host. Tray actions and position recovery have automated evidence; their remaining live matrix is not inferred from that.
 - Fixture evidence: raw bundled fixture preview and approval, restart persistence, source → event → signal → completion-star lineage, cross-surface state, and complete forgetting pass; no real source was used.
 - Installer evidence: a normal Explorer-launched NSIS current-user install, actual installed Start shortcut cold launch and resident relaunch, explicit Quit, and uninstall with retained app data pass. The retained files were checked only as local app-data state, not committed or printed.
@@ -107,7 +123,7 @@ The complete source → event → signal → effect graph is queried back from S
 
 ## Future creature-growth boundary
 
-Everything in this section is a future Phase 2 proposal unless explicitly identified as current fixture or v0.3.0 pilot behavior. Source v0.3.0 persists one versioned consent-scope row for the one approved fixture or work-record source, but that scope exists only to bind the current import contract and local derivation purpose. It does not authorize automatic future-record intake, source expansion, live Agent observation, A／B／C evidence classification, outcome-group accumulation, or creature-morphology compilation.
+Everything in this section is a future Phase 2 proposal unless explicitly identified as current fixture, work-record pilot, or Daily Scout behavior. Source v0.4.0 persists one versioned import consent-scope row for the one approved source, but that scope exists only to bind the import contract and local derivation purpose. Daily Scout's separate consent authorizes only its coarse daily-search context; neither scope authorizes automatic future-record intake, source expansion, live Agent observation, A／B／C evidence classification, outcome-group accumulation, or creature-morphology compilation.
 
 ### Future expanded source-consent scope
 
@@ -172,7 +188,7 @@ A connector must:
 6. fail closed when a format is unknown;
 7. never collect credentials from source files.
 
-The fixture adapter satisfies this contract for its fixed synthetic resource. The v0.3.0 `codex-app-server-thread` adapter applies the same contract to one explicitly selected completed Codex work thread through the exact pinned local CLI, but remains experimental because App Server is not production-supported. It does not establish a Codex durable-memory format, export contract, or permission to scan arbitrary home directories. A future production adapter still requires an officially supported interface, a fresh privacy review, and its own acceptance evidence.
+The fixture adapter satisfies this contract for its fixed synthetic resource. The v0.4.0 `codex-app-server-thread` adapter applies the same contract to one explicitly selected completed Codex work thread through the exact pinned local CLI, but remains experimental because App Server is not production-supported. It does not establish a Codex durable-memory format, export contract, or permission to scan arbitrary home directories. A future production adapter still requires an officially supported interface, a fresh privacy review, and its own acceptance evidence.
 
 ## Trust boundaries
 
@@ -187,7 +203,7 @@ The fixture adapter satisfies this contract for its fixed synthetic resource. Th
 
 - embedded local model versus optional remote conversation provider;
 - a production-supported Codex durable-memory export／API or supported successor to the experimental App Server pilot;
-- migration strategy after SQLite schema v2;
+- migration strategy after SQLite schema v3;
 - remaining Windows resident-shell acceptance across live DPI／monitor／taskbar changes, desktop hitbox, accessibility, and session shutdown;
 - derivations and signal-to-genome mappings beyond the deterministic completion-star boundary;
 - approved-activity taxonomy, signal-to-profile mapping, quantization rules, and mapping-version migration;

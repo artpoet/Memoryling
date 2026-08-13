@@ -11,7 +11,7 @@ export interface CreatureMarkRenderState {
 }
 
 export interface CreatureRenderState {
-  schemaVersion: 2;
+  schemaVersion: 3;
   revision: string;
   realMemoryAccess: "off";
   importState: "empty" | "fixture-approved" | "thread-approved";
@@ -19,6 +19,7 @@ export interface CreatureRenderState {
   bodyModule: "baseline";
   palette: "violet-mint";
   motion: "calm";
+  dailyScoutState: "off" | "waiting" | "ready";
   marks: CreatureMarkRenderState[];
 }
 
@@ -82,7 +83,7 @@ export const nativeDetailShellClient: DetailShellClient = {
 };
 
 export const baselineCreatureRenderState: CreatureRenderState = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   revision: "0".repeat(64),
   realMemoryAccess: "off",
   importState: "empty",
@@ -90,6 +91,7 @@ export const baselineCreatureRenderState: CreatureRenderState = {
   bodyModule: "baseline",
   palette: "violet-mint",
   motion: "calm",
+  dailyScoutState: "off",
   marks: [],
 };
 
@@ -110,7 +112,7 @@ export function sanitizeCreatureRenderState(value: unknown): CreatureRenderState
   if (!value || typeof value !== "object") return baselineCreatureRenderState;
   const state = value as Partial<CreatureRenderState>;
   const valid =
-    state.schemaVersion === 2 &&
+    state.schemaVersion === 3 &&
     isValidRevision(state.revision) &&
     state.realMemoryAccess === "off" &&
     (state.importState === "empty" ||
@@ -120,6 +122,9 @@ export function sanitizeCreatureRenderState(value: unknown): CreatureRenderState
     state.bodyModule === "baseline" &&
     state.palette === "violet-mint" &&
     state.motion === "calm" &&
+    (state.dailyScoutState === "off" ||
+      state.dailyScoutState === "waiting" ||
+      state.dailyScoutState === "ready") &&
     Array.isArray(state.marks) &&
     state.marks.every(
       (mark) =>
@@ -130,7 +135,7 @@ export function sanitizeCreatureRenderState(value: unknown): CreatureRenderState
     );
   if (!valid) return baselineCreatureRenderState;
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     revision: state.revision!,
     realMemoryAccess: "off",
     importState: state.importState!,
@@ -138,6 +143,7 @@ export function sanitizeCreatureRenderState(value: unknown): CreatureRenderState
     bodyModule: "baseline",
     palette: "violet-mint",
     motion: "calm",
+    dailyScoutState: state.dailyScoutState!,
     marks: state.marks!.map((mark) => ({ id: mark.id, style: mark.style })),
   };
 }

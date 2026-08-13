@@ -26,7 +26,7 @@ const flowCopy = {
     title: "From approved work to an explainable mark",
     body:
       "Try the bundled synthetic fixture, or explicitly choose one local Codex work record. Codex durable memories are not connected.",
-    localBadge: "LOCAL SQLITE · NO NETWORK",
+    localBadge: "LOCAL SQLITE · LOCAL IMPORT",
     booting: "Opening the local memory store…",
     unavailableTitle: "Desktop runtime required",
     unavailableBody:
@@ -52,7 +52,7 @@ const flowCopy = {
     scopeTitle: "Exact access boundary",
     scopeItems: [
       "No Codex durable-memory access or arbitrary file scanning",
-      "No source writes and no Memoryling network request",
+      "No source writes; this import makes no network request",
       "Only an explicitly selected record may be inspected",
       "Preview remains temporary until exact consent is approved",
     ],
@@ -122,7 +122,7 @@ const flowCopy = {
     title: "從核准工作，到可解釋的印記",
     body:
       "你可以試用打包的合成 fixture，或明確選擇一筆本機 Codex 工作紀錄；Codex durable memories 尚未連線。",
-    localBadge: "本機 SQLITE · 無網路傳輸",
+    localBadge: "本機 SQLITE · 本機匯入",
     booting: "正在開啟本機記憶資料庫…",
     unavailableTitle: "需要桌面版執行環境",
     unavailableBody: "瀏覽器預覽維持記憶存取關閉，也不能瀏覽 Codex 工作紀錄。",
@@ -147,7 +147,7 @@ const flowCopy = {
     scopeTitle: "精確存取邊界",
     scopeItems: [
       "不存取 Codex durable memory，也不掃描任意檔案",
-      "不修改來源，Memoryling 也不發出網路請求",
+      "不修改來源；這個匯入流程不發出網路請求",
       "只檢查你明確選定的單一紀錄",
       "精確核准前，預覽只會暫存在記憶體",
     ],

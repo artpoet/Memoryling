@@ -7,5 +7,6 @@
 | [0003](0003-pet-first-two-window-desktop-shell.md) | Pet-first two-window desktop shell | Proposed |
 | [0004](0004-deterministic-content-derived-evolution-paths.md) | Deterministic content-derived evolution paths | Proposed |
 | [0005](0005-codex-thread-history-source-pilot.md) | Codex thread-history source pilot | Proposed |
+| [0006](0006-optional-byok-daily-memory-scout.md) | Optional BYOK Daily Memory Scout | Proposed |
 
 New ADRs should record context, decision, consequences, rejected alternatives, and privacy impact. Supersede earlier ADRs rather than rewriting their history.

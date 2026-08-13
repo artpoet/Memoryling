@@ -108,6 +108,21 @@ describe("pet surface", () => {
     expect(fixture.client.getRenderState).toHaveBeenCalledTimes(2);
   });
 
+  test("shows only a neutral pet notice when a daily insight is ready", async () => {
+    const fixture = createClient({
+      ...threadApprovedState,
+      dailyScoutState: "ready",
+    });
+    render(<PetSurface client={fixture.client} />);
+
+    expect(
+      await screen.findByText(
+        "I found something useful for you. Open Memoryling to see it.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Official guide|https:\/\//)).not.toBeInTheDocument();
+  });
+
   test("allows a failed revision fetch to retry when the same event is emitted", async () => {
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);

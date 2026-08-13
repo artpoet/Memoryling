@@ -1,16 +1,19 @@
 mod caller;
 #[path = "../command_manifest.rs"]
 mod command_manifest;
+mod daily_scout;
 mod desktop_shell;
 mod memory;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
             let _ = desktop_shell::open_detail_and_finish_onboarding(app);
         }))
         .manage(memory::PendingImports::default())
+        .manage(daily_scout::DailyScoutService::default())
         .invoke_handler(tauri::generate_handler![
             memory::list_memory_sources,
             memory::preview_memory_source,
@@ -21,6 +24,16 @@ pub fn run() {
             memory::approve_memory_import,
             memory::forget_memory_source,
             memory::get_creature_render_state,
+            daily_scout::get_daily_scout_state,
+            daily_scout::save_openai_api_key,
+            daily_scout::test_openai_api_key,
+            daily_scout::configure_daily_scout,
+            daily_scout::disable_daily_scout,
+            daily_scout::delete_openai_api_key,
+            daily_scout::clear_daily_scout_history,
+            daily_scout::reset_daily_scout,
+            daily_scout::mark_daily_insight_read,
+            daily_scout::open_daily_scout_link,
             desktop_shell::show_pet_context_menu,
             desktop_shell::get_pet_shell_state,
             desktop_shell::dismiss_pet_onboarding,
@@ -29,7 +42,11 @@ pub fn run() {
         ])
         .on_menu_event(desktop_shell::handle_menu_event)
         .on_window_event(desktop_shell::handle_window_event)
-        .setup(desktop_shell::setup)
+        .setup(|app| {
+            desktop_shell::setup(app)?;
+            daily_scout::setup(app);
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -46,7 +63,10 @@ mod invoke_security_tests {
         WebviewWindowBuilder,
     };
 
-    use super::memory::{self, PendingImports, SENSITIVE_HANDLER_ENTRIES};
+    use super::{
+        daily_scout::{self, DailyScoutService},
+        memory::{self, PendingImports, SENSITIVE_HANDLER_ENTRIES},
+    };
 
     fn request(command: &str, body: Value) -> InvokeRequest {
         InvokeRequest {
@@ -93,6 +113,31 @@ mod invoke_security_tests {
                 "forget_memory_source",
                 json!({ "sourceId": "codex.synthetic.first-memory" }),
             ),
+            ("get_daily_scout_state", json!({})),
+            (
+                "save_openai_api_key",
+                json!({ "apiKey": "synthetic-key-never-reaches-handler" }),
+            ),
+            ("test_openai_api_key", json!({})),
+            (
+                "configure_daily_scout",
+                json!({
+                    "request": {
+                        "locale": "en",
+                        "deliveryTime": "10:00",
+                        "consentAccepted": true
+                    }
+                }),
+            ),
+            ("disable_daily_scout", json!({})),
+            ("delete_openai_api_key", json!({})),
+            ("clear_daily_scout_history", json!({})),
+            ("reset_daily_scout", json!({})),
+            ("mark_daily_insight_read", json!({})),
+            (
+                "open_daily_scout_link",
+                json!({ "request": { "kind": "api-keys" } }),
+            ),
         ]
     }
 
@@ -102,6 +147,7 @@ mod invoke_security_tests {
             SENSITIVE_HANDLER_ENTRIES.store(0, Ordering::SeqCst);
             let app = mock_builder()
                 .manage(PendingImports::default())
+                .manage(DailyScoutService::default())
                 .invoke_handler(tauri::generate_handler![
                     memory::list_memory_sources,
                     memory::preview_memory_source,
@@ -111,6 +157,16 @@ mod invoke_security_tests {
                     memory::get_memory_state,
                     memory::approve_memory_import,
                     memory::forget_memory_source,
+                    daily_scout::get_daily_scout_state,
+                    daily_scout::save_openai_api_key,
+                    daily_scout::test_openai_api_key,
+                    daily_scout::configure_daily_scout,
+                    daily_scout::disable_daily_scout,
+                    daily_scout::delete_openai_api_key,
+                    daily_scout::clear_daily_scout_history,
+                    daily_scout::reset_daily_scout,
+                    daily_scout::mark_daily_insight_read,
+                    daily_scout::open_daily_scout_link,
                 ])
                 .build(tauri::generate_context!(test = true))
                 .expect("production-authority mock app should build");
@@ -147,6 +203,7 @@ mod invoke_security_tests {
         SENSITIVE_HANDLER_ENTRIES.store(0, Ordering::SeqCst);
         let app = mock_builder()
             .manage(PendingImports::default())
+            .manage(DailyScoutService::default())
             .invoke_handler(tauri::generate_handler![
                 memory::list_memory_sources,
                 memory::preview_memory_source,
@@ -156,6 +213,16 @@ mod invoke_security_tests {
                 memory::get_memory_state,
                 memory::approve_memory_import,
                 memory::forget_memory_source,
+                daily_scout::get_daily_scout_state,
+                daily_scout::save_openai_api_key,
+                daily_scout::test_openai_api_key,
+                daily_scout::configure_daily_scout,
+                daily_scout::disable_daily_scout,
+                daily_scout::delete_openai_api_key,
+                daily_scout::clear_daily_scout_history,
+                daily_scout::reset_daily_scout,
+                daily_scout::mark_daily_insight_read,
+                daily_scout::open_daily_scout_link,
             ])
             .build(mock_context(noop_assets()))
             .expect("empty-authority caller-guard mock app should build");

@@ -8,7 +8,7 @@ The only packaged Memoryling build with completed installation UAT is the **pet-
 
 It does **not** read real Codex memory, scan a Codex tool-home, accept arbitrary files, or connect to a production memory source. The app must continue to show that durable-memory access is off, including while the synthetic fixture pilot is active.
 
-Separately, the repository source tree is at v0.3.0 and implements a version-bound experimental **Codex work-record／thread-history** pilot for developer evaluation. It is not present in the tested v0.2.0 installer, is not a durable-memory connector, and has not received an authorized private-thread UAT. See [Development source only: experimental Codex work-record pilot](#development-source-only-experimental-codex-work-record-pilot).
+Separately, the repository source tree is at v0.4.0. It includes the version-bound experimental **Codex work-record／thread-history** pilot and the optional **Daily Memory Scout**. Neither is present in the tested v0.2.0 installer; private-record, paid API, and packaged v0.4.0 acceptance remain unclaimed.
 
 This test build is not a signed or public release-ready package.
 
@@ -106,7 +106,7 @@ Forgetting removes the app's local imported copy and supported downstream graph.
 
 ## Development source only: experimental Codex work-record pilot
 
-OpenAI does not currently publish a stable Codex durable-memory export API or a compatibility-guaranteed memory-file schema for this integration. The v0.3.0 source implementation therefore evaluates **Codex work records／thread history**, not “Codex memories,” through a narrow local App Server stdio boundary. The App Server host remains experimental and unsupported for production.
+OpenAI does not currently publish a stable Codex durable-memory export API or a compatibility-guaranteed memory-file schema for this integration. The v0.4.0 source implementation therefore evaluates **Codex work records／thread history**, not “Codex memories,” through a narrow local App Server stdio boundary. The App Server host remains experimental and unsupported for production.
 
 This pilot is fail-closed and requires the standard local Codex Desktop CLI to report exactly `codex-cli 0.134.0`. It does not claim compatibility with earlier or later CLI versions. Its intended developer flow is:
 
@@ -122,6 +122,18 @@ The adapter is read-only. It accepts no arbitrary path, does not scan Codex dura
 
 Durable-memory access must remain visibly off. As of 2026-08-12, private-thread UAT has neither been authorized nor performed. Do not browse or read a private thread for acceptance until the user explicitly names the source／thread scope; even a later successful UAT would validate only this pinned experimental pilot, not a production connector or Phase 1 completion.
 
+## Development source only: optional Daily Memory Scout
+
+The v0.4.0 source detail window introduces **Daily Memory Scout** as a compact opt-in panel. The ordinary pet does not need an API. To enable it:
+
+1. First approve one supported Codex work record. Synthetic fixture data is never sent.
+2. Paste a personal OpenAI API key and save it to Windows Credential Manager. The field clears immediately and the saved key cannot be shown again. Use the in-app official links to create a key or read the API guide.
+3. Review the displayed coarse work summary. It may contain work categories, public tool／model names, generic goals, non-sensitive constraints, and dates. It excludes prompt／answer text, paths, repository URLs, thread IDs, credentials, and arbitrary private phrases.
+4. Choose a time from 08:00 through 21:59, accept the cost／retention disclosure, and enable. While Memoryling is running, it will make at most one Web Search attempt per local date; a failure is not retried that day and missed days are not replayed.
+5. Open the detail window when the pet says it found something useful. The compact card shows a short message, why it matches, search time, and up to three annotation-derived source links.
+
+OpenAI is the only provider in this milestone. Rust fixes `gpt-5.6-terra`, the official endpoint, Web Search, and `store: false`. API usage may cost money, and ordinary OpenAI abuse-monitoring retention may still be up to 30 days. **Turn off** stops future attempts; **Clear local insight**, **Delete key**, and the full reset are separate controls. Forgetting the supporting work source removes dependent insights and disables this consent. No real paid request has been used as acceptance evidence yet.
+
 ## Local data and uninstall behavior
 
 Memoryling's current-user app data is stored under:
@@ -130,7 +142,8 @@ Memoryling's current-user app data is stored under:
 
 The folder can include:
 
-- `memoryling.sqlite3`, containing approved normalized fixture text, hashes, lineage, and derived state; a v0.3.0 development source build can also retain the one selected final answer as normalized text, but only after the explicit pilot consent described above;
+- `memoryling.sqlite3`, containing approved normalized fixture／work-record text, hashes, lineage, derived state, and—when enabled—Daily Scout settings, attempt status, cited insights, and source lineage;
+- the OpenAI API key is separate and stored in Windows Credential Manager, not this folder;
 - `desktop-shell-v1.json` and a possible `desktop-shell-v1.json.bak`, containing only local shell settings such as onboarding, always-on-top, and safe pet position state;
 - WebView runtime data such as `EBWebView`.
 
@@ -142,7 +155,9 @@ Do not share, attach, print, or commit a real local database. Although the curre
 
 ## Troubleshooting boundaries
 
-- **The app says durable-memory access is off:** expected. The tested v0.2.0 installer has no real source connector, and the v0.3.0 source pilot reads explicitly selected work history rather than Codex durable memory.
+- **The app says durable-memory access is off:** expected. The tested v0.2.0 installer has no real source connector, and the v0.4.0 source pilot reads explicitly selected work history rather than Codex durable memory.
+- **Daily Scout is disabled:** save a key, approve one supported work record, review the outbound context, and consent. It deliberately stays off in browser preview and for the synthetic fixture.
+- **Today's search failed:** it will not retry automatically today. Check the API account or connection, then wait until the next local date; do not delete history to force a second paid attempt.
 - **The Codex work browser says the CLI version is unsupported:** expected fail-closed behavior unless the standard local Codex Desktop CLI reports exactly `codex-cli 0.134.0`. Do not bypass the pin or point the app at an arbitrary executable.
 - **The browser preview stays in the detail layout:** expected. Browser mode does not imitate the native floating pet, context menu, tray, single-instance lifecycle, SQLite, or persistence.
 - **WebView2 installation fails:** stop and retry only through the trusted installer and a trusted network or obtain WebView2 through an official Microsoft channel. Do not use an unknown third-party runtime download.

@@ -118,7 +118,7 @@ export interface MemoryClient {
 }
 
 export const emptyMemoryState: MemoryState = {
-  storeSchemaVersion: 2,
+  storeSchemaVersion: 3,
   sourceCount: 0,
   eventCount: 0,
   signalCount: 0,

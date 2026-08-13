@@ -33,6 +33,7 @@ const petCopy = {
     skip: "Got it",
     loading: "Waking up locally",
     reaction: "Memoryling gives a quiet blink.",
+    scoutReady: "I found something useful for you. Open Memoryling to see it.",
   },
   "zh-TW": {
     label: "Memoryling。記憶存取關閉。按右鍵開啟選單；拖曳即可移動。",
@@ -48,6 +49,7 @@ const petCopy = {
     skip: "知道了",
     loading: "正在本機醒來",
     reaction: "Memoryling 安靜地眨了眨眼。",
+    scoutReady: "我找到一則可能對你有用的情報，打開 Memoryling 看看吧。",
   },
 } as const;
 
@@ -91,6 +93,7 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
     (mark) => mark.style === "completion-star",
   );
   const hasThreadImport = renderState.importState === "thread-approved";
+  const scoutReady = renderState.dailyScoutState === "ready";
 
   useEffect(() => {
     document.title = "Memoryling";
@@ -219,6 +222,12 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
       <p className="pet-access-badge">
         {hasThreadImport ? t.threadActive : t.accessOff}
       </p>
+
+      {scoutReady && !onboardingVisible && (
+        <p className="pet-scout-ready" role="status">
+          {t.scoutReady}
+        </p>
+      )}
 
       {onboardingVisible && (
         <section className="pet-onboarding" aria-labelledby="pet-onboarding-title">
