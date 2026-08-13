@@ -24,7 +24,7 @@ export function ProceduralMemorySeed({
       aria-hidden="true"
       className="memory-seed-renderer"
       data-body-module={bodyModule}
-      data-renderer="procedural-svg-v5"
+      data-renderer="procedural-svg-v6"
       data-stage={stage}
       data-testid="memoryling-seed-renderer"
       focusable="false"
@@ -130,11 +130,12 @@ export function ProceduralMemorySeed({
       </g>
 
       <g className="seed-petals" stroke="#d8caff" strokeOpacity="0.2" strokeWidth="1">
+        <path className="seed-side-plate-rim" d="M45 126C37 142 37 162 46 180C55 197 70 209 88 215L91 209C74 203 61 191 52 175C44 158 44 142 50 131Z" fill="#3f2c77" opacity="0.6" stroke="none" />
+        <path className="seed-side-plate-rim" d="M195 126C203 142 203 162 194 180C185 197 170 209 152 215L149 209C166 203 179 191 188 175C196 158 196 142 190 131Z" fill="#3f2c77" opacity="0.6" stroke="none" />
         <path className="seed-side-plate" d="M45 128C66 142 93 174 113 219C90 214 66 198 52 176C43 161 41 142 45 128Z" fill={`url(#${leafGradient})`} />
         <path className="seed-side-plate" d="M195 128C174 142 147 174 127 219C150 214 174 198 188 176C197 161 199 142 195 128Z" fill={`url(#${leafGradient})`} />
-        <path className="seed-inner-plate seed-inner-plate-back" d="M173 176C150 182 133 199 121 221C144 220 165 201 173 176Z" fill={`url(#${petalGradient})`} opacity="0.88" />
-        <path className="seed-plate-thickness" d="M121 218C139 216 152 207 161 195C151 209 140 221 121 224Z" fill="#4a337f" opacity="0.46" stroke="none" />
-        <path className="seed-inner-plate seed-inner-plate-front" d="M68 173C91 180 109 197 122 218C99 218 77 199 68 173Z" fill={`url(#${petalGradient})`} />
+        <path className="seed-inner-plate" d="M68 174C91 181 108 198 120 219C97 217 77 199 68 174Z" fill={`url(#${petalGradient})`} />
+        <path className="seed-inner-plate" d="M172 174C149 181 132 198 120 219C143 217 163 199 172 174Z" fill={`url(#${petalGradient})`} />
         <path d="M78 179C96 187 109 201 118 215" fill="none" opacity="0.2" stroke="#f1eaff" strokeLinecap="round" strokeWidth="1.5" />
         <path d="M163 183C148 190 136 203 126 217" fill="none" opacity="0.17" stroke="#d8caff" strokeLinecap="round" strokeWidth="1.4" />
         <path d="M52 143C71 157 91 181 106 207" fill="none" opacity="0.34" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />

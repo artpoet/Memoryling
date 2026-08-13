@@ -1,9 +1,10 @@
 # Memoryling procedural seed visual QA
 
 - Source visual truth: `C:\Users\user\AppData\Local\Temp\memoryling-approved-seed-crop.png`
-- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v5-final.png`
-- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-ai-v4-v5-final-clean.png`
-- Focused lower-plate comparison: `C:\Users\user\AppData\Local\Temp\memoryling-v4-v5-bottom-depth-final.png`
+- User annotation for edge thickness: `C:\Users\user\AppData\Local\Temp\codex-clipboard-bbc3e051-1a81-4bdc-a167-fb041e31c39d.png`
+- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v6-edge-rims-pass2.png`
+- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-ai-v5-v6-outer-rims-full.png`
+- Focused annotated comparison: `C:\Users\user\AppData\Local\Temp\memoryling-marked-v5-v6-outer-rims-focus.png`
 - State: seed-stage pet, neutral resting frame, no completion mark
 - Viewport: implementation rendered headlessly at 320 × 320 CSS px and device scale 1
 - Dimensions: source concept crop 190 × 230 px; implementation 320 × 320 px
@@ -11,16 +12,17 @@
 
 ## Findings
 
-- No actionable P0／P1／P2 mismatch remains for the requested facet and lower-plate depth pass. Renderer v5 adds four restrained translucent shell planes; they register as soft refraction at full size without obscuring the face or turning the apex into a hard crown.
-- The lower inner plates are no longer exact mirrors. The right plate is drawn first and sits slightly behind／lower; one narrow darker thickness shape follows it; the left plate is drawn last and overlaps in front. The focused comparison makes the small offset and central occlusion visible without reading as a hole or broken shell.
-- The accepted v4 shell width, pointed apex, rounded base, eye size／spacing, memory core, and outer side plates remain unchanged.
+- No actionable P0／P1／P2 mismatch remains for the corrected meaning of plate thickness. Renderer v6 removes the mistakenly centered thickness block and restores a clean balanced lower seam.
+- Two code-generated dark-violet rim shapes now sit behind the left／right side plates and extend beyond the main shell silhouette through the outside midsection. The focused comparison aligns directly with the user's orange-marked regions.
+- Pass 1 allowed the rims to extend too far around the bottom and read like extra wings. Pass 2 shortens and lightens them so they taper away before the base, reading as plate thickness rather than a new appendage or full outline.
+- The accepted v5 shell width, pointed apex, rounded base, eye size／spacing, memory core, and restrained facets remain unchanged.
 - The procedural renderer remains cleaner and less irregular than the AI reference. This is an accepted P3 difference: production must remain deterministic, layer-addressable program-generated SVG rather than a raster asset.
 
 ## Required fidelity surfaces
 
 - Fonts and typography: not applicable to the creature-only comparison; pet status typography is unchanged.
-- Spacing and layout rhythm: the full silhouette and face retain v4 proportions; only the lower inner plates gain a roughly three-unit vertical／horizontal stagger and front-to-back overlap. The pointed apex and rounded base remain intact within the unchanged 320 × 320 compact envelope.
-- Colors and tokens: violet body, indigo eyes, mint core, pale-lilac plates, restrained glow, and low-opacity lavender facet planes remain consistent with the accepted concept family. The plate thickness edge is dark violet rather than black.
+- Spacing and layout rhythm: the full silhouette and face retain v5 proportions; only the side-plate outer contour expands locally by roughly 5–8 viewBox units. The rim retracts before the rounded base and remains inside the unchanged 320 × 320 compact envelope.
+- Colors and tokens: violet body, indigo eyes, mint core, pale-lilac plates, restrained glow, and low-opacity lavender facet planes remain consistent with the accepted concept family. The exposed side rims are translucent dark violet rather than black.
 - Image quality and asset fidelity: the implementation is vector-sharp and transparent. No generated raster, embedded `<image>`, or runtime bitmap is used; the accepted AI image is reference-only by explicit product decision.
 - Copy and content: no creature copy changed; the required access-off text remains outside the renderer.
 - Accessibility and behavior: paired blink is one motion unit and the existing reduced-motion path remains intact; the pet's accessible label and interaction surface are unchanged.
@@ -39,9 +41,11 @@
 10. The final three-way equal-height comparison shows v4 is visibly fuller than v3 while remaining a vertical seed form; the eye change is noticeable but restrained, and no P0／P1／P2 proportion issue remains for this request.
 11. User asked to continue the crystal／biological polish and identified that the two lowest plates should be slightly staggered with visible thickness. A red-light contract required four facet layers, explicit back／front plate order, asymmetric paths, and one thickness edge before implementation.
 12. V5 pass 1 established the overlap but made the rear plate too dark, reading as a hole. Pass 2 restored the shared petal gradient and narrowed／lightened the thickness edge. The final full and focused comparisons show a subtle right-back／left-front overlap with no remaining P0／P1／P2 issue.
+13. User clarified with an annotated screenshot that “thickness” meant the left／right plate edges should protrude beyond the body outline, not that the two inner plates should overlap at the center. A red-light contract required two outer rims and no center thickness layer before implementation.
+14. V6 pass 1 moved thickness to the correct sides but extended too far toward the bottom, resembling extra wings. Pass 2 shortened and softened the rims. The final full and annotated focused comparisons show the protrusion at the requested side edges with a clean lower seam and no remaining P0／P1／P2 issue.
 
 ## Follow-up polish
 
-- P3: future renderer work could add slightly more irregular biological contour variation, without changing the accepted v5 facet contrast or lower-plate overlap and without importing a raster pet asset.
+- P3: future renderer work could add slightly more irregular biological contour variation, without changing the accepted v6 facet contrast or side-rim protrusion and without importing a raster pet asset.
 
 final result: passed
