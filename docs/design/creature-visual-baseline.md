@@ -11,9 +11,9 @@ Memoryling starts as a compact violet **memory seed**: an egg-like silhouette wi
 - `palette: violet-mint`
 - `motion: calm`
 
-The desktop body is generated at runtime by the layered React SVG renderer in `src/ProceduralMemorySeed.tsx` (`procedural-svg-v1`). Its shell, sprouts, eyes, memory core, lower plates, highlights, and motion remain individually addressable code layers; the desktop pet does not load a raster creature image.
+The desktop body is generated at runtime by the layered React SVG renderer in `src/ProceduralMemorySeed.tsx` (`procedural-svg-v2`). Its shell, sprouts, eyes, memory core, lower plates, highlights, and motion remain individually addressable code layers; the desktop pet does not load a raster creature image. The v2 face proportions are grounded in the accepted AI concept reference, but every visible production layer remains deterministic program-generated SVG.
 
-The paired eyes are a single synchronized motion unit: their primary ellipses share one vertical center and they blink together. Do not reintroduce independent eye timing, per-eye transforms, or asymmetrical offsets that can make the face read as misregistered. On the compact pet surface, the required memory-access-off truth remains visible as quiet inline text rather than a pill, button, card, shadow, or other interactive-looking control.
+The paired eyes are a single synchronized motion unit: their primary ellipses share one vertical center, sit at `x=96／144` in the 240-unit viewBox, and blink together. The slightly larger eyes, shorter eye-to-mouth gap, prominent memory core, outward leaf sprouts, and four continuous plates that hug the cheeks and meet at the base are deliberate juvenile／cute proportions from the accepted concept. Do not reintroduce independent eye timing, per-eye transforms, asymmetrical offsets, or detached necklace-like lower petals. On the compact pet surface, the required memory-access-off truth remains visible as quiet inline text rather than a pill, button, card, shadow, or other interactive-looking control.
 
 The checked-in transparent PNGs under `src-tauri/icons/` and `src/assets/memoryling-icon.png` are packaging／brand references only. They are not runtime pet sprites, renderer inputs, or future growth states. Earlier AI concept images likewise remain visual references only.
 

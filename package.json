@@ -9,6 +9,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "render:seed": "node scripts/render-procedural-seed.mjs",
     "tauri": "tauri",
     "build:windows": "tauri build --bundles nsis --ci",
     "test": "vitest run",

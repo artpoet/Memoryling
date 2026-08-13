@@ -128,7 +128,7 @@ describe("pet surface", () => {
 
     const renderer = await screen.findByTestId("memoryling-seed-renderer");
     expect(renderer.tagName).toBe("svg");
-    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v1");
+    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v2");
     expect(renderer).toHaveAttribute("data-stage", "seed");
     expect(renderer).toHaveAttribute(
       "data-body-module",
@@ -149,10 +149,15 @@ describe("pet surface", () => {
       Array.from(eyeShapes, (eye) => eye.getAttribute("cy")),
     ).toEqual(["120", "120"]);
     expect(
+      Array.from(eyeShapes, (eye) => eye.getAttribute("cx")),
+    ).toEqual(["96", "144"]);
+    expect(
       Array.from(pairedEyes?.querySelectorAll(".seed-eye") ?? [], (eye) =>
         eye.getAttribute("transform"),
       ),
     ).toEqual([null, null]);
+    expect(renderer.querySelectorAll(".seed-side-plate")).toHaveLength(2);
+    expect(renderer.querySelectorAll(".seed-inner-plate")).toHaveLength(2);
 
     const accessStatus = screen.getByText("Memory access off");
     expect(accessStatus).toHaveClass("pet-access-status");
