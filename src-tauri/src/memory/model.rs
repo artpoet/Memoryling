@@ -173,6 +173,7 @@ pub struct CreatureRenderState {
     pub real_memory_access: RealMemoryAccess,
     pub import_state: ImportState,
     pub envelope: CreatureEnvelope,
+    pub stage: CreatureStage,
     pub body_module: BodyModule,
     pub palette: CreaturePalette,
     pub motion: CreatureMotion,
@@ -211,7 +212,13 @@ pub enum CreatureEnvelope {
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum BodyModule {
-    Baseline,
+    MemorySeedEggV1,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum CreatureStage {
+    Seed,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]

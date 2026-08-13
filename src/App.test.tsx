@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 import { App } from "./App";
 import type { DetailEventClient, DetailShellClient } from "./creatureClient";
+import type { ProductSetupClient } from "./productSetupClient";
 import {
   emptyMemoryState,
   type ImportPreview,
@@ -216,6 +217,40 @@ const quietDetailShell: DetailShellClient = {
 };
 
 describe("First real memory vertical slice", () => {
+  test("finishes first-run setup before revealing the detail dashboard", async () => {
+    const user = userEvent.setup();
+    const fixture = createClient();
+    const productSetupClient: ProductSetupClient = {
+      available: true,
+      getState: vi.fn(async () => ({
+        schemaVersion: 1 as const,
+        setupComplete: false,
+      })),
+      complete: vi.fn(async () => ({
+        schemaVersion: 1 as const,
+        setupComplete: true,
+      })),
+    };
+    render(
+      <App
+        detailEvents={quietDetailEvents}
+        detailShell={quietDetailShell}
+        memoryClient={fixture.client}
+        productSetupClient={productSetupClient}
+      />,
+    );
+
+    expect(await screen.findByText("Create your Memoryling")).toBeInTheDocument();
+    expect(screen.queryByText("Your agent memories, alive.")).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "Wake up my Memoryling" }),
+    );
+    expect(productSetupClient.complete).toHaveBeenCalledTimes(1);
+    expect(
+      await screen.findByText("Your agent memories, alive."),
+    ).toBeInTheDocument();
+  });
+
   test("browses one Codex work record, redacts content, binds exact consent, and forgets it", async () => {
     const user = userEvent.setup();
     const fixture = createClient();

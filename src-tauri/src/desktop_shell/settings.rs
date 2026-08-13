@@ -24,7 +24,14 @@ fn read_valid(path: &Path) -> Option<ShellSettings> {
         return None;
     }
     let bytes = fs::read(path).ok()?;
-    let settings = serde_json::from_slice::<ShellSettings>(&bytes).ok()?;
+    let value = serde_json::from_slice::<serde_json::Value>(&bytes).ok()?;
+    let legacy_without_setup = value.get("setupComplete").is_none();
+    let mut settings = serde_json::from_value::<ShellSettings>(value).ok()?;
+    if legacy_without_setup {
+        // Any existing settings file proves the app already ran before the
+        // first-run creation flow existed. Do not interrupt upgraded users.
+        settings.setup_complete = true;
+    }
     if !settings.is_valid() {
         return None;
     }
@@ -102,7 +109,7 @@ mod tests {
         assert_eq!(load(&path).expect("settings should reload"), expected);
 
         let encoded = fs::read_to_string(&path).expect("settings should be readable");
-        for forbidden in ["memoryText", "sourceId", "locator", "contentHash"] {
+        for forbidden in ["memoryText", "sourceId", "locator", "contentHash", "apiKey"] {
             assert!(!encoded.contains(forbidden));
         }
         fs::remove_dir_all(directory).expect("temporary settings should be removable");
@@ -136,6 +143,31 @@ mod tests {
             load(&path).expect("invalid files should recover safely"),
             ShellSettings::default()
         );
+        fs::remove_dir_all(directory).expect("temporary settings should be removable");
+    }
+
+    #[test]
+    fn legacy_settings_skip_new_first_run_without_losing_preferences() {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("clock should be valid")
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "memoryling-shell-legacy-{}-{nonce}",
+            std::process::id()
+        ));
+        fs::create_dir_all(&directory).expect("test directory should exist");
+        let path = directory.join("desktop-shell-v1.json");
+        fs::write(
+            &path,
+            br#"{"schemaVersion":1,"onboardingDismissed":true,"alwaysOnTop":false,"petPosition":null}"#,
+        )
+        .expect("legacy settings should write");
+
+        let settings = load(&path).expect("legacy settings should migrate in memory");
+        assert!(settings.setup_complete);
+        assert!(settings.onboarding_dismissed);
+        assert!(!settings.always_on_top);
         fs::remove_dir_all(directory).expect("temporary settings should be removable");
     }
 }

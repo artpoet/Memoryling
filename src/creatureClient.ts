@@ -10,13 +10,17 @@ export interface CreatureMarkRenderState {
   style: "completion-star";
 }
 
+export type CreatureStage = "seed";
+export type CreatureBodyModule = "memory-seed-egg-v1";
+
 export interface CreatureRenderState {
-  schemaVersion: 3;
+  schemaVersion: 4;
   revision: string;
   realMemoryAccess: "off";
   importState: "empty" | "fixture-approved" | "thread-approved";
   envelope: "compact";
-  bodyModule: "baseline";
+  stage: CreatureStage;
+  bodyModule: CreatureBodyModule;
   palette: "violet-mint";
   motion: "calm";
   dailyScoutState: "off" | "waiting" | "ready";
@@ -41,12 +45,18 @@ export interface CreatureClient {
   showContextMenu(trigger: MenuTrigger): Promise<void>;
   startDragging(): Promise<void>;
   dismissOnboarding(): Promise<PetShellState>;
-  onRenderRevision(listener: (payload: CreatureRevision) => void): Promise<UnlistenFn>;
-  onPetShellState(listener: (payload: PetShellState) => void): Promise<UnlistenFn>;
+  onRenderRevision(
+    listener: (payload: CreatureRevision) => void,
+  ): Promise<UnlistenFn>;
+  onPetShellState(
+    listener: (payload: PetShellState) => void,
+  ): Promise<UnlistenFn>;
 }
 
 export interface DetailEventClient {
-  onRenderRevision(listener: (payload: CreatureRevision) => void): Promise<UnlistenFn>;
+  onRenderRevision(
+    listener: (payload: CreatureRevision) => void,
+  ): Promise<UnlistenFn>;
   onDetailReset(listener: () => void): Promise<UnlistenFn>;
 }
 
@@ -59,13 +69,13 @@ function listenFor<T>(eventName: string, listener: (payload: T) => void) {
 }
 
 export const nativeCreatureClient: CreatureClient = {
-  getRenderState: () => invoke<CreatureRenderState>("get_creature_render_state"),
+  getRenderState: () =>
+    invoke<CreatureRenderState>("get_creature_render_state"),
   getPetShellState: () => invoke<PetShellState>("get_pet_shell_state"),
   showContextMenu: (trigger) =>
     invoke<void>("show_pet_context_menu", { trigger }),
   startDragging: () => invoke<void>("start_pet_dragging"),
-  dismissOnboarding: () =>
-    invoke<PetShellState>("dismiss_pet_onboarding"),
+  dismissOnboarding: () => invoke<PetShellState>("dismiss_pet_onboarding"),
   onRenderRevision: (listener) =>
     listenFor<CreatureRevision>(CREATURE_STATE_CHANGED, listener),
   onPetShellState: (listener) =>
@@ -83,12 +93,13 @@ export const nativeDetailShellClient: DetailShellClient = {
 };
 
 export const baselineCreatureRenderState: CreatureRenderState = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   revision: "0".repeat(64),
   realMemoryAccess: "off",
   importState: "empty",
   envelope: "compact",
-  bodyModule: "baseline",
+  stage: "seed",
+  bodyModule: "memory-seed-egg-v1",
   palette: "violet-mint",
   motion: "calm",
   dailyScoutState: "off",
@@ -108,18 +119,21 @@ export function isValidRevision(value: unknown): value is string {
   return typeof value === "string" && REVISION_PATTERN.test(value);
 }
 
-export function sanitizeCreatureRenderState(value: unknown): CreatureRenderState {
+export function sanitizeCreatureRenderState(
+  value: unknown,
+): CreatureRenderState {
   if (!value || typeof value !== "object") return baselineCreatureRenderState;
   const state = value as Partial<CreatureRenderState>;
   const valid =
-    state.schemaVersion === 3 &&
+    state.schemaVersion === 4 &&
     isValidRevision(state.revision) &&
     state.realMemoryAccess === "off" &&
     (state.importState === "empty" ||
       state.importState === "fixture-approved" ||
       state.importState === "thread-approved") &&
     state.envelope === "compact" &&
-    state.bodyModule === "baseline" &&
+    state.stage === "seed" &&
+    state.bodyModule === "memory-seed-egg-v1" &&
     state.palette === "violet-mint" &&
     state.motion === "calm" &&
     (state.dailyScoutState === "off" ||
@@ -135,12 +149,13 @@ export function sanitizeCreatureRenderState(value: unknown): CreatureRenderState
     );
   if (!valid) return baselineCreatureRenderState;
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     revision: state.revision!,
     realMemoryAccess: "off",
     importState: state.importState!,
     envelope: "compact",
-    bodyModule: "baseline",
+    stage: "seed",
+    bodyModule: "memory-seed-egg-v1",
     palette: "violet-mint",
     motion: "calm",
     dailyScoutState: state.dailyScoutState!,

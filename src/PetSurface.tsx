@@ -20,7 +20,8 @@ const DRAG_THRESHOLD_DIP = 6;
 
 const petCopy = {
   en: {
-    label: "Memoryling. Memory access is off. Right-click for menu; drag to move.",
+    label:
+      "Memoryling. Memory access is off. Right-click for menu; drag to move.",
     accessOff: "Memory access off",
     threadLabel:
       "Memoryling. One Codex work record is active; durable memory access is off. Right-click for menu; drag to move.",
@@ -65,8 +66,9 @@ export interface PetSurfaceProps {
 }
 
 function useReducedMotion() {
-  const [reduced, setReduced] = useState(() =>
-    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false,
+  const [reduced, setReduced] = useState(
+    () =>
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false,
   );
   useEffect(() => {
     const media = window.matchMedia?.("(prefers-reduced-motion: reduce)");
@@ -119,8 +121,12 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
 
   function handlePointerMove(event: PointerEvent<HTMLButtonElement>) {
     const gesture = dragGesture.current;
-    if (!gesture || gesture.pointerId !== event.pointerId || gesture.dragging) return;
-    if (Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) < DRAG_THRESHOLD_DIP) {
+    if (!gesture || gesture.pointerId !== event.pointerId || gesture.dragging)
+      return;
+    if (
+      Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) <
+      DRAG_THRESHOLD_DIP
+    ) {
       return;
     }
     gesture.dragging = true;
@@ -214,8 +220,10 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
         type="button"
       >
         <CreatureBody
+          bodyModule={renderState.bodyModule}
           hasCompletionStar={hasCompletionStar}
           motionEnabled={!reducedMotion}
+          stage={renderState.stage}
         />
       </button>
 
@@ -230,7 +238,10 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
       )}
 
       {onboardingVisible && (
-        <section className="pet-onboarding" aria-labelledby="pet-onboarding-title">
+        <section
+          className="pet-onboarding"
+          aria-labelledby="pet-onboarding-title"
+        >
           <h1 id="pet-onboarding-title">{t.onboardingTitle}</h1>
           <ul>
             <li>{t.drag}</li>

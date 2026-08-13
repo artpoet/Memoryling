@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 import {
@@ -83,7 +89,9 @@ describe("pet surface", () => {
     const fixture = createClient(threadApprovedState);
     render(<PetSurface client={fixture.client} />);
     expect(
-      await screen.findByText("1 Codex work record active · durable memory off"),
+      await screen.findByText(
+        "1 Codex work record active · durable memory off",
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", {
@@ -97,15 +105,37 @@ describe("pet surface", () => {
     render(<PetSurface client={fixture.client} />);
 
     expect(screen.getByText("Memory access off")).toBeInTheDocument();
-    await waitFor(() => expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1),
+    );
     expect(screen.queryByTestId("derived-memory-mark")).not.toBeInTheDocument();
 
-    vi.mocked(fixture.client.getRenderState).mockResolvedValueOnce(approvedState);
+    vi.mocked(fixture.client.getRenderState).mockResolvedValueOnce(
+      approvedState,
+    );
     act(() => fixture.emitRender({ revision: revisionTwo }));
-    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
+    expect(
+      await screen.findByTestId("derived-memory-mark"),
+    ).toBeInTheDocument();
 
     act(() => fixture.emitRender({ revision: revisionTwo }));
     expect(fixture.client.getRenderState).toHaveBeenCalledTimes(2);
+  });
+
+  test("renders the approved seed-stage egg body module", async () => {
+    const fixture = createClient();
+    render(<PetSurface client={fixture.client} />);
+
+    const renderer = await screen.findByTestId("memoryling-seed-renderer");
+    expect(renderer.tagName).toBe("svg");
+    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v1");
+    expect(renderer).toHaveAttribute("data-stage", "seed");
+    expect(renderer).toHaveAttribute(
+      "data-body-module",
+      "memory-seed-egg-v1",
+    );
+    expect(renderer.querySelectorAll("path").length).toBeGreaterThan(10);
+    expect(renderer.querySelector("image")).not.toBeInTheDocument();
   });
 
   test("shows only a neutral pet notice when a daily insight is ready", async () => {
@@ -120,21 +150,29 @@ describe("pet surface", () => {
         "I found something useful for you. Open Memoryling to see it.",
       ),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/Official guide|https:\/\//)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Official guide|https:\/\//),
+    ).not.toBeInTheDocument();
   });
 
   test("allows a failed revision fetch to retry when the same event is emitted", async () => {
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);
-    await waitFor(() => expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1),
+    );
 
     vi.mocked(fixture.client.getRenderState)
       .mockRejectedValueOnce(new Error("private native detail"))
       .mockResolvedValueOnce(approvedState);
     act(() => fixture.emitRender({ revision: revisionTwo }));
-    await waitFor(() => expect(fixture.client.getRenderState).toHaveBeenCalledTimes(2));
+    await waitFor(() =>
+      expect(fixture.client.getRenderState).toHaveBeenCalledTimes(2),
+    );
     act(() => fixture.emitRender({ revision: revisionTwo }));
-    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
+    expect(
+      await screen.findByTestId("derived-memory-mark"),
+    ).toBeInTheDocument();
   });
 
   test("does not let a slow stale response roll back a newer revision", async () => {
@@ -146,14 +184,18 @@ describe("pet surface", () => {
       .mockReturnValueOnce(stale.promise)
       .mockReturnValueOnce(newest.promise);
     render(<PetSurface client={fixture.client} />);
-    await waitFor(() => expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1),
+    );
 
     act(() => fixture.emitRender({ revision: revisionTwo }));
     act(() => fixture.emitRender({ revision: revisionTwo }));
     expect(fixture.client.getRenderState).toHaveBeenCalledTimes(2);
     act(() => fixture.emitRender({ revision: revisionThree }));
     newest.resolve({ ...approvedState, revision: revisionThree });
-    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
+    expect(
+      await screen.findByTestId("derived-memory-mark"),
+    ).toBeInTheDocument();
     stale.resolve({ ...emptyState, revision: revisionTwo });
     await act(async () => {
       await stale.promise;
@@ -167,7 +209,9 @@ describe("pet surface", () => {
       bodyModule: "payload containing private text",
     });
     render(<PetSurface client={fixture.client} />);
-    await waitFor(() => expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1),
+    );
     expect(screen.queryByText(/private text/)).not.toBeInTheDocument();
     expect(screen.queryByTestId("derived-memory-mark")).not.toBeInTheDocument();
     act(() => fixture.emitRender({ revision: "invalid" }));
@@ -187,7 +231,9 @@ describe("pet surface", () => {
       ],
     };
     const sanitized = sanitizeCreatureRenderState(tainted);
-    expect(sanitized.marks).toEqual([{ id: "mark-1", style: "completion-star" }]);
+    expect(sanitized.marks).toEqual([
+      { id: "mark-1", style: "completion-star" },
+    ]);
     expect(sanitized).not.toHaveProperty("memoryText");
     expect(sanitized.marks[0]).not.toHaveProperty("locator");
 
@@ -203,15 +249,20 @@ describe("pet surface", () => {
     const user = userEvent.setup();
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);
-    const pet = screen.getByRole("button", { name: /Memoryling\. Memory access is off/ });
+    const pet = screen.getByRole("button", {
+      name: /Memoryling\. Memory access is off/,
+    });
 
     await user.click(pet);
-    expect(screen.getByText("Memoryling gives a quiet blink.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Memoryling gives a quiet blink."),
+    ).toBeInTheDocument();
     expect(fixture.client.showContextMenu).not.toHaveBeenCalled();
     fireEvent.contextMenu(pet);
     expect(fixture.client.showContextMenu).toHaveBeenCalledWith("pointer");
 
-    for (const key of ["Enter", " ", "ContextMenu"]) fireEvent.keyDown(pet, { key });
+    for (const key of ["Enter", " ", "ContextMenu"])
+      fireEvent.keyDown(pet, { key });
     fireEvent.keyDown(pet, { key: "F10", shiftKey: true });
     fireEvent.keyDown(pet, { key: "F10" });
     expect(fixture.client.showContextMenu).toHaveBeenCalledTimes(5);
@@ -221,7 +272,9 @@ describe("pet surface", () => {
   test("starts dragging only after the threshold and does not poison the next click", async () => {
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);
-    const pet = screen.getByRole("button", { name: /Memoryling\. Memory access is off/ });
+    const pet = screen.getByRole("button", {
+      name: /Memoryling\. Memory access is off/,
+    });
 
     fireEvent.pointerDown(pet, {
       pointerId: 1,
@@ -230,16 +283,28 @@ describe("pet surface", () => {
       clientX: 10,
       clientY: 10,
     });
-    fireEvent.pointerMove(pet, { pointerId: 1, isPrimary: true, clientX: 13, clientY: 13 });
+    fireEvent.pointerMove(pet, {
+      pointerId: 1,
+      isPrimary: true,
+      clientX: 13,
+      clientY: 13,
+    });
     expect(fixture.client.startDragging).not.toHaveBeenCalled();
-    fireEvent.pointerMove(pet, { pointerId: 1, isPrimary: true, clientX: 20, clientY: 20 });
+    fireEvent.pointerMove(pet, {
+      pointerId: 1,
+      isPrimary: true,
+      clientX: 20,
+      clientY: 20,
+    });
     expect(fixture.client.startDragging).toHaveBeenCalledTimes(1);
     fireEvent.pointerUp(pet, { pointerId: 1 });
     await act(async () => {
       await new Promise((resolve) => window.setTimeout(resolve, 0));
     });
     fireEvent.click(pet, { detail: 1 });
-    expect(screen.getByText("Memoryling gives a quiet blink.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Memoryling gives a quiet blink."),
+    ).toBeInTheDocument();
   });
 
   test("recovers after native dragging absorbs pointer-up", async () => {
@@ -247,7 +312,9 @@ describe("pet surface", () => {
     const fixture = createClient();
     vi.mocked(fixture.client.startDragging).mockReturnValueOnce(drag.promise);
     render(<PetSurface client={fixture.client} />);
-    const pet = screen.getByRole("button", { name: /Memoryling\. Memory access is off/ });
+    const pet = screen.getByRole("button", {
+      name: /Memoryling\. Memory access is off/,
+    });
 
     fireEvent.pointerDown(pet, {
       pointerId: 7,
@@ -256,9 +323,16 @@ describe("pet surface", () => {
       clientX: 10,
       clientY: 10,
     });
-    fireEvent.pointerMove(pet, { pointerId: 7, isPrimary: true, clientX: 20, clientY: 20 });
+    fireEvent.pointerMove(pet, {
+      pointerId: 7,
+      isPrimary: true,
+      clientX: 20,
+      clientY: 20,
+    });
     fireEvent.click(pet, { detail: 1 });
-    expect(screen.queryByText("Memoryling gives a quiet blink.")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Memoryling gives a quiet blink."),
+    ).not.toBeInTheDocument();
 
     drag.resolve();
     await act(async () => {
@@ -266,7 +340,9 @@ describe("pet surface", () => {
       await new Promise((resolve) => window.setTimeout(resolve, 0));
     });
     fireEvent.click(pet, { detail: 1 });
-    expect(screen.getByText("Memoryling gives a quiet blink.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Memoryling gives a quiet blink."),
+    ).toBeInTheDocument();
   });
 
   test("persists onboarding dismissal, supports Chinese, and honors reduced motion", async () => {
@@ -279,8 +355,13 @@ describe("pet surface", () => {
     render(<PetSurface client={fixture.client} />);
 
     expect(await screen.findByText("記憶存取關閉")).toBeInTheDocument();
-    expect(await screen.findByText("按右鍵，再選擇開啟 Memoryling。")).toBeInTheDocument();
-    expect(screen.getByTestId("pet-surface")).toHaveAttribute("data-motion", "reduced");
+    expect(
+      await screen.findByText("按右鍵，再選擇開啟 Memoryling。"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("pet-surface")).toHaveAttribute(
+      "data-motion",
+      "reduced",
+    );
     await userEvent.click(screen.getByRole("button", { name: "知道了" }));
     expect(fixture.client.dismissOnboarding).toHaveBeenCalledTimes(1);
     await waitFor(() =>
@@ -291,7 +372,9 @@ describe("pet surface", () => {
   test("cleans up both native listeners", async () => {
     const fixture = createClient();
     const view = render(<PetSurface client={fixture.client} />);
-    await waitFor(() => expect(fixture.client.onPetShellState).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(fixture.client.onPetShellState).toHaveBeenCalled(),
+    );
     view.unmount();
     expect(fixture.renderUnlisten).toHaveBeenCalledTimes(1);
     expect(fixture.shellUnlisten).toHaveBeenCalledTimes(1);
@@ -303,7 +386,9 @@ describe("pet surface", () => {
       throw new Error("listener unavailable");
     });
     const view = render(<PetSurface client={fixture.client} />);
-    await waitFor(() => expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1),
+    );
     expect(screen.getByText("Memory access off")).toBeInTheDocument();
     view.unmount();
     expect(fixture.renderUnlisten).toHaveBeenCalledTimes(1);
@@ -318,7 +403,9 @@ describe("pet surface", () => {
       throw new Error("listener unavailable");
     });
     const view = render(<PetSurface client={fixture.client} />);
-    await waitFor(() => expect(fixture.client.onRenderRevision).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(fixture.client.onRenderRevision).toHaveBeenCalled(),
+    );
     view.unmount();
     late.resolve(lateUnlisten);
     await waitFor(() => expect(lateUnlisten).toHaveBeenCalledTimes(1));

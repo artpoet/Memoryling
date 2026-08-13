@@ -36,6 +36,8 @@ pub fn run() {
             daily_scout::open_daily_scout_link,
             desktop_shell::show_pet_context_menu,
             desktop_shell::get_pet_shell_state,
+            desktop_shell::get_product_setup_state,
+            desktop_shell::complete_product_setup,
             desktop_shell::dismiss_pet_onboarding,
             desktop_shell::start_pet_dragging,
             desktop_shell::reset_pet_onboarding

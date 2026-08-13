@@ -45,7 +45,9 @@ html[data-surface="pet"] *::after {
   -webkit-tap-highlight-color: transparent;
 }
 
-.pet-button:active { cursor: grabbing; }
+.pet-button:active {
+  cursor: grabbing;
+}
 
 .pet-button:focus-visible {
   outline: 3px solid #82e7c5;
@@ -56,12 +58,20 @@ html[data-surface="pet"] *::after {
 .pet-button .creature-body {
   width: min(100%, 304px);
   height: min(100%, 266px);
-  transform: scale(1.08);
+  transform: scale(1.02);
 }
 
-.pet-button .orbit-one { width: 286px; height: 146px; }
-.pet-button .orbit-two { width: 218px; height: 260px; }
-.pet-button.pet-reacting .memoryling { transform: translateY(-4px) scale(1.035); }
+.pet-button .orbit-one {
+  width: 286px;
+  height: 146px;
+}
+.pet-button .orbit-two {
+  width: 218px;
+  height: 260px;
+}
+.pet-button.pet-reacting .memoryling {
+  transform: translateY(-4px) scale(1.035);
+}
 
 .pet-access-badge {
   position: absolute;
@@ -114,9 +124,15 @@ html[data-surface="pet"] *::after {
   transform: scale(0.82);
   transform-origin: top center;
 }
-.pet-surface-onboarding .pet-button .orbit-one { width: 286px; }
-.pet-surface-onboarding .pet-button .orbit-two { height: 198px; }
-.pet-surface-onboarding .pet-access-badge { bottom: 8px; }
+.pet-surface-onboarding .pet-button .orbit-one {
+  width: 286px;
+}
+.pet-surface-onboarding .pet-button .orbit-two {
+  height: 198px;
+}
+.pet-surface-onboarding .pet-access-badge {
+  bottom: 8px;
+}
 
 .pet-onboarding {
   position: absolute;
@@ -173,7 +189,9 @@ html[data-surface="pet"] *::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pet-button.pet-reacting .memoryling { transform: none; }
+  .pet-button.pet-reacting .memoryling {
+    transform: none;
+  }
 }
 
 @media (forced-colors: active) {
@@ -186,5 +204,7 @@ html[data-surface="pet"] *::after {
     forced-color-adjust: auto;
   }
 
-  .pet-button:focus-visible { outline-color: Highlight; }
+  .pet-button:focus-visible {
+    outline-color: Highlight;
+  }
 }

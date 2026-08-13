@@ -33,6 +33,7 @@ Implemented now:
 
 - Tauri 2 desktop shell
 - React 19 + TypeScript + Vite bilingual experience
+- first-run native creature creation with language selection and optional OpenAI-key preparation; local-only is the default and Daily Scout is not enabled during setup
 - English and Traditional Chinese interface with remembered locale
 - interactive creature plus honestly labeled concept event and bounded-initiative panels
 - versioned normalized memory events, bundled synthetic fixture, experimental work-record adapter, and SQLite schema v3
@@ -87,11 +88,14 @@ The shell is “two surfaces, one life”: Rust owns the transparent `pet`, on-d
 ## Key paths
 
 - src/App.tsx — on-demand bilingual detail surface and safe revision refresh
+- src/ProductSetup.tsx and src/productSetupClient.ts — first-run language／optional API preparation with native completion state
 - src/PetSurface.tsx — transparent pet interaction, onboarding, menu, keyboard, and drag behavior
 - src/SurfaceRouter.tsx — native-label-authoritative surface routing and browser honesty
 - src/creatureClient.ts — whitelisted pet DTO, revision events, and narrow pet commands
 - src/useCreatureRenderState.ts — race-safe render-state subscription and refresh
 - src/App.css and src/PetSurface.css — detail and transparent pet visual systems
+- src/ProceduralMemorySeed.tsx and src/CreatureBody.css — layered runtime SVG memory-seed renderer and motion
+- docs/design/creature-visual-baseline.md — accepted egg-shaped memory-seed baseline and visual drift guard
 - src/FirstMemoryFlow.tsx — source selection, preview, consent, lineage, and forgetting UI
 - src/memoryClient.ts — typed Tauri command boundary
 - src/DailyScoutPanel.tsx and dailyScoutClient.ts — bilingual BYOK, context consent, status, cited insight, and controls

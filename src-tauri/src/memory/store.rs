@@ -7,9 +7,9 @@ use super::{
     adapter::stable_id,
     model::{
         BodyModule, CreatureEnvelope, CreatureMark, CreatureMotion, CreaturePalette,
-        CreatureRenderMark, CreatureRenderMarkStyle, CreatureRenderState, DailyScoutRenderState,
-        ImportState, LineageSource, MemoryState, PreparedImport, RealMemoryAccess,
-        CODEX_THREAD_ADAPTER_ID, DERIVATION_VERSION, STORE_SCHEMA_VERSION,
+        CreatureRenderMark, CreatureRenderMarkStyle, CreatureRenderState, CreatureStage,
+        DailyScoutRenderState, ImportState, LineageSource, MemoryState, PreparedImport,
+        RealMemoryAccess, CODEX_THREAD_ADAPTER_ID, DERIVATION_VERSION, STORE_SCHEMA_VERSION,
     },
 };
 
@@ -534,7 +534,7 @@ fn creature_render_state_from_connection(
     };
     let revision = Sha256::digest(
         format!(
-            "3|off|{import_revision_value}|compact|baseline|violet-mint|calm|{marks_revision_value}|{daily_scout_revision_value}"
+            "4|off|{import_revision_value}|compact|seed|memory-seed-egg-v1|violet-mint|calm|{marks_revision_value}|{daily_scout_revision_value}"
         )
         .as_bytes(),
     )
@@ -543,12 +543,13 @@ fn creature_render_state_from_connection(
     .collect();
 
     Ok(CreatureRenderState {
-        schema_version: 3,
+        schema_version: 4,
         revision,
         real_memory_access: RealMemoryAccess::Off,
         import_state,
         envelope: CreatureEnvelope::Compact,
-        body_module: BodyModule::Baseline,
+        stage: CreatureStage::Seed,
+        body_module: BodyModule::MemorySeedEggV1,
         palette: CreaturePalette::VioletMint,
         motion: CreatureMotion::Calm,
         daily_scout_state,

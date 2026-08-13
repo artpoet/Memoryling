@@ -25,6 +25,13 @@ pub(crate) struct PetShellState {
     pub always_on_top: bool,
 }
 
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct ProductSetupState {
+    pub schema_version: u8,
+    pub setup_complete: bool,
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CreatureStateChanged {
@@ -73,6 +80,8 @@ impl SavedPetPosition {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct ShellSettings {
     pub schema_version: u8,
+    #[serde(default)]
+    pub setup_complete: bool,
     pub onboarding_dismissed: bool,
     pub always_on_top: bool,
     pub pet_position: Option<SavedPetPosition>,
@@ -82,6 +91,7 @@ impl Default for ShellSettings {
     fn default() -> Self {
         Self {
             schema_version: 1,
+            setup_complete: false,
             onboarding_dismissed: false,
             always_on_top: true,
             pet_position: None,
@@ -104,6 +114,13 @@ impl ShellSettings {
             schema_version: 1,
             onboarding_dismissed: self.onboarding_dismissed,
             always_on_top: self.always_on_top,
+        }
+    }
+
+    pub(crate) fn product_setup_state(&self) -> ProductSetupState {
+        ProductSetupState {
+            schema_version: 1,
+            setup_complete: self.setup_complete,
         }
     }
 }
@@ -142,5 +159,14 @@ mod tests {
             json,
             r#"{"schemaVersion":1,"onboardingDismissed":false,"alwaysOnTop":true}"#
         );
+    }
+
+    #[test]
+    fn product_setup_state_exposes_only_completion() {
+        let mut settings = ShellSettings::default();
+        settings.setup_complete = true;
+        let json = serde_json::to_string(&settings.product_setup_state())
+            .expect("setup state should serialize");
+        assert_eq!(json, r#"{"schemaVersion":1,"setupComplete":true}"#);
     }
 }

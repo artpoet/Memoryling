@@ -58,11 +58,12 @@
 
 ## 使用 pet-first 外殼
 
-1. 一般啟動會先顯示浮動 pet，不會直接開啟完整詳細視窗。符合條件的第一次啟動也可能顯示一次性的雙語指南。
-2. 若要開啟詳細內容，先在 pet 上按右鍵，再選擇 **開啟 Memoryling**。pet 已有鍵盤焦點時，Enter、Space、Menu key 或 `Shift+F10` 會開啟同一個原生選單。
-3. 拖曳 pet 可移動位置。關閉或最小化詳細視窗會回到 pet；開啟或還原詳細視窗會隱藏 pet，因此一般狀態只會看到一個 Memoryling 表面。
-4. 可透過原生選單或系統匣顯示、隱藏或開啟 Memoryling。`Win+B` 可前往 Windows 系統匣，但這條精確的鍵盤救援路徑仍需專門的 packaged acceptance。
-5. 選擇 **結束 Memoryling** 才會結束常駐 process。隱藏 pet 或關閉詳細內容都不等於 Quit。
+1. 全新的 v0.4.0 source build 會先開啟一次建立流程。選擇 English 或繁體中文，再保留建議的本機寵物，或選擇把 OpenAI API key 存入 Windows Credential Manager。保存 key 不會測試連線、不會開啟每日情報、不會傳送脈絡，也不會進行 Web Search；這些動作仍要通過後續檢視與同意流程。已有舊版 shell 設定的安裝會略過這個新流程。
+2. 完成設定後，一般啟動會先顯示浮動 pet，不會直接開啟完整詳細視窗。符合條件的第一次啟動也可能顯示一次性的雙語 pet 指南。
+3. 若要開啟詳細內容，先在 pet 上按右鍵，再選擇 **開啟 Memoryling**。pet 已有鍵盤焦點時，Enter、Space、Menu key 或 `Shift+F10` 會開啟同一個原生選單。
+4. 拖曳 pet 可移動位置。關閉或最小化詳細視窗會回到 pet；開啟或還原詳細視窗會隱藏 pet，因此一般狀態只會看到一個 Memoryling 表面。
+5. 可透過原生選單或系統匣顯示、隱藏或開啟 Memoryling。`Win+B` 可前往 Windows 系統匣，但這條精確的鍵盤救援路徑仍需專門的 packaged acceptance。
+6. 選擇 **結束 Memoryling** 才會結束常駐 process。隱藏 pet 或關閉詳細內容都不等於 Quit。
 
 ## 執行 fixture-only 記憶流程
 
@@ -144,7 +145,7 @@ Memoryling 的目前使用者 App 資料位於：
 
 - `memoryling.sqlite3`：核准後的正規化 fixture／工作紀錄文字、hash、來源鏈、衍生狀態，以及啟用時的每日情報設定、嘗試狀態、附來源情報與來源鏈；
 - OpenAI API key 另外存放在 Windows Credential Manager，不在這個資料夾；
-- `desktop-shell-v1.json` 與可能存在的 `desktop-shell-v1.json.bak`：只包含 onboarding、always-on-top 與安全 pet 位置等本機 shell 設定；
+- `desktop-shell-v1.json` 與可能存在的 `desktop-shell-v1.json.bak`：只包含不含內容的首次設定完成狀態，以及 onboarding、always-on-top 與安全 pet 位置等本機 shell 設定；
 - `EBWebView` 等 WebView runtime 資料。
 
 一般的 **遺忘這個來源** 流程會移除匯入 fixture 紀錄與目前支援的下游影響，但可能留下空的資料庫與 WebView 資料夾。

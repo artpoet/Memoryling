@@ -58,11 +58,12 @@ The exact v0.2.0 artifact, size, hash, and completed install／lifecycle／retai
 
 ## Use the pet-first shell
 
-1. Normal launch shows the floating pet instead of opening the full detail window. An eligible first run may also show the one-time bilingual guide.
-2. To open details, right-click the pet, then choose **Open Memoryling**. When the pet already has keyboard focus, Enter, Space, the Menu key, or `Shift+F10` opens the same native menu.
-3. Drag the pet to reposition it. Closing or minimizing the detail window returns to the pet; opening or restoring details hides it so only one Memoryling surface is normally visible.
-4. Use the native menu or system tray to show, hide, or open Memoryling. `Win+B` can reach the Windows tray, but that exact keyboard recovery path still needs dedicated packaged acceptance.
-5. Choose **Quit Memoryling** to end the resident process. Hiding the pet or closing details is not Quit.
+1. A brand-new v0.4.0 source build opens one first-run creation screen. Choose English or Traditional Chinese, then keep the recommended local-only pet or optionally save an OpenAI API key in Windows Credential Manager. Saving a key does not test it, enable Daily Scout, send context, or perform Web Search; those actions still require the later review and consent flow. Existing installations with older shell settings skip this new first-run screen.
+2. After setup, normal launch shows the floating pet instead of opening the full detail window. An eligible first run may also show the one-time bilingual pet guide.
+3. To open details, right-click the pet, then choose **Open Memoryling**. When the pet already has keyboard focus, Enter, Space, the Menu key, or `Shift+F10` opens the same native menu.
+4. Drag the pet to reposition it. Closing or minimizing the detail window returns to the pet; opening or restoring details hides it so only one Memoryling surface is normally visible.
+5. Use the native menu or system tray to show, hide, or open Memoryling. `Win+B` can reach the Windows tray, but that exact keyboard recovery path still needs dedicated packaged acceptance.
+6. Choose **Quit Memoryling** to end the resident process. Hiding the pet or closing details is not Quit.
 
 ## Run the fixture-only memory tour
 
@@ -144,7 +145,7 @@ The folder can include:
 
 - `memoryling.sqlite3`, containing approved normalized fixture／work-record text, hashes, lineage, derived state, and—when enabled—Daily Scout settings, attempt status, cited insights, and source lineage;
 - the OpenAI API key is separate and stored in Windows Credential Manager, not this folder;
-- `desktop-shell-v1.json` and a possible `desktop-shell-v1.json.bak`, containing only local shell settings such as onboarding, always-on-top, and safe pet position state;
+- `desktop-shell-v1.json` and a possible `desktop-shell-v1.json.bak`, containing only the content-free first-run completion bit and local shell settings such as onboarding, always-on-top, and safe pet position state;
 - WebView runtime data such as `EBWebView`.
 
 The normal **Forget this source** flow removes imported fixture records and supported downstream effects but may leave an empty database and WebView data directory.

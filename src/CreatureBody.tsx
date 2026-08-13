@@ -1,15 +1,21 @@
 import "./CreatureBody.css";
+import type { CreatureBodyModule, CreatureStage } from "./creatureClient";
+import { ProceduralMemorySeed } from "./ProceduralMemorySeed";
 
 export interface CreatureBodyProps {
   hasCompletionStar?: boolean;
   motionEnabled?: boolean;
   showOrbits?: boolean;
+  stage?: CreatureStage;
+  bodyModule?: CreatureBodyModule;
 }
 
 export function CreatureBody({
   hasCompletionStar = false,
   motionEnabled = true,
   showOrbits = true,
+  stage = "seed",
+  bodyModule = "memory-seed-egg-v1",
 }: CreatureBodyProps) {
   return (
     <span
@@ -18,16 +24,12 @@ export function CreatureBody({
     >
       {showOrbits && <span className="orbit orbit-one" />}
       {showOrbits && <span className="orbit orbit-two" />}
-      <span className="memoryling">
-        <span className="ear ear-left" />
-        <span className="ear ear-right" />
-        <span className="face">
-          <span className="eye eye-left" />
-          <span className="eye eye-right" />
-          <span className="cheek cheek-left" />
-          <span className="cheek cheek-right" />
-          <span className="mouth" />
-        </span>
+      <span
+        className="memoryling"
+        data-body-module={bodyModule}
+        data-stage={stage}
+      >
+        <ProceduralMemorySeed bodyModule={bodyModule} stage={stage} />
         {hasCompletionStar && (
           <span
             className="memory-mark derived-completion-star"
