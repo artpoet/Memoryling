@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://memoryling.app/schemas/agent-operation-v1.schema.json",
+  "title": "Memoryling Agent Operation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "operationId", "generatedAt", "agent", "sourceDigest", "profile", "evidence", "dialogues"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "operationId": { "$ref": "#/$defs/id" },
+    "generatedAt": { "$ref": "#/$defs/timestamp" },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family"],
+      "properties": { "family": { "enum": ["codex", "claude", "other"] } }
+    },
+    "sourceDigest": { "$ref": "#/$defs/hash" },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dominantActivity", "journeyState"],
+      "properties": {
+        "dominantActivity": { "$ref": "#/$defs/activity" },
+        "secondaryActivity": { "$ref": "#/$defs/activity" },
+        "journeyState": { "enum": ["steady", "exploring", "milestone", "recovering"] }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "referenceHash", "observedAt"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "kind": { "enum": ["durable-memory", "recent-work", "repo-ssot", "current-thread"] },
+          "referenceHash": { "$ref": "#/$defs/hash" },
+          "observedAt": { "$ref": "#/$defs/timestamp" }
+        }
+      }
+    },
+    "dialogues": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 12,
+      "allOf": [
+        { "contains": { "type": "object", "required": ["trigger"], "properties": { "trigger": { "const": "on-open" } } } },
+        { "contains": { "type": "object", "required": ["trigger"], "properties": { "trigger": { "const": "on-interact" } } } }
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text", "trigger", "priority", "cooldownMinutes", "maxUses", "evidenceIds"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "text": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["en", "zhTw"],
+            "properties": {
+              "en": { "$ref": "#/$defs/dialogue" },
+              "zhTw": { "$ref": "#/$defs/dialogue" }
+            }
+          },
+          "trigger": { "enum": ["on-open", "on-interact", "ambient"] },
+          "priority": { "type": "integer", "minimum": 0, "maximum": 3 },
+          "notBefore": { "$ref": "#/$defs/timestamp" },
+          "expiresAt": { "$ref": "#/$defs/timestamp" },
+          "cooldownMinutes": { "type": "integer", "minimum": 0, "maximum": 10080 },
+          "maxUses": { "type": "integer", "minimum": 1, "maximum": 20 },
+          "evidenceIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "activity": { "enum": ["building", "research", "design", "planning", "debugging", "writing", "coordination", "shipping"] },
+    "dialogue": { "type": "string", "minLength": 1, "maxLength": 240, "pattern": "^[^\\r\\n]+$" }
+  }
+}

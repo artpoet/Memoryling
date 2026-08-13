@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import memorylingIcon from "./assets/memoryling-icon.png";
+import AgentOperationPanel from "./AgentOperationPanel";
 import CreatureBody from "./CreatureBody";
-import DailyScoutPanel from "./DailyScoutPanel";
-import FirstMemoryFlow from "./FirstMemoryFlow";
 import ProductSetup from "./ProductSetup";
 import {
   nativeDetailEventClient,
@@ -12,10 +11,6 @@ import {
   type DetailShellClient,
 } from "./creatureClient";
 import { useStoredLocale } from "./locale";
-import {
-  nativeDailyScoutClient,
-  type DailyScoutClient,
-} from "./dailyScoutClient";
 import {
   emptyMemoryState,
   nativeMemoryClient,
@@ -30,24 +25,17 @@ import {
 
 const copy = {
   en: {
-    prototype: "Memory access is off · no approved sources",
-    prototypeActive: "Fixture pilot active · real memory access is off",
-    prototypeThreadActive: "1 Codex work record active · durable memory access is off",
-    prototypeAgentActive: "Codex Agent memories connected · local read-only auto-sync",
-    prototypeAgentMissing: "Codex Agent-memory source unavailable · local effects withdrawn",
+    prototype: "Waiting for Agent operation · app-side AI is off",
+    prototypeOperationActive: "Agent operation applied · local pet rules active",
     prototypeBrowser: "Browser preview · memory access is off",
     tagline: "Your agent memories, alive.",
     intro:
-      "A small desktop life that grows from what your AI agents remember—and, only if you opt in, helps your current work with one useful daily insight.",
+      "Say one phrase in your agent project. The Agent turns its approved memory and recent work into appearance, dialogue, and continuing life for this local desktop pet.",
     creatureName: "Your first Memoryling",
     creatureState: "Listening for a beginning",
     creatureStateActive: "One approved memory is shaping me",
-    approvedCreatureLine:
-      "A completion star appeared because you approved one synthetic Codex memory.",
-    approvedThreadCreatureLine:
-      "A completion star appeared because you approved one Codex work record.",
-    approvedAgentCreatureLine:
-      "A memory halo appeared because you approved local Codex Agent memories.",
+    approvedOperationCreatureLine:
+      "My latest form and words arrived in a privacy-minimized Agent operation package.",
     creatureLines: [
       "I woke up between the things you finished and the things still glowing.",
       "When memory access arrives, every mark on me will have a reason.",
@@ -62,13 +50,10 @@ const copy = {
     conceptBadge: "CONCEPT",
     memoryLabel: "Memory signals",
     noSignals: "No source-backed signals",
-    noSignalsBody: "Approve the Codex Agent-memory scope above to create the primary lineage path.",
-    activeSignal: "A completion left a star",
-    activeSignalMeta: "completion · persisted · explainable",
-    activeSignalBody: "Its complete source → event → signal → mark lineage is available above.",
-    activeAgentSignal: "Approved Agent memories formed a halo",
-    activeAgentSignalMeta: "local Agent memory · auto-synced · explainable",
-    activeAgentSignalBody: "Its redacted source → event → continuity → halo lineage is available above.",
+    noSignalsBody: "Say “Run Memoryling” in an Agent project to create the first update package.",
+    activeOperationSignal: "An Agent operation shaped the pet",
+    activeOperationSignalMeta: "memory + recent work · compiled locally · rule-driven dialogue",
+    activeOperationSignalBody: "The App received only generated pet state and hashed evidence references—not raw Agent memory.",
     initiativeLabel: "Bounded initiative",
     plannedBadge: "PLANNED",
     quietHours: "Quiet hours",
@@ -79,8 +64,8 @@ const copy = {
       "Memoryling may decide when to speak, but it never decides your limits.",
     privacyLabel: "Local-first promise",
     privacyBody:
-      "Approved Agent memories stay local and read-only at the source. Raw memories remain hidden from the WebView and are never sent to Daily Scout or silently uploaded.",
-    roadmap: "Local Codex Agent-memory auto-sync available",
+      "The Agent reads only what its environment already authorizes. Memoryling receives a bounded local update package; it does not scan Agent storage or call an AI API by itself.",
+    roadmap: "Agent Operation Protocol v1 available",
     brandHome: "Memoryling home",
     languageLabel: "Language",
     dashboardLabel: "Memoryling status dashboard",
@@ -92,21 +77,16 @@ const copy = {
     guideResetFailed: "The local setting did not change. Try again from the desktop app.",
   },
   "zh-TW": {
-    prototype: "記憶存取關閉 · 尚無核准來源",
-    prototypeActive: "Fixture 試行中 · 真實記憶存取關閉",
-    prototypeThreadActive: "1 筆 Codex 工作紀錄已啟用 · durable memory 存取關閉",
-    prototypeAgentActive: "Codex Agent 記憶已連線 · 本機唯讀自動同步",
-    prototypeAgentMissing: "Codex Agent 記憶來源不可用 · 本機效果已撤回",
+    prototype: "等待 Agent 運作 · App 端 AI 關閉",
+    prototypeOperationActive: "Agent 更新已套用 · 本機寵物規則運作中",
     prototypeBrowser: "瀏覽器預覽 · 記憶存取關閉",
     tagline: "讓你的 Agent 記憶，長成一個生命。",
     intro:
-      "一個從 AI Agent 記憶長大的桌面生命；只有你選擇開啟時，牠也會每天帶回一則對目前工作有用的情報。",
+      "只要在 Agent 專案喊出一句口號；Agent 就會把獲准的記憶與近期工作，轉化成這隻本機桌面寵物的外觀、對話與持續生活。",
     creatureName: "你的第一隻記憶獸",
     creatureState: "正在等待故事開始",
     creatureStateActive: "一筆核准記憶正在塑造我",
-    approvedCreatureLine: "你核准了一筆合成 Codex 記憶，因此完成之星出現了。",
-    approvedThreadCreatureLine: "你核准了一筆 Codex 工作紀錄，因此完成之星出現了。",
-    approvedAgentCreatureLine: "你核准了本機 Codex Agent 記憶，因此記憶光環出現了。",
+    approvedOperationCreatureLine: "我最新的外觀與話語，來自一份隱私最小化的 Agent 更新包。",
     creatureLines: [
       "我在你完成的事，和那些還亮著的事之間醒來。",
       "未來我身上的每個變化，都必須有記憶可以解釋。",
@@ -121,13 +101,10 @@ const copy = {
     conceptBadge: "概念示意",
     memoryLabel: "記憶訊號",
     noSignals: "尚無具來源鏈的訊號",
-    noSignalsBody: "核准上方 Codex Agent 記憶範圍後，才會建立主要來源鏈。",
-    activeSignal: "一個完成事件留下了星星",
-    activeSignalMeta: "完成 · 已持久化 · 可解釋",
-    activeSignalBody: "完整的來源 → 事件 → 訊號 → 印記鏈，可在上方檢視。",
-    activeAgentSignal: "核准的 Agent 記憶形成了光環",
-    activeAgentSignalMeta: "本機 Agent 記憶 · 自動同步 · 可解釋",
-    activeAgentSignalBody: "已遮罩的來源 → 事件 → 連續性 → 光環鏈，可在上方檢視。",
+    noSignalsBody: "請在 Agent 專案說「運作 Memoryling」，建立第一份更新包。",
+    activeOperationSignal: "一次 Agent 運作塑造了寵物",
+    activeOperationSignalMeta: "記憶＋近期工作 · 本機編譯 · 規則化對話",
+    activeOperationSignalBody: "App 只收到生成後的寵物狀態與雜湊證據引用，不會收到原始 Agent 記憶。",
     initiativeLabel: "有限主動性",
     plannedBadge: "規劃中",
     quietHours: "安靜時段",
@@ -137,8 +114,8 @@ const copy = {
     principle: "記憶獸可以決定何時開口，但永遠不能替你決定界線。",
     privacyLabel: "Local-first 承諾",
     privacyBody:
-      "核准的 Agent 記憶留在本機，來源維持唯讀；原始記憶不會進入 WebView，也不會交給 Daily Scout 或被偷偷上傳。",
-    roadmap: "桌面版已具備本機 Codex Agent 記憶自動同步",
+      "Agent 只讀取其環境原本授權的資訊；Memoryling 接收有限的本機更新包，不會自行掃描 Agent 儲存空間或呼叫 AI API。",
+    roadmap: "Agent Operation Protocol v1 已可使用",
     brandHome: "Memoryling 首頁",
     languageLabel: "語言",
     dashboardLabel: "Memoryling 狀態面板",
@@ -153,7 +130,6 @@ const copy = {
 
 interface AppProps {
   memoryClient?: MemoryClient;
-  dailyScoutClient?: DailyScoutClient;
   detailEvents?: DetailEventClient;
   detailShell?: DetailShellClient;
   browserPreview?: boolean;
@@ -162,7 +138,6 @@ interface AppProps {
 
 export function DetailSurface({
   memoryClient = nativeMemoryClient,
-  dailyScoutClient = nativeDailyScoutClient,
   detailEvents = nativeDetailEventClient,
   detailShell = nativeDetailShellClient,
   browserPreview = !memoryClient.available,
@@ -172,8 +147,6 @@ export function DetailSurface({
   const [lineIndex, setLineIndex] = useState(0);
   const [eventSnoozed, setEventSnoozed] = useState(false);
   const [memoryState, setMemoryState] = useState(emptyMemoryState);
-  const [detailResetRevision, setDetailResetRevision] = useState(0);
-  const [dailyScoutRefreshRevision, setDailyScoutRefreshRevision] = useState(0);
   const [guideResetStatus, setGuideResetStatus] = useState<"success" | "failed" | null>(null);
   const [productSetupState, setProductSetupState] =
     useState<ProductSetupState | null>(() =>
@@ -181,15 +154,7 @@ export function DetailSurface({
     );
   const refreshGeneration = useRef(0);
   const t = copy[locale];
-  const activeMark = memoryState.marks[0];
-  const hasApprovedMemory = memoryState.sourceCount > 0;
-  const hasDerivedMemory = Boolean(activeMark);
-  const hasApprovedThread =
-    activeMark?.lineage[0]?.adapterId === "codex-app-server-thread";
-  const hasApprovedAgentMemory =
-    memoryState.activeSource?.adapterId === "codex-local-memory-store";
-  const isAgentMemorySourceMissing =
-    hasApprovedAgentMemory && memoryState.activeSource?.syncStatus === "source-missing";
+  const hasAgentOperation = memoryState.agentOperation?.state === "applied";
 
   useEffect(() => {
     if (!productSetupClient.available) return;
@@ -223,9 +188,10 @@ export function DetailSurface({
       }
     }
 
+    void refreshMemoryState();
+
     void detailEvents
       .onRenderRevision(() => {
-        setDailyScoutRefreshRevision((value) => value + 1);
         void refreshMemoryState();
       })
       .then((unlisten) => {
@@ -236,8 +202,6 @@ export function DetailSurface({
     void detailEvents
       .onDetailReset(() => {
         if (!active) return;
-        setDetailResetRevision((value) => value + 1);
-        setDailyScoutRefreshRevision((value) => value + 1);
         void refreshMemoryState();
       })
       .then((unlisten) => {
@@ -255,38 +219,21 @@ export function DetailSurface({
   }, [detailEvents, memoryClient]);
 
   const creatureLine = useMemo(() => {
-    const lines = hasDerivedMemory
-      ? [
-          hasApprovedAgentMemory
-            ? t.approvedAgentCreatureLine
-            : hasApprovedThread
-            ? t.approvedThreadCreatureLine
-            : t.approvedCreatureLine,
-          ...t.creatureLines,
-        ]
+    const lines = hasAgentOperation
+      ? [t.approvedOperationCreatureLine, ...t.creatureLines]
       : t.creatureLines;
     return lines[lineIndex % lines.length];
   }, [
-    hasDerivedMemory,
-    hasApprovedAgentMemory,
-    hasApprovedThread,
+    hasAgentOperation,
     lineIndex,
-    t.approvedCreatureLine,
-    t.approvedAgentCreatureLine,
-    t.approvedThreadCreatureLine,
+    t.approvedOperationCreatureLine,
     t.creatureLines,
   ]);
 
   const accessStatus = !memoryClient.available
     ? t.prototypeBrowser
-    : hasApprovedMemory
-      ? hasApprovedThread
-        ? t.prototypeThreadActive
-        : hasApprovedAgentMemory
-          ? isAgentMemorySourceMissing
-            ? t.prototypeAgentMissing
-            : t.prototypeAgentActive
-          : t.prototypeActive
+    : hasAgentOperation
+      ? t.prototypeOperationActive
       : t.prototype;
 
   async function resetPetGuide() {
@@ -297,6 +244,10 @@ export function DetailSurface({
     } catch {
       setGuideResetStatus("failed");
     }
+  }
+
+  async function clearAgentOperation() {
+    setMemoryState(await memoryClient.clearAgentOperation());
   }
 
   if (productSetupState === null) {
@@ -310,7 +261,6 @@ export function DetailSurface({
   if (!browserPreview && !productSetupState.setupComplete) {
     return (
       <ProductSetup
-        dailyScoutClient={dailyScoutClient}
         locale={locale}
         onComplete={() => setProductSetupState(completeProductSetupState)}
         onLocaleChange={setLocale}
@@ -392,16 +342,14 @@ export function DetailSurface({
             aria-label={t.tapHint}
           >
             <CreatureBody
-              hasCompletionStar={
-                activeMark?.style === "completion-star"
-              }
-              hasMemoryHalo={activeMark?.style === "memory-halo"}
+              hasCompletionStar={false}
+              agentActivity={memoryState.agentOperation?.activity ?? "off"}
             />
           </button>
 
           <div className="creature-caption">
             <p>{t.creatureName}</p>
-            <span>{hasDerivedMemory ? t.creatureStateActive : t.creatureState}</span>
+            <span>{hasAgentOperation ? t.creatureStateActive : t.creatureState}</span>
           </div>
 
           <div className="speech-card" aria-live="polite">
@@ -412,18 +360,11 @@ export function DetailSurface({
         </div>
       </section>
 
-      <FirstMemoryFlow
-        client={memoryClient}
+      <AgentOperationPanel
+        browserPreview={browserPreview}
         locale={locale}
         memoryState={memoryState}
-        onMemoryStateChange={setMemoryState}
-        resetRevision={detailResetRevision}
-      />
-
-      <DailyScoutPanel
-        client={dailyScoutClient}
-        locale={locale}
-        refreshRevision={dailyScoutRefreshRevision}
+        onClear={memoryClient.available ? clearAgentOperation : undefined}
       />
 
       <section className="dashboard" aria-label={t.dashboardLabel}>
@@ -450,18 +391,18 @@ export function DetailSurface({
             <span className="panel-icon violet">✦</span>
             <p>{t.memoryLabel}</p>
           </div>
-          {hasDerivedMemory ? (
+          {hasAgentOperation ? (
             <>
               <ul className="signal-list">
                 <li>
                   <span className="signal-orb signal-2" />
                   <span>
-                    <strong>{hasApprovedAgentMemory ? t.activeAgentSignal : t.activeSignal}</strong>
-                    <small>{hasApprovedAgentMemory ? t.activeAgentSignalMeta : t.activeSignalMeta}</small>
+                    <strong>{t.activeOperationSignal}</strong>
+                    <small>{t.activeOperationSignalMeta}</small>
                   </span>
                 </li>
               </ul>
-              <p className="why-copy">{hasApprovedAgentMemory ? t.activeAgentSignalBody : t.activeSignalBody}</p>
+              <p className="why-copy">{t.activeOperationSignalBody}</p>
             </>
           ) : (
             <div className="empty-signal-state">

@@ -2,15 +2,17 @@ use std::{collections::HashSet, fs, path::PathBuf, time::Duration};
 
 use rusqlite::{params, Connection, OptionalExtension, Transaction, TransactionBehavior};
 use sha2::{Digest, Sha256};
+use time::OffsetDateTime;
 
 use super::{
     adapter::stable_id,
     model::{
-        ActiveMemorySource, BodyModule, ConsentScopeV1, CreatureEnvelope, CreatureMark,
-        CreatureMotion, CreaturePalette, CreatureRenderMark, CreatureRenderMarkStyle,
-        CreatureRenderState, CreatureStage, DailyScoutRenderState, ImportState, LineageSource,
-        MemoryState, PreparedImport, RealMemoryAccess, CODEX_MEMORY_ADAPTER_ID,
-        CODEX_THREAD_ADAPTER_ID, DERIVATION_VERSION, STORE_SCHEMA_VERSION,
+        ActiveMemorySource, AgentActivity, AgentOperationRenderState, AgentOperationSummary,
+        BodyModule, ConsentScopeV1, CreatureEnvelope, CreatureMark, CreatureMotion,
+        CreaturePalette, CreatureRenderMark, CreatureRenderMarkStyle, CreatureRenderState,
+        CreatureStage, DailyScoutRenderState, ImportState, LineageSource, MemoryState, PetDialogue,
+        PreparedImport, RealMemoryAccess, CODEX_MEMORY_ADAPTER_ID, CODEX_THREAD_ADAPTER_ID,
+        DERIVATION_VERSION, STORE_SCHEMA_VERSION,
     },
 };
 
@@ -18,6 +20,7 @@ const MIGRATION_0001: &str = include_str!("../../migrations/0001_first_memory.sq
 const MIGRATION_0002: &str = include_str!("../../migrations/0002_source_consent_scope.sql");
 const MIGRATION_0003: &str = include_str!("../../migrations/0003_daily_memory_scout.sql");
 const MIGRATION_0004: &str = include_str!("../../migrations/0004_agent_memory_sync.sql");
+const MIGRATION_0005: &str = include_str!("../../migrations/0005_agent_operation_protocol.sql");
 
 pub(crate) struct MemoryStore {
     path: PathBuf,
@@ -348,6 +351,324 @@ impl MemoryStore {
         Ok(state)
     }
 
+    pub(crate) fn apply_agent_operation(
+        &self,
+        package: &super::agent_operation::AgentOperationPackage,
+    ) -> Result<(), String> {
+        package.validate()?;
+        let mut connection = self.open_connection()?;
+        let transaction = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|error| local_store_error("begin Agent operation", error))?;
+        let existing_digest = transaction
+            .query_row(
+                "SELECT source_digest FROM agent_operations WHERE operation_id = ?1",
+                params![package.operation_id],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .map_err(|error| local_store_error("check Agent operation identity", error))?;
+        if let Some(existing_digest) = existing_digest {
+            if existing_digest != package.source_digest {
+                return Err(
+                    "The Agent operation ID was reused with different evidence.".to_string()
+                );
+            }
+            transaction
+                .execute(
+                    "UPDATE agent_operation_runtime
+                     SET inbox_status = 'applied', inbox_error_code = NULL,
+                         last_inbox_checked_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+                     WHERE singleton_id = 1",
+                    [],
+                )
+                .map_err(|error| local_store_error("confirm duplicate Agent operation", error))?;
+            transaction
+                .commit()
+                .map_err(|error| local_store_error("commit duplicate Agent operation", error))?;
+            return Ok(());
+        }
+
+        transaction
+            .execute("DELETE FROM agent_operations", [])
+            .map_err(|error| local_store_error("replace prior Agent operation", error))?;
+
+        transaction
+            .execute(
+                "INSERT INTO agent_operations
+                    (operation_id, schema_version, generated_at, agent_family, source_digest,
+                     dominant_activity, secondary_activity, journey_state)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                params![
+                    package.operation_id,
+                    package.schema_version,
+                    package.generated_at,
+                    package.agent.family,
+                    package.source_digest,
+                    activity_to_db(package.profile.dominant_activity),
+                    package.profile.secondary_activity.map(activity_to_db),
+                    package.profile.journey_state,
+                ],
+            )
+            .map_err(|error| local_store_error("save Agent operation", error))?;
+        for evidence in &package.evidence {
+            transaction
+                .execute(
+                    "INSERT INTO agent_operation_evidence
+                        (evidence_id, operation_id, evidence_kind, reference_hash, observed_at)
+                     VALUES (?1, ?2, ?3, ?4, ?5)",
+                    params![
+                        evidence.id,
+                        package.operation_id,
+                        evidence.kind,
+                        evidence.reference_hash,
+                        evidence.observed_at,
+                    ],
+                )
+                .map_err(|error| local_store_error("save Agent operation evidence", error))?;
+        }
+        for dialogue in &package.dialogues {
+            transaction
+                .execute(
+                    "INSERT INTO agent_dialogue_cards
+                        (dialogue_id, operation_id, text_en, text_zh_tw, trigger_kind, priority,
+                         not_before, expires_at, cooldown_minutes, max_uses)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+                    params![
+                        dialogue.id,
+                        package.operation_id,
+                        dialogue.text.en,
+                        dialogue.text.zh_tw,
+                        dialogue.trigger,
+                        dialogue.priority,
+                        dialogue.not_before,
+                        dialogue.expires_at,
+                        dialogue.cooldown_minutes,
+                        dialogue.max_uses,
+                    ],
+                )
+                .map_err(|error| local_store_error("save Agent dialogue", error))?;
+            for evidence_id in &dialogue.evidence_ids {
+                transaction
+                    .execute(
+                        "INSERT INTO agent_dialogue_evidence (dialogue_id, evidence_id)
+                         VALUES (?1, ?2)",
+                        params![dialogue.id, evidence_id],
+                    )
+                    .map_err(|error| local_store_error("save dialogue lineage", error))?;
+            }
+        }
+
+        let now = super::agent_operation::local_clock().0;
+        let now_value = OffsetDateTime::parse(&now, &time::format_description::well_known::Rfc3339)
+            .map_err(|_| "Memoryling could not evaluate the opening dialogue clock.".to_string())?;
+        let first_dialogue = package
+            .dialogues
+            .iter()
+            .filter(|dialogue| {
+                dialogue.trigger == "on-open"
+                    && super::agent_operation::dialogue_is_active_at(dialogue, now_value)
+            })
+            .min_by(|left, right| {
+                right
+                    .priority
+                    .cmp(&left.priority)
+                    .then_with(|| left.id.cmp(&right.id))
+            })
+            .map(|dialogue| dialogue.id.clone());
+        if let Some(dialogue_id) = &first_dialogue {
+            transaction
+                .execute(
+                    "UPDATE agent_dialogue_cards
+                     SET use_count = 1, last_used_at = ?2 WHERE dialogue_id = ?1",
+                    params![dialogue_id, now],
+                )
+                .map_err(|error| local_store_error("activate opening Agent dialogue", error))?;
+        }
+        transaction
+            .execute(
+                "UPDATE agent_operation_runtime
+                 SET current_dialogue_id = ?1, inbox_status = 'applied', inbox_error_code = NULL,
+                     last_inbox_checked_at = ?2 WHERE singleton_id = 1",
+                params![first_dialogue, now],
+            )
+            .map_err(|error| local_store_error("activate Agent operation", error))?;
+        transaction
+            .commit()
+            .map_err(|error| local_store_error("commit Agent operation", error))?;
+        Ok(())
+    }
+
+    pub(crate) fn clear_agent_operations(&self) -> Result<MemoryState, String> {
+        let mut connection = self.open_connection()?;
+        let transaction = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|error| local_store_error("begin clearing Agent operation", error))?;
+        transaction
+            .execute("DELETE FROM agent_operations", [])
+            .map_err(|error| local_store_error("clear Agent operation", error))?;
+        transaction
+            .execute("DELETE FROM agent_dialogue_daily_usage", [])
+            .map_err(|error| local_store_error("clear Agent dialogue budget", error))?;
+        transaction
+            .execute(
+                "UPDATE agent_operation_runtime
+                 SET current_dialogue_id = NULL, inbox_status = 'waiting', inbox_error_code = NULL,
+                     last_inbox_checked_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+                 WHERE singleton_id = 1",
+                [],
+            )
+            .map_err(|error| local_store_error("reset Agent operation runtime", error))?;
+        transaction
+            .commit()
+            .map_err(|error| local_store_error("commit clearing Agent operation", error))?;
+        self.state()
+    }
+
+    pub(crate) fn record_agent_operation_error(&self, error_code: &str) -> Result<(), String> {
+        let connection = self.open_connection()?;
+        connection
+            .execute(
+                "UPDATE agent_operation_runtime
+                 SET inbox_status = 'invalid', inbox_error_code = ?1,
+                     last_inbox_checked_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+                 WHERE singleton_id = 1",
+                params![error_code],
+            )
+            .map_err(|error| local_store_error("record Agent operation rejection", error))?;
+        Ok(())
+    }
+
+    pub(crate) fn advance_agent_dialogue(
+        &self,
+        trigger: &str,
+    ) -> Result<CreatureRenderState, String> {
+        let (now_text, local_date, local_hour) = super::agent_operation::local_clock();
+        if trigger == "ambient" && !(9..22).contains(&local_hour) {
+            return self.creature_render_state();
+        }
+        let now = OffsetDateTime::parse(&now_text, &time::format_description::well_known::Rfc3339)
+            .map_err(|_| "Memoryling could not evaluate the local dialogue clock.".to_string())?;
+        let mut connection = self.open_connection()?;
+        let transaction = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|error| local_store_error("begin Agent dialogue", error))?;
+        if trigger == "ambient" {
+            let used = transaction
+                .query_row(
+                    "SELECT ambient_count FROM agent_dialogue_daily_usage WHERE local_date = ?1",
+                    params![local_date],
+                    |row| row.get::<_, i64>(0),
+                )
+                .optional()
+                .map_err(|error| local_store_error("read ambient dialogue budget", error))?
+                .unwrap_or(0);
+            if used >= 2 {
+                transaction
+                    .commit()
+                    .map_err(|error| local_store_error("commit quiet dialogue check", error))?;
+                return self.creature_render_state();
+            }
+        }
+        let latest_operation = transaction
+            .query_row(
+                "SELECT operation_id FROM agent_operations ORDER BY applied_at DESC LIMIT 1",
+                [],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .map_err(|error| local_store_error("find current Agent operation", error))?;
+        let Some(latest_operation) = latest_operation else {
+            transaction
+                .commit()
+                .map_err(|error| local_store_error("commit empty dialogue check", error))?;
+            return self.creature_render_state();
+        };
+        let current_dialogue = transaction
+            .query_row(
+                "SELECT current_dialogue_id FROM agent_operation_runtime WHERE singleton_id = 1",
+                [],
+                |row| row.get::<_, Option<String>>(0),
+            )
+            .map_err(|error| local_store_error("read current Agent dialogue", error))?;
+        let candidates = {
+            let mut statement = transaction
+                .prepare(
+                    "SELECT dialogue_id, not_before, expires_at, cooldown_minutes, last_used_at
+                     FROM agent_dialogue_cards
+                     WHERE operation_id = ?1 AND trigger_kind = ?2 AND use_count < max_uses
+                     ORDER BY priority DESC,
+                              CASE WHEN last_used_at IS NULL THEN 0 ELSE 1 END,
+                              last_used_at, dialogue_id",
+                )
+                .map_err(|error| local_store_error("prepare Agent dialogue selection", error))?;
+            let rows = statement
+                .query_map(params![latest_operation, trigger], |row| {
+                    Ok((
+                        row.get::<_, String>(0)?,
+                        row.get::<_, Option<String>>(1)?,
+                        row.get::<_, Option<String>>(2)?,
+                        row.get::<_, i64>(3)?,
+                        row.get::<_, Option<String>>(4)?,
+                    ))
+                })
+                .map_err(|error| local_store_error("read Agent dialogue candidates", error))?;
+            rows.collect::<Result<Vec<_>, _>>()
+                .map_err(|error| local_store_error("collect Agent dialogue candidates", error))?
+        };
+        let selected =
+            candidates
+                .into_iter()
+                .find(|(id, not_before, expires_at, cooldown, last)| {
+                    if current_dialogue.as_deref() == Some(id.as_str()) {
+                        return false;
+                    }
+                    let not_before_ok = not_before.as_deref().is_none_or(|value| {
+                        OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
+                            .is_ok_and(|bound| now >= bound)
+                    });
+                    let expires_ok = expires_at.as_deref().is_none_or(|value| {
+                        OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
+                            .is_ok_and(|bound| now <= bound)
+                    });
+                    let cooldown_ok = last.as_deref().is_none_or(|value| {
+                        OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
+                            .is_ok_and(|used| now - used >= time::Duration::minutes(*cooldown))
+                    });
+                    not_before_ok && expires_ok && cooldown_ok
+                });
+        if let Some((dialogue_id, ..)) = selected {
+            transaction
+                .execute(
+                    "UPDATE agent_dialogue_cards
+                     SET use_count = use_count + 1, last_used_at = ?2 WHERE dialogue_id = ?1",
+                    params![dialogue_id, now_text],
+                )
+                .map_err(|error| local_store_error("consume Agent dialogue", error))?;
+            transaction
+                .execute(
+                    "UPDATE agent_operation_runtime SET current_dialogue_id = ?1
+                     WHERE singleton_id = 1",
+                    params![dialogue_id],
+                )
+                .map_err(|error| local_store_error("show Agent dialogue", error))?;
+            if trigger == "ambient" {
+                transaction
+                    .execute(
+                        "INSERT INTO agent_dialogue_daily_usage (local_date, ambient_count)
+                         VALUES (?1, 1)
+                         ON CONFLICT(local_date) DO UPDATE SET ambient_count = ambient_count + 1",
+                        params![local_date],
+                    )
+                    .map_err(|error| local_store_error("record ambient dialogue budget", error))?;
+            }
+        }
+        transaction
+            .commit()
+            .map_err(|error| local_store_error("commit Agent dialogue", error))?;
+        self.creature_render_state()
+    }
+
     pub(crate) fn open_connection(&self) -> Result<Connection, String> {
         if let Some(parent) = self.path.parent() {
             fs::create_dir_all(parent).map_err(|_| {
@@ -376,19 +697,25 @@ impl MemoryStore {
         match version {
             0 => migration
                 .execute_batch(&format!(
-                    "{MIGRATION_0001}\n{MIGRATION_0002}\n{MIGRATION_0003}\n{MIGRATION_0004}"
+                    "{MIGRATION_0001}\n{MIGRATION_0002}\n{MIGRATION_0003}\n{MIGRATION_0004}\n{MIGRATION_0005}"
                 ))
                 .map_err(|error| local_store_error("apply schema migrations", error))?,
             1 => {
                 migrate_v1_to_v2(&migration)?;
                 migrate_v2_to_v3(&migration)?;
                 migrate_v3_to_v4(&migration)?;
+                migrate_v4_to_v5(&migration)?;
             }
             2 => {
                 migrate_v2_to_v3(&migration)?;
                 migrate_v3_to_v4(&migration)?;
+                migrate_v4_to_v5(&migration)?;
             }
-            3 => migrate_v3_to_v4(&migration)?,
+            3 => {
+                migrate_v3_to_v4(&migration)?;
+                migrate_v4_to_v5(&migration)?;
+            }
+            4 => migrate_v4_to_v5(&migration)?,
             STORE_SCHEMA_VERSION => {}
             _ => return Err("The local Memoryling database schema is not supported.".to_string()),
         }
@@ -398,6 +725,12 @@ impl MemoryStore {
 
         Ok(connection)
     }
+}
+
+fn migrate_v4_to_v5(transaction: &Transaction<'_>) -> Result<(), String> {
+    transaction
+        .execute_batch(MIGRATION_0005)
+        .map_err(|error| local_store_error("apply Agent operation migration", error))
 }
 
 fn migrate_v3_to_v4(transaction: &Transaction<'_>) -> Result<(), String> {
@@ -725,6 +1058,31 @@ fn state_from_connection(connection: &Connection) -> Result<MemoryState, String>
         .optional()
         .map_err(|error| local_store_error("read active memory source", error))?;
 
+    let agent_operation = connection
+        .query_row(
+            "SELECT ao.applied_at, ao.dominant_activity,
+                    (SELECT COUNT(*) FROM agent_dialogue_cards adc
+                     WHERE adc.operation_id = ao.operation_id)
+             FROM agent_operations ao ORDER BY ao.applied_at DESC LIMIT 1",
+            [],
+            |row| {
+                let activity = row.get::<_, String>(1)?;
+                let dialogue_count = row.get::<_, i64>(2)?;
+                Ok((row.get::<_, String>(0)?, activity, dialogue_count))
+            },
+        )
+        .optional()
+        .map_err(|error| local_store_error("read Agent operation summary", error))?
+        .map(|(applied_at, activity, dialogue_count)| {
+            Ok::<AgentOperationSummary, String>(AgentOperationSummary {
+                state: "applied".to_string(),
+                applied_at,
+                activity: activity_from_db(&activity)?,
+                dialogue_count: usize::try_from(dialogue_count).unwrap_or(0),
+            })
+        })
+        .transpose()?;
+
     Ok(MemoryState {
         store_schema_version: STORE_SCHEMA_VERSION,
         source_count,
@@ -732,6 +1090,7 @@ fn state_from_connection(connection: &Connection) -> Result<MemoryState, String>
         signal_count,
         marks,
         active_source,
+        agent_operation,
     })
 }
 
@@ -752,87 +1111,86 @@ fn creature_render_state_from_connection(
         Some(CODEX_THREAD_ADAPTER_ID) => ImportState::ThreadApproved,
         Some(_) => ImportState::FixtureApproved,
     };
-    let effect_style = connection
-        .query_row(
-            "SELECT effect_style FROM world_effects WHERE state = 'active' ORDER BY id LIMIT 1",
-            [],
-            |row| row.get::<_, String>(0),
-        )
-        .optional()
-        .map_err(|error| local_store_error("read render-safe creature state", error))?;
-    let marks = match effect_style.as_deref() {
-        Some("completion-star") => vec![CreatureRenderMark {
-            id: "mark-1".to_string(),
-            style: CreatureRenderMarkStyle::CompletionStar,
-        }],
-        Some("memory-halo") => vec![CreatureRenderMark {
-            id: "mark-1".to_string(),
-            style: CreatureRenderMarkStyle::MemoryHalo,
-        }],
-        _ => Vec::new(),
-    };
+    // Pre-v0.6 effects remain readable for migration and deletion, but they no longer
+    // shape the primary pet. Only an Agent Operation Protocol package can do that.
+    let mut marks: Vec<CreatureRenderMark> = Vec::new();
     let import_revision_value = match import_state {
         ImportState::Empty => "empty",
         ImportState::FixtureApproved => "fixture-approved",
         ImportState::ThreadApproved => "thread-approved",
         ImportState::AgentMemoryApproved => "agent-memory-approved",
     };
-    let marks_revision_value = match marks.first().map(|mark| mark.style) {
-        None => "none",
-        Some(CreatureRenderMarkStyle::CompletionStar) => "completion-star",
-        Some(CreatureRenderMarkStyle::MemoryHalo) => "memory-halo",
-    };
-    let daily_scout_enabled = connection
+    let operation = connection
         .query_row(
-            "SELECT enabled FROM daily_scout_settings WHERE singleton_id = 1",
+            "SELECT operation_id, dominant_activity, journey_state
+             FROM agent_operations ORDER BY applied_at DESC LIMIT 1",
             [],
-            |row| row.get::<_, i64>(0),
+            |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                ))
+            },
         )
         .optional()
-        .map_err(|error| local_store_error("read render-safe Daily Scout state", error))?
-        == Some(1);
-    let unread_insight_count = connection
-        .query_row(
-            "SELECT COUNT(*) FROM daily_insights WHERE read_at IS NULL",
-            [],
-            |row| row.get::<_, i64>(0),
-        )
-        .map_err(|error| local_store_error("read render-safe Daily Scout message", error))?;
-    let daily_scout_state = if unread_insight_count > 0 {
-        DailyScoutRenderState::Ready
-    } else if daily_scout_enabled {
-        DailyScoutRenderState::Waiting
-    } else {
-        DailyScoutRenderState::Off
-    };
-    let daily_scout_revision_value = match daily_scout_state {
-        DailyScoutRenderState::Off => "scout-off",
-        DailyScoutRenderState::Waiting => "scout-waiting",
-        DailyScoutRenderState::Ready => "scout-ready",
-    };
-    let agent_memory_event_count = if approved_adapter.as_deref() == Some(CODEX_MEMORY_ADAPTER_ID) {
-        connection
-            .query_row(
-                "SELECT COUNT(*) FROM memory_events WHERE source_id = ?1",
-                params![super::model::CODEX_MEMORY_SOURCE_ID],
-                |row| row.get::<_, i64>(0),
+        .map_err(|error| local_store_error("read render-safe Agent operation", error))?;
+    let (operation_revision_value, agent_operation_state, agent_activity) = match &operation {
+        Some((operation_id, activity, journey_state)) => {
+            if journey_state == "milestone"
+                && !marks
+                    .iter()
+                    .any(|mark| mark.style == CreatureRenderMarkStyle::CompletionStar)
+            {
+                marks.push(CreatureRenderMark {
+                    id: "mark-operation".to_string(),
+                    style: CreatureRenderMarkStyle::CompletionStar,
+                });
+            }
+            (
+                operation_id.as_str(),
+                AgentOperationRenderState::Applied,
+                activity_from_db(activity)?,
             )
-            .map_err(|error| local_store_error("read Agent memory availability", error))?
-    } else {
-        0
+        }
+        None => (
+            "empty",
+            AgentOperationRenderState::Empty,
+            AgentActivity::Off,
+        ),
     };
-    let real_memory_access = if agent_memory_event_count > 0 {
-        RealMemoryAccess::CodexLocal
-    } else {
-        RealMemoryAccess::Off
-    };
-    let access_revision_value = match real_memory_access {
-        RealMemoryAccess::Off => "off",
-        RealMemoryAccess::CodexLocal => "codex-local",
-    };
+    let dialogue = connection
+        .query_row(
+            "SELECT adc.dialogue_id, adc.text_en, adc.text_zh_tw, adc.trigger_kind
+             FROM agent_operation_runtime aor
+             JOIN agent_dialogue_cards adc ON adc.dialogue_id = aor.current_dialogue_id
+             WHERE aor.singleton_id = 1",
+            [],
+            |row| {
+                Ok(PetDialogue {
+                    id: row.get(0)?,
+                    text_en: row.get(1)?,
+                    text_zh_tw: row.get(2)?,
+                    trigger: row.get(3)?,
+                })
+            },
+        )
+        .optional()
+        .map_err(|error| local_store_error("read render-safe Agent dialogue", error))?;
+    let marks_revision_value = marks
+        .iter()
+        .map(|mark| match mark.style {
+            CreatureRenderMarkStyle::CompletionStar => "completion-star",
+        })
+        .collect::<Vec<_>>()
+        .join("+");
+    let activity_revision_value = activity_to_db(agent_activity);
+    let dialogue_revision_value = dialogue.as_ref().map_or("none", |item| item.id.as_str());
+    let daily_scout_state = DailyScoutRenderState::Off;
+    let real_memory_access = RealMemoryAccess::Off;
     let revision = Sha256::digest(
         format!(
-            "5|{access_revision_value}|{import_revision_value}|compact|seed|memory-seed-egg-v1|violet-mint|calm|{marks_revision_value}|{daily_scout_revision_value}"
+            "6|off|{import_revision_value}|{operation_revision_value}|{activity_revision_value}|{dialogue_revision_value}|compact|seed|memory-seed-egg-v1|violet-mint|calm|{marks_revision_value}|scout-off"
         )
         .as_bytes(),
     )
@@ -841,7 +1199,7 @@ fn creature_render_state_from_connection(
     .collect();
 
     Ok(CreatureRenderState {
-        schema_version: 5,
+        schema_version: 6,
         revision,
         real_memory_access,
         import_state,
@@ -852,7 +1210,38 @@ fn creature_render_state_from_connection(
         motion: CreatureMotion::Calm,
         daily_scout_state,
         marks,
+        agent_operation_state,
+        agent_activity,
+        dialogue,
     })
+}
+
+fn activity_to_db(activity: AgentActivity) -> &'static str {
+    match activity {
+        AgentActivity::Off => "off",
+        AgentActivity::Building => "building",
+        AgentActivity::Research => "research",
+        AgentActivity::Design => "design",
+        AgentActivity::Planning => "planning",
+        AgentActivity::Debugging => "debugging",
+        AgentActivity::Writing => "writing",
+        AgentActivity::Coordination => "coordination",
+        AgentActivity::Shipping => "shipping",
+    }
+}
+
+fn activity_from_db(activity: &str) -> Result<AgentActivity, String> {
+    match activity {
+        "building" => Ok(AgentActivity::Building),
+        "research" => Ok(AgentActivity::Research),
+        "design" => Ok(AgentActivity::Design),
+        "planning" => Ok(AgentActivity::Planning),
+        "debugging" => Ok(AgentActivity::Debugging),
+        "writing" => Ok(AgentActivity::Writing),
+        "coordination" => Ok(AgentActivity::Coordination),
+        "shipping" => Ok(AgentActivity::Shipping),
+        _ => Err("The Agent activity profile is invalid.".to_string()),
+    }
 }
 
 fn count(connection: &Connection, table: &str) -> Result<usize, String> {
@@ -880,7 +1269,7 @@ mod tests {
     use super::*;
     use crate::memory::{
         adapter::{consent_scope_contract, prepare_import, preview_source},
-        codex_memory,
+        agent_operation, codex_memory,
         model::{ConsentScopeV1, CreatureRenderMarkStyle, CODEX_THREAD_ADAPTER_VERSION},
     };
 
@@ -1025,7 +1414,7 @@ mod tests {
             .creature_render_state()
             .expect("approved render state should load");
         assert_eq!(approved_render.import_state, ImportState::FixtureApproved);
-        assert_eq!(approved_render.marks.len(), 1);
+        assert!(approved_render.marks.is_empty());
         assert_ne!(approved_render.revision, empty_render.revision);
         let pet_json =
             serde_json::to_string(&approved_render).expect("render state should serialize");
@@ -1176,9 +1565,9 @@ mod tests {
         let render = store
             .creature_render_state()
             .expect("render-safe Agent state should load");
-        assert_eq!(render.real_memory_access, RealMemoryAccess::CodexLocal);
+        assert_eq!(render.real_memory_access, RealMemoryAccess::Off);
         assert_eq!(render.import_state, ImportState::AgentMemoryApproved);
-        assert_eq!(render.marks[0].style, CreatureRenderMarkStyle::MemoryHalo);
+        assert!(render.marks.is_empty());
 
         let old_hash = approved.marks[0].lineage[0].content_hash.clone();
         fs::write(
@@ -1233,6 +1622,100 @@ mod tests {
         assert_eq!(forgotten.source_count, 0);
         assert!(forgotten.active_source.is_none());
         assert!(memory_root.join("MEMORY.md").is_file());
+
+        fs::remove_dir_all(directory).expect("temporary store should be removable");
+    }
+
+    #[test]
+    fn agent_operation_persists_bounded_render_state_and_dialogue_lineage() {
+        let (store, directory) = temporary_store();
+        let package = agent_operation::synthetic_package();
+
+        let empty = store
+            .creature_render_state()
+            .expect("empty Agent operation state should load");
+        assert_eq!(empty.schema_version, 6);
+        assert_eq!(
+            empty.agent_operation_state,
+            AgentOperationRenderState::Empty
+        );
+        assert_eq!(empty.agent_activity, AgentActivity::Off);
+        assert!(empty.dialogue.is_none());
+
+        store
+            .apply_agent_operation(&package)
+            .expect("synthetic Agent operation should apply");
+        let state = store.state().expect("Agent operation summary should load");
+        let operation = state
+            .agent_operation
+            .expect("Agent operation summary should be present");
+        assert_eq!(operation.state, "applied");
+        assert_eq!(operation.activity, AgentActivity::Building);
+        assert_eq!(operation.dialogue_count, 3);
+
+        let render = store
+            .creature_render_state()
+            .expect("render-safe Agent operation should load");
+        assert_eq!(
+            render.agent_operation_state,
+            AgentOperationRenderState::Applied
+        );
+        assert_eq!(render.agent_activity, AgentActivity::Building);
+        assert_eq!(render.dialogue.as_ref().unwrap().id, "dialogue-1");
+        assert!(render
+            .marks
+            .iter()
+            .any(|mark| mark.style == CreatureRenderMarkStyle::CompletionStar));
+        let serialized = serde_json::to_string(&render).expect("render state should serialize");
+        assert!(!serialized.contains(&package.source_digest));
+        assert!(!serialized.contains(&package.evidence[0].reference_hash));
+        assert!(!serialized.contains("evidence.repo"));
+
+        let interacted = store
+            .advance_agent_dialogue("on-interact")
+            .expect("interaction dialogue should advance");
+        assert_eq!(interacted.dialogue.as_ref().unwrap().id, "dialogue-2");
+        assert_ne!(interacted.revision, render.revision);
+
+        store
+            .apply_agent_operation(&package)
+            .expect("an identical operation should be idempotent");
+        let mut reused_id = package.clone();
+        reused_id.source_digest = "c".repeat(64);
+        assert!(store.apply_agent_operation(&reused_id).is_err());
+
+        let reopened = MemoryStore::new(store.path.clone())
+            .creature_render_state()
+            .expect("Agent operation should survive restart");
+        assert_eq!(
+            reopened.agent_operation_state,
+            AgentOperationRenderState::Applied
+        );
+        assert_eq!(reopened.dialogue.as_ref().unwrap().id, "dialogue-2");
+
+        let mut replacement = package.clone();
+        replacement.operation_id = "operation.synthetic-002".to_string();
+        replacement.source_digest = "d".repeat(64);
+        store
+            .apply_agent_operation(&replacement)
+            .expect("a new authoritative operation should replace the prior package");
+        let connection = Connection::open(&store.path).expect("operation store should reopen");
+        assert_eq!(count(&connection, "agent_operations").unwrap(), 1);
+        assert_eq!(count(&connection, "agent_dialogue_cards").unwrap(), 3);
+        drop(connection);
+
+        let cleared = store
+            .clear_agent_operations()
+            .expect("derived Agent operation should be clearable");
+        assert!(cleared.agent_operation.is_none());
+        let cleared_render = store
+            .creature_render_state()
+            .expect("cleared Agent operation render state should load");
+        assert_eq!(
+            cleared_render.agent_operation_state,
+            AgentOperationRenderState::Empty
+        );
+        assert!(cleared_render.dialogue.is_none());
 
         fs::remove_dir_all(directory).expect("temporary store should be removable");
     }

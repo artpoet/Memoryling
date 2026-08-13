@@ -1,0 +1,110 @@
+.agent-operation-panel {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto 28px;
+  padding: 28px;
+  border: 1px solid rgba(130, 231, 197, 0.24);
+  border-radius: 28px;
+  background: linear-gradient(145deg, rgba(24, 31, 42, 0.96), rgba(25, 19, 41, 0.96));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.agent-operation-heading {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.agent-operation-heading p {
+  margin: 0 0 10px;
+  color: #82e7c5;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.agent-operation-heading h2 {
+  max-width: 780px;
+  margin: 0 0 10px;
+  font-size: clamp(25px, 4vw, 42px);
+  line-height: 1.06;
+}
+
+.agent-operation-heading span,
+.agent-operation-steps span,
+.agent-operation-status span,
+.agent-operation-privacy {
+  color: #bcb4cb;
+  line-height: 1.55;
+}
+
+.agent-operation-clear {
+  margin-top: 2px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 171, 171, 0.28);
+  border-radius: 10px;
+  color: #ffd0d0;
+  background: rgba(112, 44, 58, 0.16);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.agent-operation-clear:disabled { cursor: wait; opacity: 0.65; }
+.agent-operation-clear-error { margin: 8px 0 0; color: #ffb7b7; font-size: 12px; }
+
+.agent-operation-heading > strong {
+  padding: 8px 12px;
+  border: 1px solid rgba(130, 231, 197, 0.3);
+  border-radius: 999px;
+  color: #aaf3db;
+  background: rgba(130, 231, 197, 0.08);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.agent-operation-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.agent-operation-steps li {
+  display: grid;
+  gap: 7px;
+  min-height: 132px;
+  padding: 18px;
+  border: 1px solid rgba(205, 187, 255, 0.14);
+  border-radius: 18px;
+  background: rgba(10, 9, 19, 0.28);
+}
+
+.agent-operation-status {
+  display: grid;
+  gap: 5px;
+  padding: 15px 17px;
+  border: 1px solid rgba(205, 187, 255, 0.18);
+  border-radius: 16px;
+  background: rgba(12, 10, 20, 0.44);
+}
+
+.agent-operation-status.applied {
+  border-color: rgba(130, 231, 197, 0.38);
+}
+
+.agent-operation-privacy {
+  margin: 14px 2px 0;
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .agent-operation-panel { width: min(100% - 24px, 1180px); padding: 20px; }
+  .agent-operation-heading { display: grid; }
+  .agent-operation-heading > strong { justify-self: start; }
+  .agent-operation-steps { grid-template-columns: 1fr; }
+  .agent-operation-steps li { min-height: 0; }
+}

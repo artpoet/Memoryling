@@ -1,4 +1,5 @@
 mod adapter;
+mod agent_operation;
 mod codex_memory;
 mod codex_thread;
 pub(crate) mod model;
@@ -33,6 +34,17 @@ pub(crate) use model::{
     ApproveImportRequest, CodexThreadCatalog, CreatureRenderState, ImportPreview, MemoryState,
     SourceOption,
 };
+
+#[tauri::command]
+pub(crate) fn advance_pet_dialogue<R: tauri::Runtime>(
+    _caller: RenderCaller<R>,
+    app: AppHandle<R>,
+    trigger: String,
+) -> Result<CreatureRenderState, String> {
+    let state = agent_operation::advance_dialogue(&store_for(&app)?, &trigger)?;
+    crate::desktop_shell::emit_creature_state_changed(&app);
+    Ok(state)
+}
 
 use codex_thread::InternalCatalog;
 use model::PreparedImport;
@@ -287,6 +299,17 @@ pub(crate) fn get_memory_state<R: tauri::Runtime>(
 }
 
 #[tauri::command]
+pub(crate) fn clear_agent_operation<R: tauri::Runtime>(
+    _caller: MainCaller,
+    app: AppHandle<R>,
+) -> Result<MemoryState, String> {
+    record_sensitive_handler_entry();
+    let state = store_for(&app)?.clear_agent_operations()?;
+    crate::desktop_shell::emit_creature_state_changed(&app);
+    Ok(state)
+}
+
+#[tauri::command]
 pub(crate) fn approve_memory_import<R: tauri::Runtime>(
     _caller: MainCaller,
     app: AppHandle<R>,
@@ -378,28 +401,7 @@ pub(crate) async fn sync_codex_memories<R: tauri::Runtime>(
 }
 
 pub(crate) fn setup<R: tauri::Runtime>(app: &tauri::App<R>) {
-    let first_handle = app.handle().clone();
-    tauri::async_runtime::spawn_blocking(move || {
-        if sync_agent_memory_if_approved(&first_handle)
-            .ok()
-            .flatten()
-            .is_some()
-        {
-            crate::desktop_shell::emit_creature_state_changed(&first_handle);
-        }
-    });
-
-    let periodic_handle = app.handle().clone();
-    std::thread::spawn(move || loop {
-        std::thread::sleep(Duration::from_secs(15 * 60));
-        if sync_agent_memory_if_approved(&periodic_handle)
-            .ok()
-            .flatten()
-            .is_some()
-        {
-            crate::desktop_shell::emit_creature_state_changed(&periodic_handle);
-        }
-    });
+    agent_operation::setup(app);
 }
 
 #[tauri::command]

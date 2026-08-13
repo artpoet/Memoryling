@@ -6,6 +6,7 @@
   "webviews": ["pet"],
   "permissions": [
     "allow-get-creature-render-state",
+    "allow-advance-pet-dialogue",
     "allow-show-pet-context-menu",
     "allow-get-pet-shell-state",
     "allow-dismiss-pet-onboarding",

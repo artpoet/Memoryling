@@ -1,27 +1,36 @@
 # Security Policy
 
-Memoryling is pre-release software and must not yet be trusted with production-sensitive memory sources. Source v0.3.0 contains a version-bound experimental Codex work／thread-history pilot; it is not a production connector or a Codex durable-memory interface.
+Memoryling is pre-release software. Source v0.6.0 must not yet be trusted with production-sensitive Agent context, and it has no accepted v0.6.0 installer or private-memory UAT.
 
 ## Reporting a vulnerability
 
-Please do not open a public issue for a suspected security or privacy vulnerability. Use GitHub's private vulnerability reporting feature under the repository's Security tab. Include reproduction steps, impact, affected versions, and any suggested mitigation.
+Do not open a public issue for a suspected security or privacy vulnerability. Use GitHub private vulnerability reporting and include a synthetic reproduction, impact, and affected version.
 
-Do not attach real agent memories, credentials, tokens, private prompts, or personal databases. Create the smallest synthetic reproduction possible.
+Never attach real Agent memories, prompts, credentials, tokens, operation packages, local databases, or identifiable screenshots.
 
-## Current security boundary
+## Current v0.6.0 core boundary
 
-- The verified v0.2.0 installer remains an unchanged fixture-only no-redo artifact. The v0.3.0 connector work is source-only: there is no accepted v0.3.0 installer and no private-thread UAT.
-- OpenAI currently publishes no stable Codex durable-memory export API or compatibility-guaranteed file schema. Memoryling does not scan or parse `~/.codex/memories/`, Codex databases, session files, rollout files, or arbitrary user-supplied paths.
-- Rust alone resolves the fixed standard local Codex Desktop executable and requires exactly `codex-cli 0.134.0`. The experimental adapter may issue only local App Server stdio `thread/list` and `thread/read`; it opens no WebSocket, model, telemetry, cloud, or runtime network boundary and performs no source write or mutation.
-- Listing is explicitly user-triggered and content-minimized. Raw identifiers, titles, paths, prompts, responses, tool output, and selected final-answer text remain in Rust; the frontend receives only opaque handles and a redacted count／time／hash preview after one explicit selection.
-- Approval is bound to a canonical consent-scope hash. SQLite schema v2 permits one approved source and keeps selected normalized text app-local; external lineage is content-free. Forgetting removes or recomputes Memoryling's local copy and downstream graph only, never the original Codex thread.
-- CLI-version verification and the App Server request share one 10-second deadline. Output is capped, stderr is suppressed from product surfaces, and child-process cleanup is bounded after timeout or failure.
-- The pet WebView receives a whitelisted render DTO and is denied all eight sensitive memory commands by both exact capabilities and independent Rust caller-label guards.
-- No telemetry, cloud upload, remote model call, background source scan, or automatic synchronization is implemented.
-- Any future production connector must be source-specific, read-only by default, based on a supported interface, and separately privacy-reviewed.
-- Derived records must retain source lineage and support deletion or recomputation.
-- Secrets and local memory databases are ignored by Git and must never enter fixtures.
+- The user invokes one bounded update through `運作 Memoryling` or `Run Memoryling` in an Agent project.
+- The current Agent may use only context its environment already authorizes. The slogan grants no new source, account, connector, external-service, or write permission.
+- The app does not discover or scan Agent tool homes. It polls one exact app-local inbox file only.
+- The protocol package forbids raw memory, prompts, reasoning, paths, names, secrets, credentials, and tool output.
+- The submit helper and Rust independently validate size, file type, symlink state, schema, unknown fields, IDs, timestamps, enums, counts, and dialogue bounds.
+- SQLite retains only the newest authoritative operation. New apply transactionally replaces the old graph; the detail clear control removes it immediately.
+- The pet WebView receives a whitelisted render DTO without source hashes, operation digest, paths, or full state.
+- Exact Tauri capabilities and independent Rust caller-label guards protect sensitive main commands from the pet surface.
+- The core Agent-operated loop has no telemetry, cloud sync, API key, model request, or source write.
+- Automated and browser verification uses synthetic data only.
 
-Synthetic fixtures and a content-free live `thread/list` smoke cover the pinned compatibility boundary. That smoke did not select a thread or call `thread/read`. Access to any private thread requires separate exact-source authorization and must record only content-free pass／fail evidence.
+The app cannot observe an Agent-memory deletion because it deliberately does not scan Agent storage. The next successful operation must be compiled from current context and replaces prior derived state. Immediate local removal uses Clear. Neither path edits Agent-owned memory.
 
-Only the latest released version will receive security fixes once packaged releases begin.
+## Legacy compatibility code
+
+Older fixture import, exact Codex work-record, direct Codex-memory, and BYOK Daily Scout implementations remain in source for compatibility research. Direct memory and Daily Scout schedulers are disabled, and their UI is not part of the v0.6.0 core.
+
+Daily Scout compatibility code can make an OpenAI API request only after its old, separate manual key and consent flow. Do not present that as the ordinary pet, reactivate it automatically, or reuse Agent-operation data for it. Any continued network feature needs a fresh product and privacy review before public distribution.
+
+## Release boundary
+
+The unsigned v0.2.0 current-user installer is the last installed-UAT artifact. It is a historical local-test baseline and does not prove v0.6.0. Code signing, packaged upgrade and migration, WebView2-missing behavior, mixed-DPI／monitor recovery, assistive technology, sign-out／shutdown, and screenshot privacy remain open.
+
+Only a packaged release explicitly listed as supported will receive a release security window. Until then, report issues against the source version and commit.

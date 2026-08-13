@@ -1,23 +1,27 @@
 import "./CreatureBody.css";
-import type { CreatureBodyModule, CreatureStage } from "./creatureClient";
+import type {
+  AgentActivity,
+  CreatureBodyModule,
+  CreatureStage,
+} from "./creatureClient";
 import { ProceduralMemorySeed } from "./ProceduralMemorySeed";
 
 export interface CreatureBodyProps {
   hasCompletionStar?: boolean;
-  hasMemoryHalo?: boolean;
   motionEnabled?: boolean;
   showOrbits?: boolean;
   stage?: CreatureStage;
   bodyModule?: CreatureBodyModule;
+  agentActivity?: AgentActivity;
 }
 
 export function CreatureBody({
   hasCompletionStar = false,
-  hasMemoryHalo = false,
   motionEnabled = true,
   showOrbits = true,
   stage = "seed",
   bodyModule = "memory-seed-egg-v1",
+  agentActivity = "off",
 }: CreatureBodyProps) {
   return (
     <span
@@ -30,10 +34,8 @@ export function CreatureBody({
         className="memoryling"
         data-body-module={bodyModule}
         data-stage={stage}
+        data-agent-activity={agentActivity}
       >
-        {hasMemoryHalo && (
-          <span className="derived-memory-halo" data-testid="derived-agent-memory-halo" />
-        )}
         <ProceduralMemorySeed bodyModule={bodyModule} stage={stage} />
         {hasCompletionStar && (
           <span

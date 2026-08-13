@@ -5,7 +5,7 @@ fn is_false(value: &bool) -> bool {
 }
 
 pub const MEMORY_EVENT_SCHEMA_VERSION: i64 = 1;
-pub const STORE_SCHEMA_VERSION: i64 = 4;
+pub const STORE_SCHEMA_VERSION: i64 = 5;
 pub const DERIVATION_VERSION: i64 = 1;
 pub const CODEX_ADAPTER_ID: &str = "codex-durable-memory";
 pub const CODEX_ADAPTER_VERSION: i64 = 1;
@@ -176,6 +176,17 @@ pub struct MemoryState {
     pub marks: Vec<CreatureMark>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active_source: Option<ActiveMemorySource>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agent_operation: Option<AgentOperationSummary>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentOperationSummary {
+    pub state: String,
+    pub applied_at: String,
+    pub activity: AgentActivity,
+    pub dialogue_count: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -205,10 +216,45 @@ pub struct CreatureRenderState {
     pub motion: CreatureMotion,
     pub daily_scout_state: DailyScoutRenderState,
     pub marks: Vec<CreatureRenderMark>,
+    pub agent_operation_state: AgentOperationRenderState,
+    pub agent_activity: AgentActivity,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dialogue: Option<PetDialogue>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
+pub enum AgentOperationRenderState {
+    Empty,
+    Applied,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum AgentActivity {
+    Off,
+    Building,
+    Research,
+    Design,
+    Planning,
+    Debugging,
+    Writing,
+    Coordination,
+    Shipping,
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct PetDialogue {
+    pub id: String,
+    pub text_en: String,
+    pub text_zh_tw: String,
+    pub trigger: String,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+#[allow(dead_code)] // Kept for reading pre-v0.6 local state; the Agent-operated path always reports Off.
 pub enum DailyScoutRenderState {
     Off,
     Waiting,
@@ -217,6 +263,7 @@ pub enum DailyScoutRenderState {
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
+#[allow(dead_code)] // Kept for reading pre-v0.6 local state; direct memory access is no longer primary.
 pub enum RealMemoryAccess {
     Off,
     CodexLocal,
@@ -272,5 +319,4 @@ pub struct CreatureRenderMark {
 #[serde(rename_all = "kebab-case")]
 pub enum CreatureRenderMarkStyle {
     CompletionStar,
-    MemoryHalo,
 }

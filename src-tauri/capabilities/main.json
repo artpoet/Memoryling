@@ -11,6 +11,7 @@
     "allow-preview-codex-thread",
     "allow-cancel-memory-preview",
     "allow-get-memory-state",
+    "allow-clear-agent-operation",
     "allow-approve-memory-import",
     "allow-forget-memory-source",
     "allow-sync-codex-memories",

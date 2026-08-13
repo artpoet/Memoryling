@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "operationId": "operation.synthetic-001",
+  "generatedAt": "2026-08-13T10:00:00Z",
+  "agent": { "family": "codex" },
+  "sourceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "profile": {
+    "dominantActivity": "building",
+    "secondaryActivity": "design",
+    "journeyState": "milestone"
+  },
+  "evidence": [
+    {
+      "id": "evidence.repo",
+      "kind": "repo-ssot",
+      "referenceHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "observedAt": "2026-08-13T09:00:00Z"
+    },
+    {
+      "id": "evidence.work",
+      "kind": "recent-work",
+      "referenceHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "observedAt": "2026-08-13T09:30:00Z"
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "dialogue.open",
+      "text": { "en": "The latest pieces are settling into place.", "zhTw": "最近的幾塊拼圖，正在慢慢就位。" },
+      "trigger": "on-open",
+      "priority": 3,
+      "cooldownMinutes": 60,
+      "maxUses": 3,
+      "evidenceIds": ["evidence.repo", "evidence.work"]
+    },
+    {
+      "id": "dialogue.touch-one",
+      "text": { "en": "I can feel the shape of what you built today.", "zhTw": "我感覺得到你今天做出的輪廓。" },
+      "trigger": "on-interact",
+      "priority": 2,
+      "cooldownMinutes": 15,
+      "maxUses": 4,
+      "evidenceIds": ["evidence.work"]
+    },
+    {
+      "id": "dialogue.touch-two",
+      "text": { "en": "A careful finish can be its own kind of progress.", "zhTw": "仔細收尾，本身也是一種前進。" },
+      "trigger": "on-interact",
+      "priority": 1,
+      "cooldownMinutes": 30,
+      "maxUses": 4,
+      "evidenceIds": ["evidence.repo"]
+    },
+    {
+      "id": "dialogue.ambient",
+      "text": { "en": "A small pause might help the next idea arrive.", "zhTw": "停一下，也許下一個想法就會靠近。" },
+      "trigger": "ambient",
+      "priority": 1,
+      "expiresAt": "2026-08-20T10:00:00Z",
+      "cooldownMinutes": 240,
+      "maxUses": 2,
+      "evidenceIds": ["evidence.work"]
+    }
+  ]
+}

@@ -1,10 +1,12 @@
 # ADR-0007: Codex Agent memory is the primary read-only source
 
-- Status: Accepted
+- Status: Superseded as primary by ADR-0008
 - Date: 2026-08-13
 - Supersedes: ADR-0005 only as the primary-source priority and its prohibition on reading documented local memory state
 - Related: [ADR-0001](0001-local-first-derived-memory.md), [ADR-0004](0004-deterministic-content-derived-evolution-paths.md), [ADR-0005](0005-codex-thread-history-source-pilot.md)
 - Research: [2026-08-13 Codex local-memory source update](../research/2026-08-13_codex-local-memory-source-update.md)
+
+> Historical note (2026-08-13): the implementation remains in source as a compatibility experiment, but it is no longer started automatically or presented as the product's core. ADR-0008 moves semantic reading back to the user-invoked Agent and keeps the app outside Agent-owned memory stores.
 
 ## Context
 

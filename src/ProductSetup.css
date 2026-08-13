@@ -278,3 +278,29 @@
     animation: none;
   }
 }
+.setup-agent-route {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid rgba(130, 231, 197, 0.35);
+  border-radius: 16px;
+  background: rgba(130, 231, 197, 0.07);
+}
+
+.setup-agent-route p {
+  margin: 0;
+}
+
+.setup-agent-title {
+  color: #82e7c5;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.setup-slogan {
+  color: #f6f0ff;
+  font-size: clamp(20px, 3vw, 28px);
+  letter-spacing: -0.03em;
+}

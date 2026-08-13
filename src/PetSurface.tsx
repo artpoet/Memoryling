@@ -8,6 +8,7 @@ import {
 import CreatureBody from "./CreatureBody";
 import {
   nativeCreatureClient,
+  sanitizeCreatureRenderState,
   sanitizePetShellState,
   type CreatureClient,
   type MenuTrigger,
@@ -21,42 +22,36 @@ const DRAG_THRESHOLD_DIP = 6;
 const petCopy = {
   en: {
     label:
-      "Memoryling. Memory access is off. Right-click for menu; drag to move.",
-    accessOff: "Memory access off",
-    threadLabel:
-      "Memoryling. One Codex work record is active; durable memory access is off. Right-click for menu; drag to move.",
-    threadActive: "1 Codex work record active · durable memory off",
-    agentLabel:
-      "Memoryling. Codex Agent memories are connected read-only and sync locally. Right-click for menu; drag to move.",
-    agentActive: "Codex Agent memories connected · read-only auto-sync",
+      "Memoryling is waiting for an Agent operation. Right-click for menu; drag to move.",
+    accessOff: "Waiting for Agent operation · memory access off",
+    operationLabel:
+      "Memoryling has an Agent-made update. Right-click for menu; drag to move; click to talk.",
+    operationActive: "Agent operation applied · app memory scanning off",
     onboardingTitle: "Meet your Memoryling",
     drag: "Drag me to move me.",
     menu: "Right-click me, then choose Open Memoryling.",
     recovery: "If I hide, find me from the system tray.",
-    privacy: "Real memory access is currently off.",
+    operate: "In your Agent project, say “Run Memoryling” to update me.",
+    privacy: "The app never scans Agent memory or calls AI by itself.",
     skip: "Got it",
     loading: "Waking up locally",
     reaction: "Memoryling gives a quiet blink.",
-    scoutReady: "I found something useful for you. Open Memoryling to see it.",
   },
   "zh-TW": {
-    label: "Memoryling。記憶存取關閉。按右鍵開啟選單；拖曳即可移動。",
-    accessOff: "記憶存取關閉",
-    threadLabel:
-      "Memoryling。一筆 Codex 工作紀錄已啟用；durable memory 存取仍關閉。按右鍵開啟選單；拖曳即可移動。",
-    threadActive: "1 筆 Codex 工作紀錄已啟用 · durable memory 關閉",
-    agentLabel:
-      "Memoryling。Codex Agent 記憶已唯讀連線並在本機自動同步。按右鍵開啟選單；拖曳即可移動。",
-    agentActive: "Codex Agent 記憶已連線 · 唯讀自動同步",
+    label: "Memoryling 正在等待 Agent 運作。按右鍵開啟選單；拖曳即可移動。",
+    accessOff: "等待 Agent 運作 · 記憶存取關閉",
+    operationLabel:
+      "Memoryling 已收到 Agent 產生的更新。按右鍵開啟選單；拖曳可移動；點一下可交談。",
+    operationActive: "Agent 運作已套用 · App 不掃描記憶",
     onboardingTitle: "認識你的 Memoryling",
     drag: "拖曳我來移動位置。",
     menu: "按右鍵，再選擇開啟 Memoryling。",
     recovery: "找不到我時，可以從系統匣叫我回來。",
-    privacy: "真實記憶存取目前關閉。",
+    operate: "在你的 Agent 專案中說「運作 Memoryling」來更新我。",
+    privacy: "App 不會自行掃描 Agent 記憶，也不會自行呼叫 AI。",
     skip: "知道了",
     loading: "正在本機醒來",
     reaction: "Memoryling 安靜地眨了眨眼。",
-    scoutReady: "我找到一則可能對你有用的情報，打開 Memoryling 看看吧。",
   },
 } as const;
 
@@ -90,7 +85,7 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
   const [locale] = useStoredLocale();
   const t = petCopy[locale];
   const reducedMotion = useReducedMotion();
-  const { renderState, shellState, setShellState, ready } =
+  const { renderState, setRenderState, shellState, setShellState, ready } =
     useCreatureRenderState(client);
   const [reaction, setReaction] = useState(false);
   const dragGesture = useRef<DragGesture | null>(null);
@@ -100,14 +95,7 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
   const hasCompletionStar = renderState.marks.some(
     (mark) => mark.style === "completion-star",
   );
-  const hasMemoryHalo = renderState.marks.some(
-    (mark) => mark.style === "memory-halo",
-  );
-  const hasThreadImport = renderState.importState === "thread-approved";
-  const hasAgentMemory =
-    renderState.importState === "agent-memory-approved" &&
-    renderState.realMemoryAccess === "codex-local";
-  const scoutReady = renderState.dailyScoutState === "ready";
+  const hasAgentOperation = renderState.agentOperationState === "applied";
 
   useEffect(() => {
     document.title = "Memoryling";
@@ -183,6 +171,12 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
       return;
     }
     setReaction(true);
+    if (hasAgentOperation) {
+      void client
+        .advanceDialogue("on-interact")
+        .then((next) => setRenderState(sanitizeCreatureRenderState(next)))
+        .catch(() => undefined);
+    }
     window.clearTimeout(reactionTimer.current);
     reactionTimer.current = window.setTimeout(() => setReaction(false), 1400);
   }
@@ -217,7 +211,7 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
     >
       <button
         aria-haspopup="menu"
-        aria-label={hasAgentMemory ? t.agentLabel : hasThreadImport ? t.threadLabel : t.label}
+        aria-label={hasAgentOperation ? t.operationLabel : t.label}
         className={`pet-button${reaction ? " pet-reacting" : ""}`}
         onClick={handleClick}
         onContextMenu={(event) => {
@@ -234,19 +228,21 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
         <CreatureBody
           bodyModule={renderState.bodyModule}
           hasCompletionStar={hasCompletionStar}
-          hasMemoryHalo={hasMemoryHalo}
           motionEnabled={!reducedMotion}
           stage={renderState.stage}
+          agentActivity={renderState.agentActivity}
         />
       </button>
 
       <p className="pet-access-status">
-        {hasAgentMemory ? t.agentActive : hasThreadImport ? t.threadActive : t.accessOff}
+        {hasAgentOperation ? t.operationActive : t.accessOff}
       </p>
 
-      {scoutReady && !onboardingVisible && (
-        <p className="pet-scout-ready" role="status">
-          {t.scoutReady}
+      {renderState.dialogue && !onboardingVisible && (
+        <p className="pet-dialogue" role="status">
+          {locale === "zh-TW"
+            ? renderState.dialogue.textZhTw
+            : renderState.dialogue.textEn}
         </p>
       )}
 
@@ -260,6 +256,7 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
             <li>{t.drag}</li>
             <li>{t.menu}</li>
             <li>{t.recovery}</li>
+            <li>{t.operate}</li>
             <li>{t.privacy}</li>
           </ul>
           <button onClick={() => void dismissOnboarding()} type="button">

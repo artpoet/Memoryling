@@ -39,9 +39,15 @@ const threadApprovedState: CreatureRenderState = {
 const agentMemoryState: CreatureRenderState = {
   ...emptyState,
   revision: revisionThree,
-  realMemoryAccess: "codex-local",
-  importState: "agent-memory-approved",
-  marks: [{ id: "mark-1", style: "memory-halo" }],
+  agentOperationState: "applied",
+  agentActivity: "design",
+  dialogue: {
+    id: "dialogue.open",
+    textEn: "The shape is becoming clear.",
+    textZhTw: "輪廓正在變得清楚。",
+    trigger: "on-open",
+  },
+  marks: [{ id: "mark-1", style: "completion-star" }],
 };
 const dismissedShell: PetShellState = {
   schemaVersion: 1,
@@ -59,6 +65,7 @@ function createClient(
   const shellUnlisten = vi.fn();
   const client: CreatureClient = {
     getRenderState: vi.fn(async () => renderState as CreatureRenderState),
+    advanceDialogue: vi.fn(async () => renderState as CreatureRenderState),
     getPetShellState: vi.fn(async () => shellState as PetShellState),
     showContextMenu: vi.fn(async () => undefined),
     startDragging: vi.fn(async () => undefined),
@@ -92,29 +99,49 @@ function deferred<T>() {
 }
 
 describe("pet surface", () => {
-  test("shows the render-safe Agent-memory connection and halo", async () => {
+  test("shows a render-safe Agent operation, activity, and dialogue", async () => {
     const fixture = createClient(agentMemoryState);
     render(<PetSurface client={fixture.client} />);
     expect(
-      await screen.findByText("Codex Agent memories connected · read-only auto-sync"),
+      await screen.findByText("Agent operation applied · app memory scanning off"),
     ).toBeInTheDocument();
-    expect(screen.getByTestId("derived-agent-memory-halo")).toBeInTheDocument();
+    expect(screen.getByText("The shape is becoming clear.")).toBeInTheDocument();
+    expect(document.querySelector('[data-agent-activity="design"]')).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Agent memories are connected read-only/i }),
+      screen.getByRole("button", { name: /Agent-made update/i }),
     ).toBeInTheDocument();
   });
 
-  test("reports one active work record without claiming durable-memory access", async () => {
+  test("asks the local rule engine for another dialogue on interaction", async () => {
+    const user = userEvent.setup();
+    const fixture = createClient(agentMemoryState);
+    vi.mocked(fixture.client.advanceDialogue).mockResolvedValueOnce({
+      ...agentMemoryState,
+      revision: "4".repeat(64),
+      dialogue: {
+        id: "dialogue.touch",
+        textEn: "A careful finish is still progress.",
+        textZhTw: "仔細收尾，也是一種前進。",
+        trigger: "on-interact",
+      },
+    });
+    render(<PetSurface client={fixture.client} />);
+    const pet = await screen.findByRole("button", { name: /Agent-made update/i });
+
+    await user.click(pet);
+    expect(fixture.client.advanceDialogue).toHaveBeenCalledWith("on-interact");
+    expect(await screen.findByText("A careful finish is still progress.")).toBeInTheDocument();
+  });
+
+  test("does not present a legacy work record as an Agent operation", async () => {
     const fixture = createClient(threadApprovedState);
     render(<PetSurface client={fixture.client} />);
     expect(
-      await screen.findByText(
-        "1 Codex work record active · durable memory off",
-      ),
+      await screen.findByText("Waiting for Agent operation · memory access off"),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", {
-        name: /One Codex work record is active; durable memory access is off/,
+        name: /waiting for an Agent operation/i,
       }),
     ).toBeInTheDocument();
   });
@@ -123,7 +150,7 @@ describe("pet surface", () => {
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);
 
-    expect(screen.getByText("Memory access off")).toBeInTheDocument();
+    expect(screen.getByText("Waiting for Agent operation · memory access off")).toBeInTheDocument();
     await waitFor(() =>
       expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1),
     );
@@ -233,23 +260,20 @@ describe("pet surface", () => {
     ]);
     expect(renderer.querySelectorAll(".seed-inner-plate")).toHaveLength(2);
 
-    const accessStatus = screen.getByText("Memory access off");
+    const accessStatus = screen.getByText("Waiting for Agent operation · memory access off");
     expect(accessStatus).toHaveClass("pet-access-status");
     expect(document.querySelector(".pet-access-badge")).not.toBeInTheDocument();
   });
 
-  test("shows only a neutral pet notice when a daily insight is ready", async () => {
+  test("does not surface the retired Daily Scout state in the pet", async () => {
     const fixture = createClient({
       ...threadApprovedState,
       dailyScoutState: "ready",
     });
     render(<PetSurface client={fixture.client} />);
 
-    expect(
-      await screen.findByText(
-        "I found something useful for you. Open Memoryling to see it.",
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Waiting for Agent operation · memory access off")).toBeInTheDocument();
+    expect(screen.queryByText(/found something useful/i)).not.toBeInTheDocument();
     expect(
       screen.queryByText(/Official guide|https:\/\//),
     ).not.toBeInTheDocument();
@@ -350,7 +374,7 @@ describe("pet surface", () => {
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);
     const pet = screen.getByRole("button", {
-      name: /Memoryling\. Memory access is off/,
+      name: /waiting for an Agent operation/i,
     });
 
     await user.click(pet);
@@ -373,7 +397,7 @@ describe("pet surface", () => {
     const fixture = createClient();
     render(<PetSurface client={fixture.client} />);
     const pet = screen.getByRole("button", {
-      name: /Memoryling\. Memory access is off/,
+      name: /waiting for an Agent operation/i,
     });
 
     fireEvent.pointerDown(pet, {
@@ -413,7 +437,7 @@ describe("pet surface", () => {
     vi.mocked(fixture.client.startDragging).mockReturnValueOnce(drag.promise);
     render(<PetSurface client={fixture.client} />);
     const pet = screen.getByRole("button", {
-      name: /Memoryling\. Memory access is off/,
+      name: /waiting for an Agent operation/i,
     });
 
     fireEvent.pointerDown(pet, {
@@ -454,7 +478,7 @@ describe("pet surface", () => {
     });
     render(<PetSurface client={fixture.client} />);
 
-    expect(await screen.findByText("記憶存取關閉")).toBeInTheDocument();
+    expect(await screen.findByText("等待 Agent 運作 · 記憶存取關閉")).toBeInTheDocument();
     expect(
       await screen.findByText("按右鍵，再選擇開啟 Memoryling。"),
     ).toBeInTheDocument();
@@ -489,7 +513,7 @@ describe("pet surface", () => {
     await waitFor(() =>
       expect(fixture.client.getRenderState).toHaveBeenCalledTimes(1),
     );
-    expect(screen.getByText("Memory access off")).toBeInTheDocument();
+    expect(screen.getByText("Waiting for Agent operation · memory access off")).toBeInTheDocument();
     view.unmount();
     expect(fixture.renderUnlisten).toHaveBeenCalledTimes(1);
   });

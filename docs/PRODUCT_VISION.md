@@ -2,86 +2,69 @@
 
 ## The promise
 
-Memoryling turns the durable memories of a person's AI agents into a small, persistent desktop life.
+Memoryling turns the memory and recent work already understood by a person's AI Agent into a small, persistent desktop life.
 
-It is not merely a pet that can chat. Its body, habits, relationships, home, stories, and carefully timed reminders should emerge from what the user's agents have learned across real work and life—without surrendering control of that memory.
+The user does not configure another AI service. In a project they say `運作 Memoryling` or `Run Memoryling`; the Agent creates a privacy-minimized pet update, and the local app carries that life forward.
+
+## The operating model
+
+Memoryling is deliberately half Agent and half app:
+
+- **Agent understands.** It uses only context it is already authorized to read: relevant durable memory, recent work, current conversation, and project SSOT.
+- **Agent compiles.** It converts that context into a bounded activity profile, hashed evidence references, and 3–12 bilingual dialogue cards.
+- **App lives.** It persists only the current compiled state, renders appearance accents, and chooses dialogue through deterministic triggers, expiry, cooldown, quiet hours, and budgets.
+
+The app never needs to scan Agent memory or call an AI API for the core experience. The Agent never controls notification timing or silently expands app permissions.
 
 ## The experience
 
-The user meets a quiet creature with little history. As approved memory sources are connected, the creature develops:
+The first Memoryling is quiet and visibly waiting. After the slogan, it may gain an activity-colored aura, a milestone mark, and a deck of short thoughts grounded in the shape of recent work without quoting it. Clicking the pet requests another eligible line from the local rule engine. Ambient lines are rare and stay silent during quiet hours.
 
-- marks and traits shaped by recurring themes and values;
-- conversations grounded in remembered projects and decisions;
-- continuing events that persist across days;
-- a habitat that changes after meaningful completions or unresolved tensions;
-- occasional reminders tied to promises and priorities;
-- when separately enabled, one compact, source-linked daily insight related to the user's recent approved work;
-- curiosity and opinions that remain bounded by user-defined limits.
+Later versions can add:
 
-The creature should feel continuous, not randomly generated. If it changes, the user can ask why.
+- persistent morphology shaped by repeated Agent activities;
+- growth marks tied to meaningful milestones;
+- multi-day stories and habitat changes;
+- bounded reminders derived from current, authorized context;
+- richer conversation through an explicit future provider decision.
 
-## Useful companionship
-
-Memoryling should be introduced as a useful companion, not only a desktop pet. The pet makes memory and information approachable; its practical value comes from relevant recall, bounded initiative, and the planned Daily Memory Scout.
-
-> More than a desktop pet. Memoryling grows from the agent memories you approve and, when you choose to connect an API, can bring back one useful, source-linked insight for the work you are doing today.
-
-Daily Memory Scout is planned and optional, not current functionality. Until it ships, public copy must keep the implemented local pet experience separate from this future API-enabled capability.
+Every lasting change must remain explainable and removable.
 
 ## Desktop presence contract
 
-Memoryling's default desktop presence is the creature itself, not an always-open dashboard. The v0.2.0 foundation implements one small transparent floating pet; right-click opens a native menu, and Open Memoryling reveals the standard detail window for memories, growth, lineage, habitat, privacy, and settings.
-
-Right-click is not the only recovery path. The tray, Start Menu, and installed shortcut recover the single resident process and focus its one detail window; installed cold and resident launch were verified on the current host. When the pet has focus, Enter／Space／Menu key／`Shift+F10` opens the same menu. Opening details hides the pet so the user never sees two separate creatures; closing or minimizing details restores it. Hiding, closing details, forgetting a source, and explicit Quit remain distinct actions. `Win+B`, extended DPI／monitor recovery, assistive technology, and sign-out／shutdown still require dedicated live acceptance.
-
-This pet-first two-window foundation is implemented with Rust-owned lifecycle and a narrow render-state boundary; its full acceptance remains tracked in the [pet-first desktop shell design draft](drafts/pet-first-desktop-shell-2026-08-11.md) and proposed ADR-0003. Until a real connector exists, the pet keeps a visible “memory access is off” state.
+The default presence is the creature, not a dashboard. The existing Tauri shell provides one transparent floating pet, native menu and tray recovery, a single detail window, saved position, and explicit Quit. Browser preview stays detail-only and never imitates native persistence or memory access.
 
 ## Creature growth contract
 
-Memoryling may evolve substantially as approved memories create stable, versioned growth signals. Its proportions, silhouette, appendages, movement, surface, and relationship with its habitat may all change. Distant stages do not need to look immediately recognizable as the same form; each adjacent transition must preserve an understandable visual or behavioral relationship, creating a traceable evolution chain rather than an unexplained replacement.
+The long-term family is biological and organic with restrained sacred-premium materials. Agent activity is the primary morphology signal; accumulated outcomes gate maturity and milestone structures; collaboration style may affect only bounded rhythm. Content domain may influence surface material, never species or sensitive personality labels.
 
-The same Memoryling does not have only one fixed evolution form. Its family language draws from living gaze, organic presence, and restrained sacred-premium materials; adjacent forms may transform even those signatures when the evolution bridge remains understandable. Its actual morphology is deterministically shaped through versioned, lineage-backed signals derived from approved memories. Weighted influences may combine into many bounded variants when histories are mixed. These variants are not fixed character classes, sensitive personality labels, or images generated by a model at runtime.
+Recent work first affects expiring expression, light, pose, and dialogue. Permanent reshaping requires multiple independent, outcome-qualified evidence groups. Calendar time, tokens, record volume, and app-open duration are not XP. A finite local module catalog and deterministic recipe compiler—not runtime image generation—must render all shipped growth.
 
-The current concept forms are visual-vocabulary and adjacent-transition references, not a fixed or pre-authored roster of pets or final states. `EvolutionPathProfile` is a weighted influence vector rather than a branch selector. A finite, versioned local module catalog should compile it into many bounded, testable `MorphologyRecipe` variants at the same life stage. Only authorized, lineage-backed durable Agent-activity evidence may change permanent morphology. No live Agent monitoring exists today. If separately approved in the future, content-minimized active／idle／session presence may change only expiring expression, pose, motion, or light; neutral is the default and no presence value becomes durable growth evidence.
-
-The future evidence hierarchy is **A: commonly repeated Agent activities > C: accumulated history and meaningful outcomes > B: collaboration style**. A controls the dominant silhouette and primary motion; C controls maturity, milestone structures, and permanent lineage-bearing marks; B may adjust only a bounded local rhythm or interaction accent. Content domain—such as coding, research, or writing—may affect only allowlisted material or surface-pattern accents. It never chooses a species, body class, or fixed form.
-
-A future real-source flow must obtain one explicit consent scope covering one selected source, its adapter version, selected data categories, and permitted growth uses. Within that approved scope, deterministic derivation may run automatically and locally. Another source requires another scope; adding a data category or use requires a new consent revision. Recent evidence begins as a TTL-bound expression, pose, motion, or light response. Permanent reshaping requires multiple deduplicated, independent evidence groups with meaningful outcome semantics to remain consistent across versioned thresholds. Calendar time, open duration, source volume, and raw record count are not XP. Every persistent change remains explainable through lineage and must disappear or be recomputed when supporting memories are forgotten.
-
-The growth core is deterministic and does not accept runtime model inference as permanent growth input. Development-time tools may help explore art direction, but shipped assets and rendering remain local. Any future model-produced growth candidate would require a separate product decision, explicit user approval, and source lineage. This entire growth contract is design-only: the current product remains fixture-only and implements neither real-source consent nor evidence-driven morphology. The detailed proposals are recorded in the [evolving creature system design draft](drafts/deep-interview-evolving-creature-system-2026-08-11.md), [Agent-memory variation rules](drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md), and proposed [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md).
+This full growth system remains planned. Protocol v1 currently implements activity accents, milestone marks, bilingual dialogue, lineage hashes, and local timing rules.
 
 ## The product wedge
 
-Memoryling's defensible center is **source-traceable memory causality**:
+```text
+user slogan
+  → authorized Agent understanding
+  → bounded operation package
+  → local deterministic life rules
+  → appearance, dialogue, story, or reminder
+```
 
-    approved source memory
-        → normalized local event
-        → derived signal
-        → creature change, story, or reminder
-        → inspectable explanation
-
-This makes the companion emotionally legible and operationally trustworthy.
+The differentiator is not a chat widget or memory dashboard. It is a companion whose life is authored by the Agent relationship the user already has, while the desktop app supplies continuity and boundaries.
 
 ## Design principles
 
-1. **Life, not dashboard.** Data appears through character and consequence before it appears as analytics.
-2. **Explainable magic.** Delight is welcome; unexplained manipulation is not.
-3. **Continuity over novelty.** A smaller number of persistent stories is better than endless disposable content.
-4. **Bounded initiative.** The creature may choose a moment, never the user's limits.
-5. **Local by default.** Raw memories remain on the user's machine unless a future feature obtains explicit, informed consent.
-6. **Forgetting must work.** Deletion follows the full derivation chain.
-7. **Honest prototypes.** Demonstrations clearly distinguish sample signals from connected data.
+1. **One phrase, not another setup ritual.**
+2. **Life, not dashboard.**
+3. **Agent semantics, app persistence.**
+4. **Explainable magic.**
+5. **Bounded initiative.**
+6. **Local, replaceable derived state.**
+7. **Forgetting and clear controls must work.**
+8. **Honest prototypes and compatibility labels.**
 
-## First user
+## First user and success
 
-The first user is a person who works with multiple coding or knowledge agents and already has durable memory spread across them. They want continuity, delight, and useful recall without another demanding productivity system.
-
-## Success
-
-Memoryling succeeds when a user:
-
-- understands why the creature changed;
-- remembers something important at the right moment;
-- feels that a story continued while they were away;
-- trusts the product enough to connect another memory source;
-- misses the creature when it is not running, without feeling interrupted when it is.
+The first user works with coding or knowledge Agents and wants continuity without another demanding productivity tool. Memoryling succeeds when the user naturally calls the slogan after meaningful work, recognizes their recent journey in the pet without seeing private text exposed, trusts its limits, and notices the creature's absence without feeling interrupted by its presence.

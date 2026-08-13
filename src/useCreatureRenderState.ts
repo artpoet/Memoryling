@@ -101,5 +101,5 @@ export function useCreatureRenderState(client: CreatureClient) {
     };
   }, [client]);
 
-  return { renderState, shellState, setShellState, ready };
+  return { renderState, setRenderState, shellState, setShellState, ready };
 }

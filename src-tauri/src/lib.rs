@@ -21,10 +21,12 @@ pub fn run() {
             memory::preview_codex_thread,
             memory::cancel_memory_preview,
             memory::get_memory_state,
+            memory::clear_agent_operation,
             memory::approve_memory_import,
             memory::forget_memory_source,
             memory::sync_codex_memories,
             memory::get_creature_render_state,
+            memory::advance_pet_dialogue,
             daily_scout::get_daily_scout_state,
             daily_scout::save_openai_api_key,
             daily_scout::test_openai_api_key,
@@ -48,7 +50,6 @@ pub fn run() {
         .setup(|app| {
             desktop_shell::setup(app)?;
             memory::setup(app);
-            daily_scout::setup(app);
             Ok(())
         })
         .run(tauri::generate_context!())
@@ -103,6 +104,7 @@ mod invoke_security_tests {
                 json!({ "previewId": "not-a-preview" }),
             ),
             ("get_memory_state", json!({})),
+            ("clear_agent_operation", json!({})),
             (
                 "approve_memory_import",
                 json!({
@@ -160,6 +162,7 @@ mod invoke_security_tests {
                     memory::preview_codex_thread,
                     memory::cancel_memory_preview,
                     memory::get_memory_state,
+                    memory::clear_agent_operation,
                     memory::approve_memory_import,
                     memory::forget_memory_source,
                     memory::sync_codex_memories,
@@ -217,6 +220,7 @@ mod invoke_security_tests {
                 memory::preview_codex_thread,
                 memory::cancel_memory_preview,
                 memory::get_memory_state,
+                memory::clear_agent_operation,
                 memory::approve_memory_import,
                 memory::forget_memory_source,
                 memory::sync_codex_memories,

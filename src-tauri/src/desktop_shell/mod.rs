@@ -484,6 +484,7 @@ mod tests {
                 "preview_codex_thread",
                 "cancel_memory_preview",
                 "get_memory_state",
+                "clear_agent_operation",
                 "approve_memory_import",
                 "forget_memory_source",
                 "sync_codex_memories",

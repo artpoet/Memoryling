@@ -7,10 +7,9 @@ pub(crate) mod store;
 use std::{
     sync::{Arc, Mutex},
     thread,
-    time::Duration,
 };
 
-use tauri::{App, AppHandle, Manager, Runtime, State};
+use tauri::{AppHandle, Manager, Runtime, State};
 use tauri_plugin_opener::OpenerExt;
 use time::{format_description::well_known::Rfc3339, OffsetDateTime, UtcOffset};
 
@@ -22,9 +21,6 @@ use model::LocalNow;
 pub(crate) use model::{ConfigureDailyScoutRequest, DailyScoutState, OpenDailyScoutLinkRequest};
 use openai::{InsightProvider, OpenAiProvider};
 
-const SCHEDULER_START_DELAY: Duration = Duration::from_secs(5);
-const SCHEDULER_INTERVAL: Duration = Duration::from_secs(15 * 60);
-
 #[derive(Default)]
 pub(crate) struct DailyScoutService {
     operation: Arc<Mutex<()>>,
@@ -34,17 +30,6 @@ impl DailyScoutService {
     fn operation(&self) -> Arc<Mutex<()>> {
         Arc::clone(&self.operation)
     }
-}
-
-pub(crate) fn setup<R: Runtime>(app: &mut App<R>) {
-    let handle = app.handle().clone();
-    thread::spawn(move || {
-        thread::sleep(SCHEDULER_START_DELAY);
-        loop {
-            let _ = run_if_due(&handle);
-            thread::sleep(SCHEDULER_INTERVAL);
-        }
-    });
 }
 
 #[tauri::command]

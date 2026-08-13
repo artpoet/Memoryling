@@ -6,6 +6,50 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ## [Unreleased]
 
+No unreleased changes recorded.
+
+## [0.6.0] - 2026-08-13
+
+> Source-only Agent-operated milestone. The v0.2.0 installer remains the last installed-UAT baseline; no packaged v0.6.0 or private-memory acceptance is claimed.
+
+### Added
+
+- project trigger phrases `運作 Memoryling`, `執行 Memoryling`, and `Run Memoryling`
+- validated `memoryling-operation` Agent skill with explicit authorization and minimization rules
+- strict protocol-v1 JSON Schema, human reference, and committed synthetic example
+- PowerShell validation and atomic app-local inbox submission without package-content output
+- exact-file Rust inbox worker with regular-file／symlink／UTF-8／64 KiB／strict-schema guards
+- SQLite migration 0005／schema v5 for Agent operation profile, hashed evidence, bilingual dialogue, lineage, runtime counters, and ambient daily budget
+- render-state schema v6 with Agent operation state, coarse activity accent, milestone mark, and current dialogue
+- on-open, on-interact, and ambient dialogue with time bounds, cooldown, max uses, 22:00–09:00 quiet hours, and two ambient lines per local day
+- local **Clear this pet update** control
+- accepted ADR-0008 and an Agent-operated architecture／privacy／user-guide SSOT chain
+
+### Changed
+
+- split responsibilities explicitly: the Agent understands and compiles; the app persists, renders, times, and clears
+- made every new operation an authoritative transactional replacement so obsolete derived dialogue is not retained as history
+- removed API-key and direct memory-connector setup from first run and the primary detail surface
+- stopped automatic direct Codex-memory sync and Daily Scout scheduling; retained their code as labeled compatibility experiments only
+- revised product copy around one slogan, local rule-driven life, and no app-side AI API
+- bumped source version to 0.6.0 and store／render schemas to 5／6
+
+### Security and privacy
+
+- operation packages forbid raw memories, prompts, reasoning, paths, names, secrets, credentials, and tool output
+- hashed source references never cross the render DTO
+- duplicate operation ID＋digest is idempotent; reused ID with another digest fails closed
+- synthetic-only protocol, persistence, replacement, clear, rendering, and submit-helper tests avoid user memory
+
+### Validated
+
+- official `skill-creator` validator passes for the project skill
+- submit helper passes against the committed synthetic package in an isolated app-data directory
+- targeted Rust Agent-operation and frontend Agent-operated surfaces pass
+- full repository checks, browser smoke, CI, and Final Gate are recorded in `PROJECT_STATUS.md`
+
+## [0.5.0] - 2026-08-13
+
 > Source v0.5.0 development milestone. The primary path is now a one-time approved local Codex Agent-memory source with read-only automatic sync. No private-memory UAT or packaged v0.5.0 acceptance is claimed; v0.2.0 remains the installed no-redo baseline.
 
 ### Added

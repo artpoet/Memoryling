@@ -7,14 +7,31 @@ export const PET_SHELL_STATE_CHANGED = "memoryling://pet-shell-state-changed";
 
 export interface CreatureMarkRenderState {
   id: string;
-  style: "completion-star" | "memory-halo";
+  style: "completion-star";
 }
 
 export type CreatureStage = "seed";
 export type CreatureBodyModule = "memory-seed-egg-v1";
+export type AgentActivity =
+  | "off"
+  | "building"
+  | "research"
+  | "design"
+  | "planning"
+  | "debugging"
+  | "writing"
+  | "coordination"
+  | "shipping";
+
+export interface PetDialogue {
+  id: string;
+  textEn: string;
+  textZhTw: string;
+  trigger: "on-open" | "on-interact" | "ambient";
+}
 
 export interface CreatureRenderState {
-  schemaVersion: 5;
+  schemaVersion: 6;
   revision: string;
   realMemoryAccess: "off" | "codex-local";
   importState:
@@ -28,6 +45,9 @@ export interface CreatureRenderState {
   palette: "violet-mint";
   motion: "calm";
   dailyScoutState: "off" | "waiting" | "ready";
+  agentOperationState: "empty" | "applied";
+  agentActivity: AgentActivity;
+  dialogue?: PetDialogue;
   marks: CreatureMarkRenderState[];
 }
 
@@ -45,6 +65,7 @@ export type MenuTrigger = "pointer" | "keyboard";
 
 export interface CreatureClient {
   getRenderState(): Promise<CreatureRenderState>;
+  advanceDialogue(trigger: "on-interact" | "ambient"): Promise<CreatureRenderState>;
   getPetShellState(): Promise<PetShellState>;
   showContextMenu(trigger: MenuTrigger): Promise<void>;
   startDragging(): Promise<void>;
@@ -75,6 +96,8 @@ function listenFor<T>(eventName: string, listener: (payload: T) => void) {
 export const nativeCreatureClient: CreatureClient = {
   getRenderState: () =>
     invoke<CreatureRenderState>("get_creature_render_state"),
+  advanceDialogue: (trigger) =>
+    invoke<CreatureRenderState>("advance_pet_dialogue", { trigger }),
   getPetShellState: () => invoke<PetShellState>("get_pet_shell_state"),
   showContextMenu: (trigger) =>
     invoke<void>("show_pet_context_menu", { trigger }),
@@ -97,7 +120,7 @@ export const nativeDetailShellClient: DetailShellClient = {
 };
 
 export const baselineCreatureRenderState: CreatureRenderState = {
-  schemaVersion: 5,
+  schemaVersion: 6,
   revision: "0".repeat(64),
   realMemoryAccess: "off",
   importState: "empty",
@@ -107,6 +130,8 @@ export const baselineCreatureRenderState: CreatureRenderState = {
   palette: "violet-mint",
   motion: "calm",
   dailyScoutState: "off",
+  agentOperationState: "empty",
+  agentActivity: "off",
   marks: [],
 };
 
@@ -129,7 +154,7 @@ export function sanitizeCreatureRenderState(
   if (!value || typeof value !== "object") return baselineCreatureRenderState;
   const state = value as Partial<CreatureRenderState>;
   const valid =
-    state.schemaVersion === 5 &&
+    state.schemaVersion === 6 &&
     isValidRevision(state.revision) &&
     (state.realMemoryAccess === "off" || state.realMemoryAccess === "codex-local") &&
     (state.importState === "empty" ||
@@ -144,17 +169,43 @@ export function sanitizeCreatureRenderState(
     (state.dailyScoutState === "off" ||
       state.dailyScoutState === "waiting" ||
       state.dailyScoutState === "ready") &&
+    (state.agentOperationState === "empty" ||
+      state.agentOperationState === "applied") &&
+    (state.agentActivity === "off" ||
+      state.agentActivity === "building" ||
+      state.agentActivity === "research" ||
+      state.agentActivity === "design" ||
+      state.agentActivity === "planning" ||
+      state.agentActivity === "debugging" ||
+      state.agentActivity === "writing" ||
+      state.agentActivity === "coordination" ||
+      state.agentActivity === "shipping") &&
+    (state.dialogue === undefined ||
+      (Boolean(state.dialogue) &&
+        typeof state.dialogue.id === "string" &&
+        OPAQUE_MARK_ID_PATTERN.test(state.dialogue.id) &&
+        typeof state.dialogue.textEn === "string" &&
+        state.dialogue.textEn.length > 0 &&
+        state.dialogue.textEn.length <= 240 &&
+        !/[\r\n]/.test(state.dialogue.textEn) &&
+        typeof state.dialogue.textZhTw === "string" &&
+        state.dialogue.textZhTw.length > 0 &&
+        state.dialogue.textZhTw.length <= 240 &&
+        !/[\r\n]/.test(state.dialogue.textZhTw) &&
+        (state.dialogue.trigger === "on-open" ||
+          state.dialogue.trigger === "on-interact" ||
+          state.dialogue.trigger === "ambient"))) &&
     Array.isArray(state.marks) &&
     state.marks.every(
       (mark) =>
         Boolean(mark) &&
         typeof mark.id === "string" &&
         OPAQUE_MARK_ID_PATTERN.test(mark.id) &&
-        (mark.style === "completion-star" || mark.style === "memory-halo"),
+        mark.style === "completion-star",
     );
   if (!valid) return baselineCreatureRenderState;
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     revision: state.revision!,
     realMemoryAccess: state.realMemoryAccess!,
     importState: state.importState!,
@@ -164,6 +215,16 @@ export function sanitizeCreatureRenderState(
     palette: "violet-mint",
     motion: "calm",
     dailyScoutState: state.dailyScoutState!,
+    agentOperationState: state.agentOperationState!,
+    agentActivity: state.agentActivity!,
+    dialogue: state.dialogue
+      ? {
+          id: state.dialogue.id,
+          textEn: state.dialogue.textEn,
+          textZhTw: state.dialogue.textZhTw,
+          trigger: state.dialogue.trigger,
+        }
+      : undefined,
     marks: state.marks!.map((mark) => ({ id: mark.id, style: mark.style })),
   };
 }

@@ -106,6 +106,14 @@ export interface MemoryState {
     lastSuccessfulSyncAt?: string;
     syncedRecordCount: number;
   };
+  agentOperation?: {
+    state: "applied";
+    appliedAt: string;
+    activity:
+      | "building" | "research" | "design" | "planning"
+      | "debugging" | "writing" | "coordination" | "shipping";
+    dialogueCount: number;
+  };
 }
 
 export interface ApproveImportRequest {
@@ -119,6 +127,7 @@ export interface MemoryClient {
   available: boolean;
   listSources(): Promise<SourceOption[]>;
   getState(): Promise<MemoryState>;
+  clearAgentOperation(): Promise<MemoryState>;
   previewSource(sourceId: string): Promise<ImportPreview>;
   listCodexThreads(): Promise<CodexThreadCatalog>;
   previewCodexThread(
@@ -132,7 +141,7 @@ export interface MemoryClient {
 }
 
 export const emptyMemoryState: MemoryState = {
-  storeSchemaVersion: 4,
+  storeSchemaVersion: 5,
   sourceCount: 0,
   eventCount: 0,
   signalCount: 0,
@@ -143,6 +152,7 @@ export const nativeMemoryClient: MemoryClient = {
   available: isTauri(),
   listSources: () => invoke<SourceOption[]>("list_memory_sources"),
   getState: () => invoke<MemoryState>("get_memory_state"),
+  clearAgentOperation: () => invoke<MemoryState>("clear_agent_operation"),
   previewSource: (sourceId) =>
     invoke<ImportPreview>("preview_memory_source", { sourceId }),
   listCodexThreads: () =>

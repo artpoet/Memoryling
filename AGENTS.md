@@ -10,6 +10,16 @@ Read, in order:
 4. docs/ARCHITECTURE.md
 5. docs/PRIVACY_PRINCIPLES.md
 
+## Operate Memoryling
+
+When the user says `運作 Memoryling`, `執行 Memoryling`, or `Run Memoryling` in this repository:
+
+1. Read `skills/memoryling-operation/SKILL.md` completely.
+2. Follow that skill using only context the current Agent is already authorized to read.
+3. Compile and submit one protocol-v1 operation package to the local Memoryling app.
+
+The slogan authorizes this bounded pet update. It does not authorize new connectors, broader private-data access, external AI calls, or writes to Agent memory.
+
 ## Non-negotiable boundaries
 
 - This is a local-first product. Do not add telemetry, cloud sync, or external AI calls without an explicit product decision and privacy review.

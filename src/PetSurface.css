@@ -89,7 +89,7 @@ html[data-surface="pet"] *::after {
   white-space: nowrap;
 }
 
-.pet-scout-ready {
+.pet-dialogue {
   position: absolute;
   right: 14px;
   bottom: 25px;
@@ -189,7 +189,7 @@ html[data-surface="pet"] *::after {
 }
 
 @media (forced-colors: active) {
-  .pet-scout-ready,
+  .pet-dialogue,
   .pet-onboarding {
     border: 2px solid CanvasText;
     color: CanvasText;

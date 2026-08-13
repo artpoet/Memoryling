@@ -1,290 +1,51 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
-import { App } from "./App";
-import type { DetailEventClient, DetailShellClient } from "./creatureClient";
-import type { ProductSetupClient } from "./productSetupClient";
+import { DetailSurface } from "./App";
+import type {
+  CreatureRevision,
+  DetailEventClient,
+  DetailShellClient,
+} from "./creatureClient";
 import {
   emptyMemoryState,
-  type ImportPreview,
   type MemoryClient,
   type MemoryState,
-  type SourceOption,
 } from "./memoryClient";
+import type { ProductSetupClient } from "./productSetupClient";
 
-const source: SourceOption = {
-  id: "codex.synthetic.first-memory",
-  adapterId: "codex-durable-memory",
-  adapterVersion: 1,
-  displayName: "Codex · First memory fixture",
-  locator: "resource://fixtures/codex-first-memory-v1.json",
-  fixtureOnly: true,
-};
-
-const contentHash = "a".repeat(64);
-const consentScopeHash = "b".repeat(64);
-
-const preview: ImportPreview = {
-  previewId: "preview_123",
-  source,
-  recordCount: 1,
-  timeRange: {
-    start: "2026-08-10T08:15:00Z",
-    end: "2026-08-10T08:15:00Z",
-  },
-  records: [
-    {
-      id: "synthetic-memory-001",
-      sourceTimestamp: "2026-08-10T08:15:00Z",
-      kind: "completion",
-      textPreview:
-        "Shipped a local-first creature whose changes can always explain their source.",
-      characterCount: 79,
-      contentHash,
-    },
-  ],
-  accessScope: {
-    readOnly: true,
-    sourceWriteAccess: false,
-    networkAccess: false,
-    arbitraryPathAccess: false,
-  },
-  consentScope: {
-    schemaVersion: 1,
-    revision: 1,
-    sourceId: source.id,
-    adapterId: source.adapterId,
-    adapterVersion: source.adapterVersion,
-    dataCategories: ["synthetic-completion"],
-    purposes: ["local-creature-derivation"],
-    readOnly: true,
-  },
-  consentScopeHash,
-};
-
-const approvedState: MemoryState = {
-  storeSchemaVersion: 2,
-  sourceCount: 1,
-  eventCount: 1,
-  signalCount: 1,
-  marks: [
-    {
-      id: "effect_123",
-      style: "completion-star",
-      signalType: "completion",
-      confidence: 1,
-      derivationVersion: 1,
-      explanationKey: "approved_completion_created_star",
-      lineage: [
-        {
-          memoryEventId: "memory_123",
-          memoryEventSchemaVersion: 1,
-          sourceId: source.id,
-          sourceLabel: source.displayName,
-          adapterId: source.adapterId,
-          adapterVersion: source.adapterVersion,
-          sourceRecordId: "synthetic-memory-001",
-          sourceTimestamp: "2026-08-10T08:15:00Z",
-          memoryText:
-            "Shipped a local-first creature whose changes can always explain their source.",
-          contentRedacted: false,
-          characterCount: 79,
-          contentHash,
-        },
-      ],
-    },
-  ],
-};
-
-const threadSource: SourceOption = {
-  id: "source_work_1",
-  adapterId: "codex-app-server-thread",
-  adapterVersion: 1,
-  displayName: "Codex work record · Aug 12",
-  locator: "opaque://source_work_1",
-  fixtureOnly: false,
-};
-
-const threadConsentScopeHash = "c".repeat(64);
-const threadPreview: ImportPreview = {
-  previewId: "preview_work_1",
-  source: threadSource,
-  recordCount: 1,
-  timeRange: {
-    start: "2026-08-12T07:30:00Z",
-    end: "2026-08-12T07:30:00Z",
-  },
-  records: [
-    {
-      id: "record_work_1",
-      sourceTimestamp: "2026-08-12T07:30:00Z",
-      kind: "completion",
-      characterCount: 428,
-      contentHash: contentHash,
-    },
-  ],
-  accessScope: {
-    readOnly: true,
-    sourceWriteAccess: false,
-    networkAccess: false,
-    arbitraryPathAccess: false,
-  },
-  consentScope: {
-    schemaVersion: 1,
-    revision: 1,
-    sourceId: threadSource.id,
-    adapterId: "codex-app-server-thread",
-    adapterVersion: 1,
-    dataCategories: ["user-confirmed-completion"],
-    purposes: ["local-creature-derivation"],
-    readOnly: true,
-  },
-  consentScopeHash: threadConsentScopeHash,
-};
-
-const approvedThreadState: MemoryState = {
-  ...approvedState,
-  marks: [
-    {
-      ...approvedState.marks[0],
-      lineage: [
-        {
-          ...approvedState.marks[0].lineage[0],
-          sourceId: threadSource.id,
-          sourceLabel: threadSource.displayName,
-          adapterId: threadSource.adapterId,
-          sourceRecordId: "raw-thread-id-must-not-render",
-          memoryText: "PRIVATE FINAL ANSWER MUST NOT RENDER",
-          contentRedacted: true,
-          characterCount: 428,
-          consentScopeHash: threadConsentScopeHash,
-          consentRevision: 1,
-        },
-      ],
-    },
-  ],
-};
-
-const agentSource: SourceOption = {
-  id: "codex.local-memories",
-  adapterId: "codex-local-memory-store",
-  adapterVersion: 1,
-  displayName: "Codex · Local Agent memories",
-  locator: "codex-home://memories",
-  fixtureOnly: false,
-};
-
-const agentConsentScopeHash = "d".repeat(64);
-const agentPreview: ImportPreview = {
-  previewId: "preview_agent_memories",
-  source: agentSource,
-  recordCount: 2,
-  timeRange: {
-    start: "2026-08-13T01:00:00Z",
-    end: "2026-08-13T02:00:00Z",
-  },
-  records: ["memory-summary", "durable-memory-registry"].map((id, index) => ({
-    id,
-    sourceTimestamp: `2026-08-13T0${index + 1}:00:00Z`,
-    kind: "agent-memory-document" as const,
-    characterCount: 120 + index,
-    contentHash: String(index + 1).repeat(64),
-  })),
-  accessScope: {
-    readOnly: true,
-    sourceWriteAccess: false,
-    networkAccess: false,
-    arbitraryPathAccess: false,
-  },
-  consentScope: {
-    schemaVersion: 2,
-    revision: 1,
-    sourceId: agentSource.id,
-    adapterId: agentSource.adapterId,
-    adapterVersion: 1,
-    dataCategories: ["agent-memory-summary", "agent-durable-memory-registry"],
-    purposes: ["local-creature-derivation", "automatic-read-only-sync"],
-    readOnly: true,
-    sourceLocatorHash: "e".repeat(64),
-    automaticSync: true,
-  },
-  consentScopeHash: agentConsentScopeHash,
-};
-
-const approvedAgentState: MemoryState = {
-  storeSchemaVersion: 4,
-  sourceCount: 1,
-  eventCount: 2,
-  signalCount: 1,
-  activeSource: {
-    sourceId: agentSource.id,
-    adapterId: agentSource.adapterId,
-    displayName: agentSource.displayName,
-    automaticSync: true,
-    syncStatus: "synced",
-    lastSuccessfulSyncAt: "2026-08-13T02:05:00Z",
-    syncedRecordCount: 2,
-  },
-  marks: [
-    {
-      id: "effect_agent_halo",
-      style: "memory-halo",
-      signalType: "agent-memory-continuity",
-      confidence: 1,
-      derivationVersion: 1,
-      explanationKey: "approved_agent_memories_created_halo",
-      lineage: agentPreview.records.map((record) => ({
-        memoryEventId: `event_${record.id}`,
-        memoryEventSchemaVersion: 1,
-        sourceId: agentSource.id,
-        sourceLabel: agentSource.displayName,
-        adapterId: agentSource.adapterId,
-        adapterVersion: 1,
-        sourceRecordId: record.id,
-        sourceTimestamp: record.sourceTimestamp,
-        contentRedacted: true,
-        characterCount: record.characterCount,
-        contentHash: record.contentHash,
-        consentScopeHash: agentConsentScopeHash,
-        consentRevision: 1,
-      })),
-    },
-  ],
-};
-
-const missingAgentState: MemoryState = {
-  ...approvedAgentState,
-  eventCount: 0,
-  signalCount: 0,
-  marks: [],
-  activeSource: {
-    ...approvedAgentState.activeSource!,
-    syncStatus: "source-missing",
-    syncedRecordCount: 0,
+const operationState: MemoryState = {
+  ...emptyMemoryState,
+  agentOperation: {
+    state: "applied",
+    appliedAt: "2026-08-13T10:00:00Z",
+    activity: "building",
+    dialogueCount: 5,
   },
 };
 
-function createClient(initialState: MemoryState = emptyMemoryState) {
-  const approveImport = vi.fn(async () => approvedState);
-  const forgetSource = vi.fn(async () => emptyMemoryState);
-  const cancelPreview = vi.fn(async () => undefined);
-  const client: MemoryClient = {
+function createMemoryClient(state: MemoryState = emptyMemoryState): MemoryClient {
+  return {
     available: true,
-    listSources: vi.fn(async () => [source]),
-    getState: vi.fn(async () => initialState),
-    previewSource: vi.fn(async () => preview),
-    listCodexThreads: vi.fn(async () => ({ catalogId: "catalog_1", candidates: [] })),
-    previewCodexThread: vi.fn(async () => preview),
-    cancelPreview,
-    approveImport,
-    forgetSource,
-    syncCodexMemories: vi.fn(async () => initialState),
+    listSources: vi.fn(async () => []),
+    getState: vi.fn(async () => state),
+    clearAgentOperation: vi.fn(async () => emptyMemoryState),
+    previewSource: vi.fn(async () => {
+      throw new Error("legacy connector is not part of this surface");
+    }),
+    listCodexThreads: vi.fn(async () => ({ catalogId: "unused", candidates: [] })),
+    previewCodexThread: vi.fn(async () => {
+      throw new Error("legacy connector is not part of this surface");
+    }),
+    cancelPreview: vi.fn(async () => undefined),
+    approveImport: vi.fn(async () => state),
+    forgetSource: vi.fn(async () => state),
+    syncCodexMemories: vi.fn(async () => state),
   };
-  return { client, approveImport, forgetSource, cancelPreview };
 }
 
 function createDetailEvents() {
-  let revisionListener: (() => void) | undefined;
+  let revisionListener: ((payload: CreatureRevision) => void) | undefined;
   let resetListener: (() => void) | undefined;
   const client: DetailEventClient = {
     onRenderRevision: vi.fn(async (listener) => {
@@ -298,17 +59,12 @@ function createDetailEvents() {
   };
   return {
     client,
-    emitRevision: () => revisionListener?.(),
+    emitRevision: (revision = "a".repeat(64)) => revisionListener?.({ revision }),
     emitReset: () => resetListener?.(),
   };
 }
 
-const quietDetailEvents: DetailEventClient = {
-  onRenderRevision: vi.fn(async () => vi.fn()),
-  onDetailReset: vi.fn(async () => vi.fn()),
-};
-
-const quietDetailShell: DetailShellClient = {
+const detailShell: DetailShellClient = {
   resetOnboarding: vi.fn(async () => ({
     schemaVersion: 1 as const,
     onboardingDismissed: false,
@@ -316,555 +72,139 @@ const quietDetailShell: DetailShellClient = {
   })),
 };
 
-describe("First real memory vertical slice", () => {
-  test("approves the complete Agent-memory scope once and exposes local auto-sync without raw text", async () => {
+const completeSetupClient: ProductSetupClient = {
+  available: false,
+  getState: vi.fn(async () => ({ schemaVersion: 1 as const, setupComplete: true })),
+  complete: vi.fn(async () => ({ schemaVersion: 1 as const, setupComplete: true })),
+};
+
+describe("Agent-operated Memoryling detail surface", () => {
+  test("renders the applied operation without exposing a direct memory connector", async () => {
     const user = userEvent.setup();
-    const approveImport = vi.fn(async () => approvedAgentState);
-    const syncCodexMemories = vi.fn(async () => approvedAgentState);
-    const client: MemoryClient = {
-      available: true,
-      listSources: vi.fn(async () => [agentSource, source]),
-      getState: vi.fn(async () => emptyMemoryState),
-      previewSource: vi.fn(async (sourceId) => {
-        expect(sourceId).toBe(agentSource.id);
-        return agentPreview;
-      }),
-      listCodexThreads: vi.fn(async () => ({ catalogId: "catalog", candidates: [] })),
-      previewCodexThread: vi.fn(async () => threadPreview),
-      cancelPreview: vi.fn(async () => undefined),
-      approveImport,
-      forgetSource: vi.fn(async () => emptyMemoryState),
-      syncCodexMemories,
-    };
+    const memoryClient = createMemoryClient(operationState);
     render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={client}
+      <DetailSurface
+        browserPreview={false}
+        detailEvents={createDetailEvents().client}
+        detailShell={detailShell}
+        memoryClient={memoryClient}
+        productSetupClient={completeSetupClient}
       />,
     );
 
-    await user.click(await screen.findByRole("radio", { name: /Local Agent memories/i }));
-    await user.click(screen.getByRole("button", { name: "Review Agent memory scope" }));
-    const records = await screen.findAllByText("CONTENT HIDDEN FROM THE WEBVIEW");
-    expect(records).toHaveLength(2);
-    expect(screen.getAllByText("Agent-memory document")).toHaveLength(2);
-    const recordChecks = screen.getAllByRole("checkbox").slice(0, 2);
-    expect(recordChecks.every((checkbox) => checkbox.hasAttribute("disabled"))).toBe(true);
-    await user.click(screen.getByRole("checkbox", { name: /approve read-only access/i }));
-    await user.click(screen.getByRole("button", { name: "Approve & store 2 records locally" }));
+    expect(await screen.findByText("Agent operation applied · local pet rules active")).toBeInTheDocument();
+    expect(screen.getByText("Latest Agent operation applied")).toBeInTheDocument();
+    expect(screen.getByText(/5 dialogue cards are ready/)).toBeInTheDocument();
+    expect(document.querySelector('[data-agent-activity="building"]')).toBeInTheDocument();
+    expect(screen.getByText("An Agent operation shaped the pet")).toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: /Agent memories/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/API key/i)).not.toBeInTheDocument();
 
-    expect(approveImport).toHaveBeenCalledWith({
-      previewId: agentPreview.previewId,
-      sourceId: agentSource.id,
-      selectedRecordIds: ["memory-summary", "durable-memory-registry"],
-      consentScopeHash: agentConsentScopeHash,
-    });
-    expect(await screen.findByTestId("derived-agent-memory-halo")).toBeInTheDocument();
-    expect(screen.getByText("Codex Agent memories connected · local read-only auto-sync")).toBeInTheDocument();
-    expect(screen.queryByText(/Synthetic summary|durable entries/i)).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Sync now" }));
-    expect(syncCodexMemories).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole("button", { name: "Clear this pet update" }));
+    expect(memoryClient.clearAgentOperation).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText("Waiting for the next Agent operation")).toBeInTheDocument();
   });
 
-  test("withdraws the Agent-memory claim when the approved source is missing", async () => {
-    const { client } = createClient(missingAgentState);
+  test("keeps browser preview honest and performs no memory read", () => {
+    const memoryClient = createMemoryClient();
+    memoryClient.available = false;
     render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={client}
-      />,
-    );
-
-    expect(
-      await screen.findByText(
-        "Codex Agent-memory source unavailable · local effects withdrawn",
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText("Codex Agent memories connected · local read-only auto-sync"),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByTestId("derived-agent-memory-halo")).not.toBeInTheDocument();
-  });
-
-  test("finishes first-run setup before revealing the detail dashboard", async () => {
-    const user = userEvent.setup();
-    const fixture = createClient();
-    const productSetupClient: ProductSetupClient = {
-      available: true,
-      getState: vi.fn(async () => ({
-        schemaVersion: 1 as const,
-        setupComplete: false,
-      })),
-      complete: vi.fn(async () => ({
-        schemaVersion: 1 as const,
-        setupComplete: true,
-      })),
-    };
-    render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={fixture.client}
-        productSetupClient={productSetupClient}
-      />,
-    );
-
-    expect(await screen.findByText("Create your Memoryling")).toBeInTheDocument();
-    expect(screen.queryByText("Your agent memories, alive.")).not.toBeInTheDocument();
-    await user.click(
-      screen.getByRole("button", { name: "Wake up my Memoryling" }),
-    );
-    expect(productSetupClient.complete).toHaveBeenCalledTimes(1);
-    expect(
-      await screen.findByText("Your agent memories, alive."),
-    ).toBeInTheDocument();
-  });
-
-  test("browses one Codex work record, redacts content, binds exact consent, and forgets it", async () => {
-    const user = userEvent.setup();
-    const fixture = createClient();
-    vi.mocked(fixture.client.listCodexThreads).mockResolvedValueOnce({
-      catalogId: "catalog_safe_1",
-      candidates: [
-        {
-          candidateId: "candidate_opaque_1",
-          displayName: "Recent completed work · Aug 12",
-          updatedAt: "2026-08-12T07:30:00Z",
-          sourceKind: "Codex work record",
-        },
-      ],
-    });
-    vi.mocked(fixture.client.previewCodexThread).mockResolvedValueOnce(threadPreview);
-    fixture.approveImport.mockResolvedValueOnce(approvedThreadState);
-
-    render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={fixture.client}
-      />,
-    );
-
-    await user.click(
-      await screen.findByRole("button", { name: "Browse local Codex work records" }),
-    );
-    expect(fixture.client.listCodexThreads).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("EXPERIMENTAL")).toBeInTheDocument();
-    expect(
-      screen.getByText(/without titles, summaries, paths, raw IDs, or transcript content/i),
-    ).toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole("radio", { name: /Recent completed work · Aug 12/ }),
-    );
-    await user.click(screen.getByRole("button", { name: "Review this record" }));
-    expect(fixture.client.previewCodexThread).toHaveBeenCalledWith(
-      "catalog_safe_1",
-      "candidate_opaque_1",
-    );
-    expect(await screen.findByText("CONTENT HIDDEN FROM THE WEBVIEW")).toBeInTheDocument();
-    expect(screen.getByText(/Category: completion · Characters: 428/)).toBeInTheDocument();
-    expect(screen.getByText("user-confirmed-completion")).toBeInTheDocument();
-    expect(screen.getByText("local-creature-derivation")).toBeInTheDocument();
-    expect(screen.getByText(threadConsentScopeHash)).toBeInTheDocument();
-    expect(screen.queryByText(/candidate_opaque_1|raw-thread-id|PRIVATE FINAL/)).not.toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole("checkbox", {
-        name: /I confirm this work record represents a completed outcome/,
-      }),
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Approve & store 1 record locally" }),
-    );
-    expect(fixture.approveImport).toHaveBeenCalledWith({
-      previewId: threadPreview.previewId,
-      sourceId: threadSource.id,
-      selectedRecordIds: ["record_work_1"],
-      consentScopeHash: threadConsentScopeHash,
-    });
-    expect(
-      await screen.findByText(
-        "1 Codex work record active · durable memory access is off",
-      ),
-    ).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Why did this happen?" }));
-    expect(screen.getByText("Stored content hidden")).toBeInTheDocument();
-    expect(screen.queryByText(/PRIVATE FINAL|raw-thread-id/)).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Forget this source" }));
-    await user.click(
-      screen.getByRole("checkbox", {
-        name: /I understand that the local imported record/,
-      }),
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Forget source and remove mark" }),
-    );
-    expect(fixture.forgetSource).toHaveBeenCalledWith(threadSource.id);
-    expect(
-      await screen.findByText("Forgotten completely. Source access is off again."),
-    ).toBeInTheDocument();
-  });
-
-  test("cancels a work-record catalog without reading a thread", async () => {
-    const user = userEvent.setup();
-    const fixture = createClient();
-    vi.mocked(fixture.client.listCodexThreads).mockResolvedValueOnce({
-      catalogId: "catalog_cancel",
-      candidates: [
-        {
-          candidateId: "candidate_cancel",
-          displayName: "Work record · Aug 11",
-          updatedAt: "2026-08-11T04:00:00Z",
-          sourceKind: "Codex work record",
-        },
-      ],
-    });
-    render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={fixture.client}
-      />,
-    );
-    await user.click(
-      await screen.findByRole("button", { name: "Browse local Codex work records" }),
-    );
-    expect(await screen.findByText("Work record · Aug 11")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Cancel browse" }));
-    expect(screen.queryByText("Work record · Aug 11")).not.toBeInTheDocument();
-    expect(fixture.cancelPreview).toHaveBeenCalledWith("catalog_cancel");
-    expect(fixture.client.previewCodexThread).not.toHaveBeenCalled();
-  });
-
-  test("fails closed when the work-record catalog cannot be listed", async () => {
-    const user = userEvent.setup();
-    const fixture = createClient();
-    vi.mocked(fixture.client.listCodexThreads).mockRejectedValueOnce(
-      new Error("C:\\private\\codex\\state.db"),
-    );
-    render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={fixture.client}
-      />,
-    );
-    await user.click(
-      await screen.findByRole("button", { name: "Browse local Codex work records" }),
-    );
-    expect(
-      await screen.findByText(
-        "The local operation did not complete. No private error details were shown and no UI state was approved.",
-      ),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(/C:\\private|state\.db/i)).not.toBeInTheDocument();
-    expect(fixture.client.previewCodexThread).not.toHaveBeenCalled();
-  });
-
-  test("moves from off to preview, persisted lineage, and complete forgetting", async () => {
-    const user = userEvent.setup();
-    const { client, approveImport, forgetSource } = createClient();
-    render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={client}
-      />,
-    );
-
-    expect(
-      screen.getByRole("link", { name: "Memoryling home" }).querySelector("img"),
-    ).toHaveAttribute("src", expect.stringContaining("memoryling-icon"));
-    expect(screen.queryByTestId("derived-memory-mark")).not.toBeInTheDocument();
-    expect(
-      screen.getByText("Memory access is off · no approved sources"),
-    ).toBeInTheDocument();
-
-    const sourceRadio = await screen.findByRole("radio", {
-      name: /Codex · First memory fixture/,
-    });
-    await user.click(sourceRadio);
-    await user.click(screen.getByRole("button", { name: "Preview synthetic fixture" }));
-
-    expect(
-      await screen.findByText(
-        "Shipped a local-first creature whose changes can always explain their source.",
-      ),
-    ).toBeInTheDocument();
-    expect(approveImport).not.toHaveBeenCalled();
-    expect(screen.queryByTestId("derived-memory-mark")).not.toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole("checkbox", {
-        name: /I approve storing the selected synthetic record/,
-      }),
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Approve & store 1 record locally" }),
-    );
-
-    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
-    expect(approveImport).toHaveBeenCalledWith({
-      previewId: preview.previewId,
-      sourceId: source.id,
-      selectedRecordIds: ["synthetic-memory-001"],
-      consentScopeHash,
-    });
-    expect(
-      screen.getByText("Fixture pilot active · real memory access is off"),
-    ).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Why did this happen?" }));
-    expect(screen.getByText("Privacy-safe lineage")).toBeInTheDocument();
-    expect(screen.getByText("Normalized memory event")).toBeInTheDocument();
-    expect(screen.getByText("Creature world effect")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Forget this source" }));
-    await user.click(
-      screen.getByRole("checkbox", {
-        name: /I understand that the local imported record/,
-      }),
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Forget source and remove mark" }),
-    );
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("derived-memory-mark")).not.toBeInTheDocument();
-    });
-    expect(forgetSource).toHaveBeenCalledWith(source.id);
-    expect(
-      screen.getByText("Memory access is off · no approved sources"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Forgotten completely. Source access is off again."),
-    ).toBeInTheDocument();
-  });
-
-  test("restores the persisted mark after a desktop restart", async () => {
-    const { client } = createClient(approvedState);
-    render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={client}
-      />,
-    );
-
-    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
-    expect(screen.getByText("One approved synthetic memory left a completion star")).toBeInTheDocument();
-  });
-
-  test("keeps the honest off state in a browser and preserves bilingual parity", async () => {
-    const user = userEvent.setup();
-    const unavailableClient: MemoryClient = {
-      available: false,
-      listSources: vi.fn(),
-      getState: vi.fn(),
-      previewSource: vi.fn(),
-      listCodexThreads: vi.fn(),
-      previewCodexThread: vi.fn(),
-      cancelPreview: vi.fn(),
-      approveImport: vi.fn(),
-      forgetSource: vi.fn(),
-      syncCodexMemories: vi.fn(),
-    };
-    const resetOnboarding = vi.fn();
-    render(
-      <App
+      <DetailSurface
         browserPreview
-        detailEvents={quietDetailEvents}
-        detailShell={{ resetOnboarding }}
-        memoryClient={unavailableClient}
+        detailEvents={createDetailEvents().client}
+        detailShell={detailShell}
+        memoryClient={memoryClient}
+        productSetupClient={completeSetupClient}
       />,
     );
 
-    expect(screen.getByText("Desktop runtime required")).toBeInTheDocument();
-    expect(
-      screen.getByText("Browser preview · memory access is off"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Floating pet is available in the Windows desktop app")).toBeInTheDocument();
-    expect(screen.queryByTestId("pet-surface")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Show pet guide again" })).not.toBeInTheDocument();
-    expect(resetOnboarding).not.toHaveBeenCalled();
-    expect(unavailableClient.listCodexThreads).not.toHaveBeenCalled();
-    expect(unavailableClient.previewCodexThread).not.toHaveBeenCalled();
+    expect(screen.getByTestId("browser-shell-boundary")).toBeInTheDocument();
+    expect(screen.getByText("Say “Run Memoryling” in your agent project")).toBeInTheDocument();
+    expect(screen.getByText(/performs no AI or memory read/i)).toBeInTheDocument();
+    expect(memoryClient.getState).not.toHaveBeenCalled();
+  });
+
+  test("keeps the Agent-operated explanation in Traditional Chinese", async () => {
+    const user = userEvent.setup();
+    render(
+      <DetailSurface
+        browserPreview
+        detailEvents={createDetailEvents().client}
+        detailShell={detailShell}
+        memoryClient={{ ...createMemoryClient(), available: false }}
+        productSetupClient={completeSetupClient}
+      />,
+    );
 
     await user.click(screen.getByRole("button", { name: "繁中" }));
-    expect(screen.getByText("讓核准的 Agent 記憶，塑造一個生命")).toBeInTheDocument();
-    expect(screen.getByText("需要桌面版執行環境")).toBeInTheDocument();
-    expect(screen.getByText("瀏覽器預覽 · 記憶存取關閉")).toBeInTheDocument();
+    expect(screen.getByText("在 Agent 專案中說：「運作 Memoryling」")).toBeInTheDocument();
+    expect(screen.getByText(/這個頁面不會自行執行 AI 或讀取記憶/)).toBeInTheDocument();
   });
 
-  test("renders a defensive fallback for an invalid preview timestamp", async () => {
+  test("refreshes the full operation summary after a native revision", async () => {
+    const memoryClient = createMemoryClient();
+    vi.mocked(memoryClient.getState)
+      .mockResolvedValueOnce(emptyMemoryState)
+      .mockResolvedValueOnce(operationState);
+    const events = createDetailEvents();
+    render(
+      <DetailSurface
+        browserPreview={false}
+        detailEvents={events.client}
+        detailShell={detailShell}
+        memoryClient={memoryClient}
+        productSetupClient={completeSetupClient}
+      />,
+    );
+    await waitFor(() => expect(memoryClient.getState).toHaveBeenCalledTimes(1));
+
+    act(() => events.emitRevision());
+    expect(await screen.findByText("Latest Agent operation applied")).toBeInTheDocument();
+    expect(memoryClient.getState).toHaveBeenCalledTimes(2);
+  });
+
+  test("finishes first-run setup without asking for an API key", async () => {
     const user = userEvent.setup();
-    const { client } = createClient();
-    client.previewSource = vi.fn(async () => ({
-      ...preview,
-      timeRange: { start: "not-a-date", end: "not-a-date" },
-      records: [{ ...preview.records[0], sourceTimestamp: "not-a-date" }],
+    const setupClient: ProductSetupClient = {
+      available: true,
+      getState: vi.fn(async () => ({ schemaVersion: 1 as const, setupComplete: false })),
+      complete: vi.fn(async () => ({ schemaVersion: 1 as const, setupComplete: true })),
+    };
+    render(
+      <DetailSurface
+        browserPreview={false}
+        detailEvents={createDetailEvents().client}
+        detailShell={detailShell}
+        memoryClient={createMemoryClient()}
+        productSetupClient={setupClient}
+      />,
+    );
+
+    expect(await screen.findByText(/Run Memoryling/)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/API key/i)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Wake up my Memoryling" }));
+    expect(await screen.findByText("Waiting for the next Agent operation")).toBeInTheDocument();
+  });
+
+  test("resets the pet guide with honest success reporting", async () => {
+    const user = userEvent.setup();
+    const resetOnboarding = vi.fn(async () => ({
+      schemaVersion: 1 as const,
+      onboardingDismissed: false,
+      alwaysOnTop: true,
     }));
     render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={client}
-      />,
-    );
-
-    await user.click(
-      await screen.findByRole("radio", { name: /Codex · First memory fixture/ }),
-    );
-    await user.click(screen.getByRole("button", { name: "Preview synthetic fixture" }));
-
-    expect((await screen.findAllByText("Invalid source timestamp")).length).toBeGreaterThan(0);
-  });
-
-  test("does not remove a persisted mark when forgetting fails", async () => {
-    const user = userEvent.setup();
-    const { client, forgetSource } = createClient(approvedState);
-    forgetSource.mockRejectedValueOnce(new Error("private database detail"));
-    render(
-      <App
-        detailEvents={quietDetailEvents}
-        detailShell={quietDetailShell}
-        memoryClient={client}
-      />,
-    );
-
-    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Forget this source" }));
-    await user.click(
-      screen.getByRole("checkbox", {
-        name: /I understand that the local imported record/,
-      }),
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Forget source and remove mark" }),
-    );
-
-    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "The local operation did not complete. No private error details were shown and no UI state was approved.",
-      ),
-    ).toBeInTheDocument();
-    expect(screen.queryByText("private database detail")).not.toBeInTheDocument();
-  });
-
-  test("refetches complete detail state after a safe revision event", async () => {
-    const fixture = createClient();
-    const detailEvents = createDetailEvents();
-    render(
-      <App
-        detailEvents={detailEvents.client}
-        detailShell={quietDetailShell}
-        memoryClient={fixture.client}
-      />,
-    );
-    await waitFor(() => expect(fixture.client.getState).toHaveBeenCalledTimes(1));
-    vi.mocked(fixture.client.getState).mockResolvedValueOnce(approvedState);
-    detailEvents.emitRevision();
-    expect(await screen.findByTestId("derived-memory-mark")).toBeInTheDocument();
-    expect(fixture.client.getState).toHaveBeenCalledTimes(2);
-  });
-
-  test("resets pending detail UI without confusing close with forgetting", async () => {
-    const user = userEvent.setup();
-    const fixture = createClient();
-    const detailEvents = createDetailEvents();
-    render(
-      <App
-        detailEvents={detailEvents.client}
-        detailShell={quietDetailShell}
-        memoryClient={fixture.client}
-      />,
-    );
-    await user.click(await screen.findByRole("radio", { name: /Codex · First memory fixture/ }));
-    await user.click(screen.getByRole("button", { name: "Preview synthetic fixture" }));
-    expect(await screen.findByText(/Shipped a local-first creature/)).toBeInTheDocument();
-    detailEvents.emitReset();
-    await waitFor(() =>
-      expect(screen.queryByText(/Shipped a local-first creature/)).not.toBeInTheDocument(),
-    );
-    expect(fixture.client.forgetSource).not.toHaveBeenCalled();
-  });
-
-  test("drops a late work-record preview after the native detail session resets", async () => {
-    const user = userEvent.setup();
-    const fixture = createClient();
-    const detailEvents = createDetailEvents();
-    let resolvePreview: ((value: ImportPreview) => void) | undefined;
-    vi.mocked(fixture.client.listCodexThreads).mockResolvedValueOnce({
-      catalogId: "catalog_late",
-      candidates: [
-        {
-          candidateId: "candidate_late",
-          displayName: "Codex work record 01",
-          updatedAt: "2026-08-12T07:30:00Z",
-          sourceKind: "codex-work-record",
-        },
-      ],
-    });
-    vi.mocked(fixture.client.previewCodexThread).mockReturnValueOnce(
-      new Promise((resolve) => {
-        resolvePreview = resolve;
-      }),
-    );
-    render(
-      <App
-        detailEvents={detailEvents.client}
-        detailShell={quietDetailShell}
-        memoryClient={fixture.client}
-      />,
-    );
-
-    await user.click(
-      await screen.findByRole("button", { name: "Browse local Codex work records" }),
-    );
-    await user.click(screen.getByRole("radio", { name: /Codex work record 01/ }));
-    await user.click(screen.getByRole("button", { name: "Review this record" }));
-    await waitFor(() =>
-      expect(fixture.client.previewCodexThread).toHaveBeenCalledTimes(1),
-    );
-
-    detailEvents.emitReset();
-    resolvePreview?.(threadPreview);
-    await waitFor(() =>
-      expect(screen.queryByText("CONTENT HIDDEN FROM THE WEBVIEW")).not.toBeInTheDocument(),
-    );
-    expect(fixture.approveImport).not.toHaveBeenCalled();
-    expect(screen.queryByText("PRIVATE FINAL ANSWER MUST NOT RENDER")).not.toBeInTheDocument();
-  });
-
-  test("lets native detail reset the pet guide with honest error handling", async () => {
-    const user = userEvent.setup();
-    const fixture = createClient();
-    const resetOnboarding = vi
-      .fn()
-      .mockRejectedValueOnce(new Error("private native path"))
-      .mockResolvedValueOnce({
-        schemaVersion: 1,
-        onboardingDismissed: false,
-        alwaysOnTop: true,
-      });
-    render(
-      <App
-        detailEvents={quietDetailEvents}
+      <DetailSurface
+        browserPreview={false}
+        detailEvents={createDetailEvents().client}
         detailShell={{ resetOnboarding }}
-        memoryClient={fixture.client}
+        memoryClient={createMemoryClient()}
+        productSetupClient={completeSetupClient}
       />,
     );
-    const button = screen.getByRole("button", { name: "Show pet guide again" });
-    await user.click(button);
-    expect(screen.getByText("The local setting did not change. Try again from the desktop app.")).toBeInTheDocument();
-    expect(screen.queryByText(/private native path/)).not.toBeInTheDocument();
-    await user.click(button);
-    expect(screen.getByText("The pet guide will appear the next time the pet is shown.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Show pet guide again" }));
+    expect(resetOnboarding).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(/guide will appear the next time/)).toBeInTheDocument();
   });
 });
