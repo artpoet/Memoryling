@@ -149,12 +149,17 @@ Memoryling 看見使用者近期正以 MiniMax H3 製作影片，關注角色一
 
 - [OpenAI API quickstart and Web Search example](https://platform.openai.com/docs/quickstart/make-your-first-api-request)
 - [OpenAI API data controls](https://platform.openai.com/docs/models/default-usage-policies-by-endpoint)
+- [OpenAI API authentication and key handling](https://platform.openai.com/docs/api-reference/authentication)
 - [OpenAI Responses API reference](https://platform.openai.com/docs/api-reference/responses)
 - [Current OpenAI model catalog](https://developers.openai.com/api/docs/models)
 
 ## API key 安全
 
 API key 是功能能否成立的硬門檻，不是一般偏好設定。
+
+OpenAI 的一般安全指引不建議把 API key 暴露在 browser／mobile／client app，並偏好由受控後端或 key-management service 保存。Memoryling 的 BYOK 提案不會把專案方的共用 key 嵌入程式，而是讓每位使用者在自己的電腦保存並使用自己的 key；即使採用 Windows Credential Manager，key 仍會在本機程式需要呼叫 API 時短暫進入 process memory，無法抵抗已取得使用者權限的惡意程式或系統管理員。這是明確的殘餘風險，不得宣稱「絕對安全」。
+
+實作 ADR 必須比較兩條路：`A. 本機 BYOK + OS credential vault` 與 `B. Memoryling 自建後端代理`。MVP 建議 A，因為 B 會引入帳號、伺服器、集中式祕密、營運成本與新的記憶資料信任邊界，明顯改變 local-first 定位；但 A 仍需在啟用頁揭露本機 key 風險，並建議使用者建立專用／受限 key、設定合理預算、監看用量及在懷疑外洩時立即輪替。
 
 - React／WebView 不得持有、讀回或發送已保存的 key。
 - key 只透過一次性的密碼輸入命令交給 Rust；命令返回後前端欄位立即清空。
