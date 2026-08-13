@@ -25,7 +25,7 @@
 
 ## Product in one paragraph
 
-Memoryling is a local-first desktop creature intended to grow from approved Agent memories. Its differentiator is source-traceable causality: every meaningful change must be explainable, correctable, and removable.
+Memoryling is a local-first desktop creature that grows from approved Agent memories. Every meaningful change must be traceable, correctable, and removable.
 
 ## Reality check
 
@@ -37,20 +37,20 @@ Implemented now:
 - English and Traditional Chinese interface with remembered locale
 - interactive creature plus honestly labeled concept event and bounded-initiative panels
 - versioned normalized memory events, bundled synthetic fixture, experimental work-record adapter, and SQLite schema v3
-- explicit fixture-source selection, in-memory preview token, record selection, and consent gate
-- local SQLite v3 store under Tauri app-local data with import／Daily Scout consent, attempt budget, citations, and source lineage
+- explicit source selection, in-memory preview, record choice, and consent gate
+- local SQLite v3 with import／Daily Scout consent, attempt budget, citations, and lineage
 - deterministic completion signal and explainable completion-star world effect
 - transactional source forgetting followed by deterministic recomputation
 - visible real-memory access remains off; fixture approval is reported separately as a local synthetic pilot
-- pet-first native desktop shell: transparent floating `pet`, hidden on-demand `main`, native context／keyboard menu, tray recovery, and single-instance behavior
-- Rust-owned close／minimize／restore／explicit-Quit lifecycle with content-free shell settings, bounded position recovery, and one-time bilingual onboarding
+- pet-first shell: floating `pet`, on-demand `main`, native menu, tray recovery, and single-instance behavior
+- Rust-owned close／minimize／restore／Quit lifecycle, safe position recovery, and bilingual onboarding
 - exact per-window capabilities plus caller-label guards; `pet` receives only a narrow `CreatureRenderState`, revision events, and its own guarded drag command
 - lazy surface routing: native labels are authoritative, browser mode stays an honest detail preview, and the pet bundle does not load full-memory APIs
 - a Rust-owned, exact-version `codex app-server` pilot for user-triggered Codex work-record listing and one explicitly selected thread read; it is not durable-memory access
-- content-minimized catalogs, Rust-only raw IDs／final text before approval, redacted preview, exact consent hash, single-active-source enforcement, content-free external lineage, and local forgetting
-- one shared 10-second connector deadline, bounded process cleanup, stale-session／concurrent-source guards, and dual ACL／caller denial coverage for eight sensitive commands
-- optional Daily Memory Scout: off by default, user BYOK in Windows Credential Manager, visible coarse-context preview, explicit consent, fixed Rust-only OpenAI Responses／Web Search, pinned `gpt-5.6-terra`, `store: false`, and annotation-only citations
-- transactional one-attempt-per-local-date guard, no same-day automatic retry／backfill, source-linked forgetting, and main-only controls; the pet receives only neutral `off`／`waiting`／`ready`
+- minimized catalogs, Rust-only private content, redacted preview, exact consent hash, one active source, redacted lineage, and local forgetting
+- bounded connector deadline／cleanup, stale-session guards, and dual ACL／caller denial coverage
+- optional Daily Scout: off by default, Credential Manager BYOK, visible coarse context, explicit consent, fixed Rust-only OpenAI Web Search, and annotation-only citations
+- one attempt per local date, no automatic retry／backfill, source-linked forgetting, and neutral pet status only
 - no telemetry; the ordinary pet, fixture, and work-record connector remain API-free
 
 Not implemented:
@@ -59,10 +59,10 @@ Not implemented:
 - arbitrary path scanning, tool-home parsing, or a user file picker
 - authorized private-thread UAT, paid Daily Scout live smoke, or a packaged v0.4.0 installer
 - derivations beyond the deterministic completion-star rule
-- the designed identity core, content-derived `EvolutionPathProfile`, lineage-bearing `MorphologyRecipe`, creature genome, adjacent-stage／recipe-change EvolutionBridges, large-form evolution stages, layered renderer, and growth journal
+- the designed identity core, path profile, lineage-bearing morphology recipes, genome, evolution bridges／stages, later-stage renderer, and growth journal
 - real conversation model
 - native reminder delivery
-- full live pet-shell acceptance at 125／150／175／200% and mixed DPI, monitor hot-unplug／taskbar relocation, adjacent-desktop hitbox, Win+B keyboard tray access, Narrator／NVDA, and sign-out／shutdown
+- the remaining live DPI／monitor／taskbar／hitbox／tray-keyboard／screen-reader／Windows-session acceptance matrix
 - WebView2-missing installer UAT in a safe disposable Windows environment
 - code signing or a public release-ready package
 
@@ -101,11 +101,11 @@ The shell is “two surfaces, one life”: Rust owns the transparent `pet`, on-d
 - src/DailyScoutPanel.tsx and dailyScoutClient.ts — bilingual BYOK, context consent, status, cited insight, and controls
 - src-tauri/src/memory/ — fixture adapter, version-bound work-record pilot, pending consent, SQLite store, derivation, and forgetting
 - src-tauri/src/daily_scout/ — coarse compiler, credential vault, fixed OpenAI client, scheduler, daily budget, lineage, and commands
-- src-tauri/src/memory/codex_thread.rs — bounded local App Server process, minimized catalog, selected-record parser, and consent binding
+- src-tauri/src/memory/codex_thread.rs — bounded App Server process, minimized catalog, selection, and consent binding
 - src-tauri/migrations/0001_first_memory.sql through 0003_daily_memory_scout.sql — local schema v3
 - src-tauri/fixtures/codex-first-memory-v1.json — fictional test-only source
 - src-tauri/icons/icon-source.png — built-in ImageGen test-art source; not public release-approved
-- src-tauri/src/desktop_shell/ — Rust-owned resident lifecycle, tray／menu, settings, position, and recovery
+- src-tauri/src/desktop_shell/ — resident lifecycle, tray／menu, settings, position, and recovery
 - src-tauri/src/caller.rs — unspoofable window／webview caller-label guards
 - src-tauri/capabilities/main.json and pet.json — exact per-surface capabilities
 - package.json — frontend, validation, and Windows NSIS build commands
@@ -114,7 +114,7 @@ The shell is “two surfaces, one life”: Rust owns the transparent `pet`, on-d
 - docs/zh-TW/USER_GUIDE.md — Traditional Chinese user guide
 - docs/PRODUCT_VISION.md — product intent
 - docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md and deep-interview-agent-memory-variation-rules-2026-08-12.md — proposed growth／variation designs; not implemented
-- docs/research/2026-08-12_codex-for-open-source-readiness.md — official program facts, current public-evidence snapshot, application readiness gates, truthful draft answers, and submission boundaries
+- docs/research/2026-08-12_codex-for-open-source-readiness.md — program facts, readiness evidence, drafts, and submission boundaries
 - docs/adr/0003-pet-first-two-window-desktop-shell.md — implemented two-window decision under extended acceptance; status remains Proposed
 - docs/adr/0004-deterministic-content-derived-evolution-paths.md — proposed local, lineage-aware bounded-variant growth decision
 - docs/adr/0005-codex-thread-history-source-pilot.md — proposed version-bound experimental work-record pilot contract
@@ -147,13 +147,13 @@ The shell is “two surfaces, one life”: Rust owns the transparent `pet`, on-d
 - Browser preview has no native memory runtime. Do not add mock persistence or present planned behavior as live.
 - The supported tester entry is the unsigned current-user NSIS installer. The raw release exe requires its generated fixture sidecar and is not portable.
 - Installer UAT must start from normal Explorer; reject agent-package LocalAppData virtualization as evidence. v0.2.0 verified retain-data uninstall, while v0.1.0 historically verified both choices; no database content was read.
-- The host already has WebView2 151.0.4129.78 and no safe Windows Sandbox／Hyper-V clean environment. The missing-runtime bootstrapper branch is deferred; never remove the host runtime just to test it. Any prerequisite download is separate from the network-free fixture memory pipeline.
+- WebView2-missing UAT requires a disposable Windows environment; never remove the host runtime to test it. Installer prerequisites remain separate from the offline fixture path.
 - Generated test artwork and transparent PNGs are not evidence of signing, store review, or public release readiness.
 - Growth drafts and branching concept art are design vocabulary only—not a live renderer, fixed route／pet roster, production sprite set, or real-memory mapping. See ADR-0004 and the two indexed growth drafts for the full boundary.
 - Native window labels, not query strings, select the pet surface. Never fake pet／tray behavior in browser mode or widen the pet DTO with memory text.
 - Tauri app commands are not safely window-scoped by default. Preserve exact capabilities plus Rust caller-label guards and real-invoke denial tests for every sensitive memory and Daily Scout command.
 - `store: false` is not zero retention. The key must remain in Windows Credential Manager and never return to the WebView; do not search with a real key without explicit paid-smoke authorization.
-- Codex for Open Source is a discretionary maintainer program, not a contest or guaranteed benefit. Memoryling still lacks a public Release, source proof, adoption, and a maintainer loop; refresh live evidence only before an authorized submission.
+- Codex for Open Source is discretionary, not a contest or guaranteed benefit. Refresh live evidence only before an authorized submission.
 
 ## Working conventions
 
@@ -193,19 +193,29 @@ Last installed-UAT artifact (v0.2.0; do not silently substitute a v0.4.0 build):
 
     src-tauri/target/release/bundle/nsis/Memoryling_0.2.0_x64-setup.exe
 
+## Fresh-session opening response
+
+After the read order and `main`／`origin/main` check, **do not start work immediately**. First answer the user in plain Traditional Chinese, in at most six short bullets:
+
+1. say that the source product and pet shell work, but v0.4.0 is not a public-ready installer;
+2. name the two largest missing proofs: one authorized real work record and one authorized paid Daily Scout request;
+3. say **「你現在只要選一個」** and present the three choices below, recommending choice 1 because it validates the current product promise before adding more features;
+4. state clearly which choice uses private data, an API key, or money;
+5. wait for the user's choice before reading a private record, sending a request, packaging／publishing, or starting a new feature.
+
+Choices to explain in plain language:
+
+- **1｜驗證真實流程（建議）**：needs one named work record with exact consent, then separate approval for one paid request and in-product key entry.
+- **2｜先做寵物成長**：synthetic fixtures only; build one explainable and reversible growth slice without private data or paid API.
+- **3｜先做可安裝測試版**：package and test v0.4.0 with synthetic data; keep it unsigned and internal-only.
+
 ## Current coherent next bundle
 
-Fresh-session instruction: start with the first unfinished gate in this section and finish that one coherent bundle through verification, SSOT, commit, and push. Do not stop at planning or a native connector skeleton, and do not submit the external application without a new explicit user instruction.
+Finish one user-chosen choice end to end through verification, SSOT, commit, push, CI, and Final Gate. Generic continuation never authorizes private `thread/read`, paid API use, publication, or application submission.
 
-No-redo baseline: v0.1.0 closed the full fixture／both-uninstall cycle; v0.2.0 closed pet security／lifecycle, raw fixture UAT, and normal installed smoke. Its exact unsigned NSIS is 2,875,965 bytes, SHA-256 `BFB2A08D272CDEF64C59C84D30389D99E2EB6A74EC45E97209EFDD906CF6DFCD`. Do not rebuild it to repeat closed gates.
+No-redo baseline: v0.1.0 closed the fixture／uninstall cycle; v0.2.0 closed pet security／lifecycle and installed smoke. Do not rebuild them merely to repeat closed gates; exact artifact evidence remains in `PROJECT_STATUS.md`.
 
-The v0.4.0 Daily Scout source slice is complete through synthetic tests and visible UI smoke: ADR-0006, SQLite v3, Windows Credential Manager BYOK, minimized context, Rust-only OpenAI boundary, daily budget, citations, deletion, and bilingual UX. No real key／paid request, private record, or v0.4.0 package is accepted.
-
-Authorization-gated: a real API smoke requires explicit paid-request approval and key entry through the product; private UAT separately requires one user-named work record and exact read／storage／derivation scope. Generic continuation authorizes neither. Use `PROJECT_STATUS.md` → **Fresh-chat handoff** for safe work. ADR-0003／0005／0006 stay Proposed.
-
-Later Phase 2 growth must start from the indexed synthetic fixture matrix; do not create a fixed sprite route, per-record consent spam, silent scope expansion, or usage-volume leveling.
-
-Codex for Open Source is not the next bundle. Do not submit without a new explicit instruction; first close private pilot UAT, release evidence, genuine adoption, and a maintainer feedback loop.
+Complete now: v0.4.0 source, Daily Scout synthetic proof, and seed renderer v8. Still open: real／paid proof, accepted package, growth, signing, release, and adoption. Exact boundaries live in `PROJECT_STATUS.md`.
 
 ## Closeout checklist
 

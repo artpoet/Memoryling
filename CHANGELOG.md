@@ -6,6 +6,15 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ## [Unreleased]
 
+### Changed
+
+- Refined the deterministic programmatic seed renderer through v8: broader teardrop／rounded-base proportions, synchronized eye geometry, layered biological facets, bright side plates that protrude beyond the body, and a restrained soft outer shadow; AI concept art remains reference-only rather than a runtime asset
+- Added a plain-language fresh-session handoff that makes the next agent summarize the current state, present three bounded next-step choices, label private／paid consequences, and wait for the user's selection before acting
+
+### Validated
+
+- 38 frontend tests and 47 Rust tests pass with one explicitly ignored private-read live smoke; renderer-v8 visual QA, TypeScript／Vite build, Rust checks, formatting, Final Gate, and Windows CI run `31681343720` pass
+
 ### Planned
 
 - Separately authorized exact-source private-thread UAT for the pinned experimental work-record pilot

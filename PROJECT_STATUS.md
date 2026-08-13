@@ -96,8 +96,8 @@ The desktop is now pet-first: normal presence is one transparent floating creatu
 
 ## Verification evidence
 
-- PASS — 32 frontend tests cover native-label routing, browser honesty, fixture／work-record flows, Daily Scout consent gating, immediate key-field clearing, citation-only links, neutral pet readiness, reset races, and bilingual boundaries
-- PASS — 45 Rust tests cover fixture／work-record parsing, process bounds, consent migration, one-source enforcement, persistence／recomputation, coarse-context minimization, explicit low-value fallback labeling, OpenAI response／citation rejection, one-attempt success／failure idempotency, source invalidation, ACL／caller guards, and pet-shell lifecycle／geometry; one private-read live smoke stays explicitly ignored
+- PASS — 38 frontend tests cover native-label routing, browser honesty, fixture／work-record flows, Daily Scout consent gating, immediate key-field clearing, citation-only links, neutral pet readiness, reset races, bilingual boundaries, and the accepted programmatic seed-renderer contract
+- PASS — 47 Rust tests cover fixture／work-record parsing, process bounds, consent migration, one-source enforcement, persistence／recomputation, coarse-context minimization, explicit low-value fallback labeling, OpenAI response／citation rejection, one-attempt success／failure idempotency, source invalidation, ACL／caller guards, and pet-shell lifecycle／geometry; one private-read live smoke stays explicitly ignored
 - PASS — production capabilities and the independent caller-label guard deny the full sensitive manifest from `pet`, including all ten Daily Scout settings／credential／network／external-link／full-insight commands; `main` retains a positive invoke path
 - PASS — `npm run check`, `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings`
 - PASS — Windows CI for source v0.4.0 implementation commit `c3b59f8`: https://github.com/artpoet/Memoryling/actions/runs/31664739429
@@ -105,6 +105,7 @@ The desktop is now pet-first: normal presence is one transparent floating creatu
 - PASS — restrictive CSP remains; broad `core:default` was replaced by exact `main`／`pet` capabilities, and the pet has no cross-window mutation permission
 - PASS — exact local `codex-cli 0.134.0` content-minimized live `thread/list` smoke returned only neutral candidates and left no Codex child process; it did not invoke `thread/read` or output IDs, titles, paths, summaries, or content
 - PASS — source v0.4.0 native desktop smoke observed the transparent pet, native Open／close／Quit lifecycle, English／Traditional Chinese Daily Scout value copy, OFF／ordinary-pet-no-API state, key／official links, synthetic-ineligible context, daily timing, consent／cost／retention copy, and disabled enable control; no key was entered, no source was browsed, and no request was made
+- PASS — programmatic seed renderer v8 visual QA compared the accepted concept, annotated plate edge, full render, and enlarged edge crop; the bright plates protrude beyond the shell with a thin rim and soft falloff, while the face and body proportions stay unchanged
 - PENDING — one explicitly authorized paid Daily Scout smoke and packaged v0.4.0 native acceptance; synthetic tests do not substitute for provider-account or paid behavior
 - PENDING — one exact user-authorized private work-record preview／consent／approve／restart／redacted-lineage／forget UAT; no private record has been selected or read
 - PASS — `npm run build:windows` produced the v0.2.0 NSIS installer, release executable, and synthetic fixture resource
@@ -137,6 +138,8 @@ Remote evidence:
 - PASS — Windows CI for the v0.3.0 source bundle: https://github.com/artpoet/Memoryling/actions/runs/31612662676
 - Daily Scout implementation commit: [`c3b59f8`](https://github.com/artpoet/Memoryling/commit/c3b59f851ab6c6aca3da9045dbea931b8fdca8f5)
 - PASS — Windows CI for the v0.4.0 source bundle: https://github.com/artpoet/Memoryling/actions/runs/31664739429
+- current functional head before this handoff: [`eca0066`](https://github.com/artpoet/Memoryling/commit/eca00661a32c8383ff25f2ce9944b581df4c50c4)
+- PASS — Windows CI for the renderer-v8 functional head: https://github.com/artpoet/Memoryling/actions/runs/31681343720
 
 ## Codex for Open Source readiness
 
@@ -162,23 +165,21 @@ The internal decision is **do not submit yet**. With the pet shell complete, pro
 
 ## Next bundle
 
-First unfinished feature gate: run one real Daily Scout request only after the user explicitly authorizes a paid smoke and provides／enters the intended API key through the product UI. Use only the visible coarse context; never retrieve a key from environment files or print it. Then verify one cited result, restart no-rerun, read state, disable, local clear, key deletion, and source-forget invalidation without capturing private content. Until that authorization exists, synthetic evidence is the honest boundary.
+At the next wakeup, explain these choices and wait for the user to select one:
 
-The v0.4.0 pilot's private-data UAT remains separate and may run only after the user names one exact Codex work record and authorizes the recorded read／local-storage／derivation scope. Do not list or read private records under a general continuation instruction.
+1. **Validate the real flow (recommended):** one user-named completed Codex work record with exact `read`／Memoryling local-storage／local-derivation authorization, plus a separate authorization for one paid Daily Scout request. The user enters the API key through the product UI. Complete selection → redacted preview → consent → local effect → one cited insight → restart／no-rerun → disable／clear／key deletion → source forget, recording only content-free evidence.
+2. **Build the first real growth slice:** use synthetic fixtures only to implement one bounded, lineage-bearing, explainable, reversible morphology change from the Phase 2 drafts／ADR-0004. No private record, paid request, runtime image generation, silent scope expansion, or usage-volume XP.
+3. **Prepare an installable v0.4.0 test build:** package the current source and run synthetic-only native acceptance for setup, pet／detail lifecycle, fixture path, Daily Scout off-state, restart, uninstall, and checksums. Keep it unsigned and internal-test-only.
 
-If a fresh conversation has no exact private-source authorization, it should continue autonomously with the safe current-host shell-UAT fallback: native tray Show／Hide／Open／Always-on-top／Quit, `Win+B` keyboard recovery, both current 100% monitors' drag／restart／clamp behavior, adjacent-desktop hitbox, and built-in UIA／Narrator basics. Record only content-free evidence. Do not change display scaling, disconnect a monitor, relocate the taskbar through registry hacks, install NVDA, sign out／shut down, or remove WebView2; leave those items PENDING／DEFERRED for a suitable environment or explicit coordination.
-
-The future Phase 2 bounded-variant growth direction is recorded in `docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md`, `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`, and proposed ADR-0004; it does not supersede the installer, pet-shell, and real-source gates above.
-
-After one authorized source slice is proven, prepare the public-beta and maintainer-evidence track: package and repeat installer UAT for that exact artifact, create a verified GitHub Release and checksums, recruit real external testers, record honest adoption, and complete at least one feedback／issue → fix → follow-up release loop. Refresh official terms and live evidence only when those gates are ready. Do not submit the application from the current pre-release state.
+If the user has not chosen, do not silently substitute shell UAT or packaging. A generic request to continue never authorizes a private record, API key lookup, paid request, public release, or application submission. Environment-incompatible checks remain PENDING／DEFERRED.
 
 ## Fresh-chat handoff
 
 Paste-ready instruction:
 
-> 請依專案 `AI-WAKEUP.md` 指定順序喚醒，先核對 `PROJECT_STATUS.md`、`main`／`origin/main` 與禁止重做邊界。v0.4.0 Daily Memory Scout source 已完成；若我沒有明確授權付費 API smoke，不得找現成 key 或發出真實請求。若我沒有明確指定一筆私人 Codex 工作紀錄及 read／local-storage／derivation scope，也不得 Browse 或呼叫 `thread/read`。請改做仍安全可執行的 synthetic quality／packaging preparation 或 current-host shell-UAT bundle，並完成內容最小化證據、SSOT、commit、push、CI／remote 核對與 Final Gate。不得重做 v0.1／v0.2 artifact gates、移除 WebView2、改 DPI／螢幕／taskbar、安裝 NVDA、sign out／shutdown，或提交 Codex for Open Source 申請表。
+> 請依 `AI-WAKEUP.md` 的順序喚醒，核對 `PROJECT_STATUS.md`、專案規則、`main`／`origin/main` 與禁止重做事項。醒來後先不要動手，請用不超過六個短點、白話告訴我：現在已完成什麼、還缺什麼，以及我現在只要從哪三個下一步選一個；請明確標出建議選項與哪些會用到私人紀錄、API Key 或費用，然後等我選。沒有我的明確同意，不得讀私人 Codex 工作紀錄、找現成 Key、發出付費請求、製作／發布公開版本，或提交 Codex for Open Source 申請。
 
-Expected wakeup outcome: the next agent either executes one explicitly authorized paid API smoke or private-record UAT, or—under a generic continuation request—finishes a non-private synthetic／current-host bundle without reopening completed implementation／installer work. Any environment-incompatible check stays honestly PENDING／DEFERRED.
+Expected wakeup outcome: the next agent first returns the plain-language three-choice reminder from **Next bundle**, recommends validating the real flow, and waits. After the user chooses, it completes only that one bounded slice end to end.
 
 ## Do not redo
 
