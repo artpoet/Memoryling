@@ -128,7 +128,7 @@ describe("pet surface", () => {
 
     const renderer = await screen.findByTestId("memoryling-seed-renderer");
     expect(renderer.tagName).toBe("svg");
-    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v3");
+    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v4");
     expect(renderer).toHaveAttribute("data-stage", "seed");
     expect(renderer).toHaveAttribute(
       "data-body-module",
@@ -140,14 +140,14 @@ describe("pet surface", () => {
     const shell = renderer.querySelector(".seed-shell");
     expect(shell).toHaveAttribute(
       "d",
-      "M120 37C109 49 88 52 72 69C55 87 48 116 49 150C50 188 73 215 103 226C114 230 126 230 137 226C167 215 190 188 191 150C192 116 185 87 168 69C152 52 131 49 120 37Z",
+      "M120 37C108 49 85 52 68 69C50 87 42 116 43 150C44 188 69 215 102 226C113 230 127 230 138 226C171 215 196 188 197 150C198 116 190 87 172 69C155 52 132 49 120 37Z",
     );
 
     const innerPlates = renderer.querySelectorAll(".seed-inner-plate");
     expect(innerPlates).toHaveLength(2);
     expect(Array.from(innerPlates, (plate) => plate.getAttribute("d"))).toEqual([
-      "M73 174C93 181 108 198 120 219C99 217 81 199 73 174Z",
-      "M167 174C147 181 132 198 120 219C141 217 159 199 167 174Z",
+      "M68 174C91 181 108 198 120 219C97 217 77 199 68 174Z",
+      "M172 174C149 181 132 198 120 219C143 217 163 199 172 174Z",
     ]);
 
     const pairedEyes = renderer.querySelector(".seed-eyes");
@@ -163,7 +163,7 @@ describe("pet surface", () => {
     ).toEqual(["120", "120"]);
     expect(
       Array.from(eyeShapes, (eye) => eye.getAttribute("cx")),
-    ).toEqual(["95", "145"]);
+    ).toEqual(["92", "148"]);
     expect(
       Array.from(eyeShapes, (eye) => [
         eye.getAttribute("rx"),
