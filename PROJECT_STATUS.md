@@ -19,7 +19,7 @@ Extended pet-shell environment acceptance and the WebView2-missing branch remain
 - Local store: SQLite schema v3 under Tauri app-local data, including import consent plus Daily Scout settings, attempt ledger, cited insight, and source lineage; API key is separate in Windows Credential Manager
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: historical first-memory／packaging, v0.2.0 pet-first, and v0.3.0 work-record bundles pass GitHub Actions; v0.4.0 CI is pending push
+- CI: historical first-memory／packaging, v0.2.0 pet-first, v0.3.0 work-record, and v0.4.0 Daily Scout bundles pass GitHub Actions
 - Release: unsigned v0.2.0 Windows x64 current-user installer passed installed UAT; v0.4.0 has no packaged artifact or public release
 - Codex for Open Source readiness: product direction is relevant and the repository meets the basic public／maintainer form, but there is no public release, real-source proof, external adoption, or maintainer loop yet; do not submit until the recorded readiness gates are met
 - Creature growth design: user-confirmed biological／organic plus restrained sacred-premium direction, bounded variants, scoped automatic derivation, and long-term-versus-recent growth rules recorded; concept forms are reference vocabulary rather than a fixed roster, while the consent scope, classifiers, path profile, morphology-recipe compiler, genome, stages, renderer, and growth journal remain proposed and unimplemented
@@ -98,6 +98,7 @@ The desktop is now pet-first: normal presence is one transparent floating creatu
 - PASS — 45 Rust tests cover fixture／work-record parsing, process bounds, consent migration, one-source enforcement, persistence／recomputation, coarse-context minimization, explicit low-value fallback labeling, OpenAI response／citation rejection, one-attempt success／failure idempotency, source invalidation, ACL／caller guards, and pet-shell lifecycle／geometry; one private-read live smoke stays explicitly ignored
 - PASS — production capabilities and the independent caller-label guard deny the full sensitive manifest from `pet`, including all ten Daily Scout settings／credential／network／external-link／full-insight commands; `main` retains a positive invoke path
 - PASS — `npm run check`, `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings`
+- PASS — Windows CI for source v0.4.0 implementation commit `c3b59f8`: https://github.com/artpoet/Memoryling/actions/runs/31664739429
 - PASS — the pet entry bundle excludes full-memory client identifiers and detail UI; browser mode renders only the honest detail preview
 - PASS — restrictive CSP remains; broad `core:default` was replaced by exact `main`／`pet` capabilities, and the pet has no cross-window mutation permission
 - PASS — exact local `codex-cli 0.134.0` content-minimized live `thread/list` smoke returned only neutral candidates and left no Codex child process; it did not invoke `thread/read` or output IDs, titles, paths, summaries, or content
@@ -132,6 +133,8 @@ Remote evidence:
 - PASS — Windows CI for the v0.2.0 implementation bundle: https://github.com/artpoet/Memoryling/actions/runs/31603804040
 - work-record implementation commit: [`1d1d918`](https://github.com/artpoet/Memoryling/commit/1d1d9180a518f27c6340b2280370dec7f9226014)
 - PASS — Windows CI for the v0.3.0 source bundle: https://github.com/artpoet/Memoryling/actions/runs/31612662676
+- Daily Scout implementation commit: [`c3b59f8`](https://github.com/artpoet/Memoryling/commit/c3b59f851ab6c6aca3da9045dbea931b8fdca8f5)
+- PASS — Windows CI for the v0.4.0 source bundle: https://github.com/artpoet/Memoryling/actions/runs/31664739429
 
 ## Codex for Open Source readiness
 
