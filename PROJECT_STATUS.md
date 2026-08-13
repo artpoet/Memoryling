@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Memoryling
 
-AS_OF: 2026-08-12 (Asia/Taipei)
+AS_OF: 2026-08-13 (Asia/Taipei)
 
 ## Current milestone
 
@@ -148,11 +148,19 @@ The internal decision is **do not submit yet**. With the pet shell complete, pro
 
 First unfinished gate: run the v0.3.0 pilot's private-data UAT only after the user names one exact Codex work record and authorizes the recorded read／local-storage／derivation scope. Then verify preview redaction, exact consent, restart persistence, content-free lineage, and complete local forgetting without printing or capturing the content. Do not list or read private records under a general “continue” instruction.
 
-In parallel with release preparation—not by rebuilding the completed pet shell—close the remaining live DPI／monitor／hitbox／Win+B／assistive-tech／shutdown matrix and the safe clean-environment WebView2 branch. Those gates block ADR-0003 acceptance and public-release claims, not the next synthetic-to-real implementation slice.
+If a fresh conversation has no exact private-source authorization, it should continue autonomously with the safe current-host shell-UAT fallback: native tray Show／Hide／Open／Always-on-top／Quit, `Win+B` keyboard recovery, both current 100% monitors' drag／restart／clamp behavior, adjacent-desktop hitbox, and built-in UIA／Narrator basics. Record only content-free evidence. Do not change display scaling, disconnect a monitor, relocate the taskbar through registry hacks, install NVDA, sign out／shut down, or remove WebView2; leave those items PENDING／DEFERRED for a suitable environment or explicit coordination.
 
 The future Phase 2 bounded-variant growth direction is recorded in `docs/drafts/deep-interview-evolving-creature-system-2026-08-11.md`, `docs/drafts/deep-interview-agent-memory-variation-rules-2026-08-12.md`, and proposed ADR-0004; it does not supersede the installer, pet-shell, and real-source gates above.
 
 After one authorized source slice is proven, prepare the public-beta and maintainer-evidence track: package and repeat installer UAT for that exact artifact, create a verified GitHub Release and checksums, recruit real external testers, record honest adoption, and complete at least one feedback／issue → fix → follow-up release loop. Refresh official terms and live evidence only when those gates are ready. Do not submit the application from the current pre-release state.
+
+## Fresh-chat handoff
+
+Paste-ready instruction:
+
+> 請依專案 `AI-WAKEUP.md` 指定順序喚醒，先核對 `PROJECT_STATUS.md`、`main`／`origin/main` 與禁止重做邊界。若我沒有明確指定一筆私人 Codex 工作紀錄及其 read／local-storage／derivation scope，不得 Browse 或呼叫 `thread/read`，也不要反覆追問；請改從 `PROJECT_STATUS.md` 的 safe current-host shell-UAT fallback 第一個未完成項開始，完成可在本機安全執行的整個 bundle、內容最小化證據、SSOT、具名 staging、commit、push、精確 CI／remote 核對與 Final Gate。不得重建或重跑已關閉的 v0.1／v0.2 artifact gates，不得移除 WebView2、改 DPI／螢幕／taskbar、安裝 NVDA、sign out／shutdown，也不得提交 Codex for Open Source 申請表。
+
+Expected wakeup outcome: the next agent either executes one explicitly authorized private-record UAT, or—under a generic continuation request—finishes the non-private current-host shell-UAT fallback without reopening completed implementation／installer work. Any environment-incompatible checks remain honestly PENDING／DEFERRED rather than inferred PASS.
 
 ## Do not redo
 

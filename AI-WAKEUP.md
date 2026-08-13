@@ -197,7 +197,7 @@ No-redo baseline: v0.1.0 closed the full fixture／both-uninstall-choice cycle; 
 
 The v0.3.0 source implementation gate is complete: official evidence ruled out a stable Codex durable-memory format, so ADR-0005 uses an explicitly labeled, exact-CLI experimental work-record pilot. Synthetic protocol／privacy／migration／concurrency tests, a content-minimized live `thread/list` smoke, and a visible pet／detail copy smoke passed without invoking private `thread/read`. No v0.3.0 installer was built.
 
-First unfinished gate: private-data UAT for one user-named Codex work record and the recorded scope. Do not list／read it without that exact authorization. Mixed DPI, monitor／taskbar changes, assistive tech, shutdown, WebView2-missing, signing, and public release remain later environment work; ADR-0003／0005 stay Proposed.
+Authorization-gated: private UAT still requires one user-named Codex work record and its exact scope. A generic fresh-session instruction must not list／read it or mark it passed; instead take the safe current-host shell-UAT fallback in `PROJECT_STATUS.md` → **Fresh-chat handoff**. ADR-0003／0005 stay Proposed.
 
 Later Phase 2 growth must start from the indexed synthetic fixture matrix; do not create a fixed sprite route, per-record consent spam, silent scope expansion, or usage-volume leveling.
 
