@@ -150,7 +150,16 @@ describe("pet surface", () => {
     ).toEqual(["120", "120"]);
     expect(
       Array.from(eyeShapes, (eye) => eye.getAttribute("cx")),
-    ).toEqual(["96", "144"]);
+    ).toEqual(["95", "145"]);
+    expect(
+      Array.from(eyeShapes, (eye) => [
+        eye.getAttribute("rx"),
+        eye.getAttribute("ry"),
+      ]),
+    ).toEqual([
+      ["10", "14"],
+      ["10", "14"],
+    ]);
     expect(
       Array.from(pairedEyes?.querySelectorAll(".seed-eye") ?? [], (eye) =>
         eye.getAttribute("transform"),

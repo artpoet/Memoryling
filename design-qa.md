@@ -1,9 +1,9 @@
 # Memoryling procedural seed visual QA
 
 - Source visual truth: `C:\Users\user\AppData\Local\Temp\memoryling-approved-seed-crop.png`
-- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v2-pass2.png`
-- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-v2-comparison-pass2.png`
-- Focused face comparison: `C:\Users\user\AppData\Local\Temp\memoryling-v2-face-comparison-pass2.png`
+- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v2-eye-corrected.png`
+- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-eye-spacing-three-way.png`
+- Focused face comparison: the three-way comparison isolates the eye-size／spacing correction at sufficient resolution; a second crop was not needed
 - State: seed-stage pet, neutral resting frame, no completion mark
 - Viewport: implementation rendered headlessly at 320 × 320 CSS px and device scale 1
 - Dimensions: source 190 × 230 px; source creature crop 104 × 150 px; implementation 320 × 320 px with a 206 × 289 px alpha crop
@@ -11,7 +11,7 @@
 
 ## Findings
 
-- No actionable P0／P1／P2 mismatch remains for the requested cute facial proportions. The paired eyes are larger and closer than the prior implementation, but retain enough separation to match the accepted concept's juvenile face. Their vertical centers and blink remain synchronized.
+- No actionable P0／P1／P2 mismatch remains for the requested cute facial proportions. The paired eyes now retain the original `rx=10／ry=14` size and move inward by only one viewBox unit per eye (`94／146` → `95／145`), restoring central breathing room while keeping the face slightly more cohesive. Their vertical centers and blink remain synchronized.
 - The eye-to-mouth distance, memory-core prominence, outward sprouts, and side plates now follow the accepted reference's composition. Four continuous program-generated plates replace the detached necklace-like lower petals.
 - The procedural renderer remains smoother and less faceted than the AI reference. This is an accepted P3 difference: the production creature must remain deterministic, layer-addressable program-generated SVG rather than a raster asset.
 
@@ -31,6 +31,7 @@
 3. Pass 2 review found the eyes had moved slightly too close and the side plates still did not reproduce the concept's continuous wrapped silhouette.
 4. Pass 2 fix settled the eye centers at x=96／144 with larger ellipses, enlarged the memory core, widened the sprouts, and replaced the lower cluster with four continuous side／inner plates that meet at the base.
 5. Post-fix full and focused comparisons show no remaining P0／P1／P2 proportion mismatch.
+6. User review correctly identified that pass 2 still felt worse because inward movement and eye enlargement compounded each other. The corrected pass restored the original eye size and reduced inward movement to one unit per side; a three-way background render confirms the central space is restored while the improved plates and facial height remain.
 
 ## Follow-up polish
 

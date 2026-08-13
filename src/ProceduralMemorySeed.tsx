@@ -110,14 +110,14 @@ export function ProceduralMemorySeed({
       <g className="seed-face">
         <g className="seed-eyes">
           <g className="seed-eye seed-eye-left">
-            <ellipse cx="96" cy="120" fill={`url(#${eyeGradient})`} rx="10.5" ry="14.5" />
-            <ellipse cx="93" cy="115" fill="#fff" opacity="0.94" rx="3.4" ry="4.4" />
-            <circle cx="99" cy="125" fill="#9cf2d8" opacity="0.42" r="1.5" />
+            <ellipse cx="95" cy="120" fill={`url(#${eyeGradient})`} rx="10" ry="14" />
+            <ellipse cx="92" cy="115" fill="#fff" opacity="0.94" rx="3.2" ry="4.2" />
+            <circle cx="98" cy="124" fill="#9cf2d8" opacity="0.42" r="1.4" />
           </g>
           <g className="seed-eye seed-eye-right">
-            <ellipse cx="144" cy="120" fill={`url(#${eyeGradient})`} rx="10.5" ry="14.5" />
-            <ellipse cx="141" cy="115" fill="#fff" opacity="0.94" rx="3.4" ry="4.4" />
-            <circle cx="147" cy="125" fill="#9cf2d8" opacity="0.42" r="1.5" />
+            <ellipse cx="145" cy="120" fill={`url(#${eyeGradient})`} rx="10" ry="14" />
+            <ellipse cx="142" cy="115" fill="#fff" opacity="0.94" rx="3.2" ry="4.2" />
+            <circle cx="148" cy="124" fill="#9cf2d8" opacity="0.42" r="1.4" />
           </g>
         </g>
         <path d="M112 141C116 145 124 145 128 141" fill="none" opacity="0.78" stroke="#2a2058" strokeLinecap="round" strokeWidth="2.4" />
