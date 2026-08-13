@@ -33,7 +33,7 @@ html[data-surface="pet"] *::after {
 
 .pet-button {
   position: absolute;
-  inset: 8px 8px 46px;
+  inset: 4px 4px 20px;
   display: grid;
   padding: 0;
   place-items: center;
@@ -73,28 +73,26 @@ html[data-surface="pet"] *::after {
   transform: translateY(-4px) scale(1.035);
 }
 
-.pet-access-badge {
+.pet-access-status {
   position: absolute;
-  right: 8px;
-  bottom: 8px;
-  left: 8px;
+  right: 12px;
+  bottom: 3px;
+  left: 12px;
   margin: 0;
-  padding: 8px 11px;
-  border: 1px solid rgba(255, 197, 107, 0.42);
-  border-radius: 999px;
-  color: #f2dfbd;
-  background: rgba(29, 23, 40, 0.92);
-  box-shadow: 0 7px 22px rgba(0, 0, 0, 0.28);
-  font-size: 12px;
-  font-weight: 750;
+  color: rgba(242, 233, 255, 0.72);
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 14px;
+  pointer-events: none;
   text-align: center;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .pet-scout-ready {
   position: absolute;
   right: 14px;
-  bottom: 54px;
+  bottom: 25px;
   left: 14px;
   z-index: 2;
   margin: 0;
@@ -130,14 +128,10 @@ html[data-surface="pet"] *::after {
 .pet-surface-onboarding .pet-button .orbit-two {
   height: 198px;
 }
-.pet-surface-onboarding .pet-access-badge {
-  bottom: 8px;
-}
-
 .pet-onboarding {
   position: absolute;
   right: 8px;
-  bottom: 48px;
+  bottom: 24px;
   left: 8px;
   z-index: 3;
   padding: 13px 14px;
@@ -195,13 +189,16 @@ html[data-surface="pet"] *::after {
 }
 
 @media (forced-colors: active) {
-  .pet-access-badge,
   .pet-scout-ready,
   .pet-onboarding {
     border: 2px solid CanvasText;
     color: CanvasText;
     background: Canvas;
     forced-color-adjust: auto;
+  }
+
+  .pet-access-status {
+    color: CanvasText;
   }
 
   .pet-button:focus-visible {

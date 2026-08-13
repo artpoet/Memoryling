@@ -13,6 +13,8 @@ Memoryling starts as a compact violet **memory seed**: an egg-like silhouette wi
 
 The desktop body is generated at runtime by the layered React SVG renderer in `src/ProceduralMemorySeed.tsx` (`procedural-svg-v1`). Its shell, sprouts, eyes, memory core, lower plates, highlights, and motion remain individually addressable code layers; the desktop pet does not load a raster creature image.
 
+The paired eyes are a single synchronized motion unit: their primary ellipses share one vertical center and they blink together. Do not reintroduce independent eye timing, per-eye transforms, or asymmetrical offsets that can make the face read as misregistered. On the compact pet surface, the required memory-access-off truth remains visible as quiet inline text rather than a pill, button, card, shadow, or other interactive-looking control.
+
 The checked-in transparent PNGs under `src-tauri/icons/` and `src/assets/memoryling-icon.png` are packaging／brand references only. They are not runtime pet sprites, renderer inputs, or future growth states. Earlier AI concept images likewise remain visual references only.
 
 This is the default visible body whenever no later accepted `MorphologyRecipe` exists. Do not replace it with the former CSS-built square-round body, long upright ears, blush cheeks, or an unrelated generated mascot.

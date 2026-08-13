@@ -136,6 +136,27 @@ describe("pet surface", () => {
     );
     expect(renderer.querySelectorAll("path").length).toBeGreaterThan(10);
     expect(renderer.querySelector("image")).not.toBeInTheDocument();
+
+    const pairedEyes = renderer.querySelector(".seed-eyes");
+    expect(pairedEyes).not.toBeNull();
+    expect(pairedEyes?.querySelectorAll(".seed-eye")).toHaveLength(2);
+
+    const eyeShapes = pairedEyes?.querySelectorAll(
+      ".seed-eye > ellipse:first-child",
+    ) ?? [];
+    expect(eyeShapes).toHaveLength(2);
+    expect(
+      Array.from(eyeShapes, (eye) => eye.getAttribute("cy")),
+    ).toEqual(["120", "120"]);
+    expect(
+      Array.from(pairedEyes?.querySelectorAll(".seed-eye") ?? [], (eye) =>
+        eye.getAttribute("transform"),
+      ),
+    ).toEqual([null, null]);
+
+    const accessStatus = screen.getByText("Memory access off");
+    expect(accessStatus).toHaveClass("pet-access-status");
+    expect(document.querySelector(".pet-access-badge")).not.toBeInTheDocument();
   });
 
   test("shows only a neutral pet notice when a daily insight is ready", async () => {

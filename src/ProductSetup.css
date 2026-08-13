@@ -274,7 +274,7 @@
 @media (prefers-reduced-motion: reduce) {
   .setup-creature .memoryling,
   .setup-creature .orbit,
-  .setup-creature .seed-eye {
+  .setup-creature .seed-eyes {
     animation: none;
   }
 }

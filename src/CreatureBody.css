@@ -43,14 +43,10 @@
   overflow: visible;
 }
 
-.seed-eye {
+.seed-eyes {
   animation: seed-blink 7.2s ease-in-out infinite;
   transform-box: fill-box;
   transform-origin: center;
-}
-
-.seed-eye-right {
-  animation-delay: 40ms;
 }
 
 .memory-mark {
@@ -75,7 +71,7 @@
 .creature-body-still .memoryling,
 .creature-body-still .orbit,
 .creature-body-still .memory-mark,
-.creature-body-still .seed-eye {
+.creature-body-still .seed-eyes {
   animation: none;
 }
 
@@ -115,10 +111,10 @@
   43%,
   47%,
   100% {
-    scale: 1 1;
+    transform: scaleY(1);
   }
   45% {
-    scale: 1 0.08;
+    transform: scaleY(0.08);
   }
 }
 
@@ -126,7 +122,7 @@
   .memoryling,
   .orbit,
   .memory-mark,
-  .seed-eye {
+  .seed-eyes {
     animation: none;
   }
 }

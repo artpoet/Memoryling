@@ -227,7 +227,7 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
         />
       </button>
 
-      <p className="pet-access-badge">
+      <p className="pet-access-status">
         {hasThreadImport ? t.threadActive : t.accessOff}
       </p>
 
