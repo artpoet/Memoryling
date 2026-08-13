@@ -20,7 +20,7 @@ Extended pet-shell environment acceptance and the WebView2-missing branch remain
 - Local store: SQLite schema v4 under Tauri app-local data, including source consent／sync state, lineage, and Daily Scout state; API key is separate in Windows Credential Manager
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
-- CI: historical first-memory／packaging, v0.2.0 pet-first, v0.3.0 work-record, and v0.4.0 Daily Scout bundles pass GitHub Actions
+- CI: current v0.5.0 Agent-memory implementation plus historical first-memory／packaging, v0.2.0 pet-first, v0.3.0 work-record, and v0.4.0 Daily Scout bundles pass GitHub Actions
 - Release: unsigned v0.2.0 Windows x64 current-user installer passed installed UAT; v0.5.0 has no packaged artifact or public release
 - Codex for Open Source readiness: product direction is relevant and the repository meets the basic public／maintainer form, but there is no public release, real-source proof, external adoption, or maintainer loop yet; do not submit until the recorded readiness gates are met
 - Creature visual baseline: the accepted violet `seed`／legacy-compatible `memory-seed-egg-v1` body now uses the `procedural-svg-v8` layered runtime renderer, with a broad pointed upper-teardrop／rounded-lower-arc shell, restrained translucent facets, original-size synchronized eyes at `x=92／148`, a prominent memory core, and cheek-hugging side plates whose pale-lilac surfaces visibly cross the main body silhouette while a thin dark-violet edge and softly blurred outer falloff explain thickness without hard cutoffs; the required access-off truth remains quiet inline text, while AI concept art and PNG icons are reference／packaging material only and later stages remain reference-only
@@ -107,6 +107,7 @@ The desktop is now pet-first: normal presence is one transparent floating creatu
 - PASS — production capabilities and the independent caller-label guard deny the full sensitive manifest from `pet`, including all ten Daily Scout settings／credential／network／external-link／full-insight commands; `main` retains a positive invoke path
 - PASS — `npm run check`, `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings`
 - PASS — local browser smoke rendered the full English primary Agent-memory page, switched to Traditional Chinese, preserved the explicit browser memory-off／desktop-required state and Daily Scout exclusion, and reported no browser warnings or errors; no source was read and no native connector behavior was imitated
+- PASS — Windows CI for v0.5.0 Agent-memory implementation commit `a51e2b7`: https://github.com/artpoet/Memoryling/actions/runs/31688838686
 - PASS — Windows CI for source v0.4.0 implementation commit `c3b59f8`: https://github.com/artpoet/Memoryling/actions/runs/31664739429
 - PASS — the pet entry bundle excludes full-memory client identifiers and detail UI; browser mode renders only the honest detail preview
 - PASS — restrictive CSP remains; broad `core:default` was replaced by exact `main`／`pet` capabilities, and the pet has no cross-window mutation permission
@@ -145,8 +146,10 @@ Remote evidence:
 - PASS — Windows CI for the v0.3.0 source bundle: https://github.com/artpoet/Memoryling/actions/runs/31612662676
 - Daily Scout implementation commit: [`c3b59f8`](https://github.com/artpoet/Memoryling/commit/c3b59f851ab6c6aca3da9045dbea931b8fdca8f5)
 - PASS — Windows CI for the v0.4.0 source bundle: https://github.com/artpoet/Memoryling/actions/runs/31664739429
-- current functional head before this handoff: [`eca0066`](https://github.com/artpoet/Memoryling/commit/eca00661a32c8383ff25f2ce9944b581df4c50c4)
+- pre-v0.5 renderer-v8 functional head: [`eca0066`](https://github.com/artpoet/Memoryling/commit/eca00661a32c8383ff25f2ce9944b581df4c50c4)
 - PASS — Windows CI for the renderer-v8 functional head: https://github.com/artpoet/Memoryling/actions/runs/31681343720
+- Agent-memory implementation commit: [`a51e2b7`](https://github.com/artpoet/Memoryling/commit/a51e2b7e5d83c4718e63da647bbf0d218319a0ab)
+- PASS — Windows CI for the v0.5.0 Agent-memory source bundle: https://github.com/artpoet/Memoryling/actions/runs/31688838686
 
 ## Codex for Open Source readiness
 
