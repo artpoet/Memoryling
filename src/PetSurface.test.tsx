@@ -36,6 +36,13 @@ const threadApprovedState: CreatureRenderState = {
   ...approvedState,
   importState: "thread-approved",
 };
+const agentMemoryState: CreatureRenderState = {
+  ...emptyState,
+  revision: revisionThree,
+  realMemoryAccess: "codex-local",
+  importState: "agent-memory-approved",
+  marks: [{ id: "mark-1", style: "memory-halo" }],
+};
 const dismissedShell: PetShellState = {
   schemaVersion: 1,
   onboardingDismissed: true,
@@ -85,6 +92,18 @@ function deferred<T>() {
 }
 
 describe("pet surface", () => {
+  test("shows the render-safe Agent-memory connection and halo", async () => {
+    const fixture = createClient(agentMemoryState);
+    render(<PetSurface client={fixture.client} />);
+    expect(
+      await screen.findByText("Codex Agent memories connected · read-only auto-sync"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("derived-agent-memory-halo")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Agent memories are connected read-only/i }),
+    ).toBeInTheDocument();
+  });
+
   test("reports one active work record without claiming durable-memory access", async () => {
     const fixture = createClient(threadApprovedState);
     render(<PetSurface client={fixture.client} />);

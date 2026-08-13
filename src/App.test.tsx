@@ -165,6 +165,105 @@ const approvedThreadState: MemoryState = {
   ],
 };
 
+const agentSource: SourceOption = {
+  id: "codex.local-memories",
+  adapterId: "codex-local-memory-store",
+  adapterVersion: 1,
+  displayName: "Codex · Local Agent memories",
+  locator: "codex-home://memories",
+  fixtureOnly: false,
+};
+
+const agentConsentScopeHash = "d".repeat(64);
+const agentPreview: ImportPreview = {
+  previewId: "preview_agent_memories",
+  source: agentSource,
+  recordCount: 2,
+  timeRange: {
+    start: "2026-08-13T01:00:00Z",
+    end: "2026-08-13T02:00:00Z",
+  },
+  records: ["memory-summary", "durable-memory-registry"].map((id, index) => ({
+    id,
+    sourceTimestamp: `2026-08-13T0${index + 1}:00:00Z`,
+    kind: "agent-memory-document" as const,
+    characterCount: 120 + index,
+    contentHash: String(index + 1).repeat(64),
+  })),
+  accessScope: {
+    readOnly: true,
+    sourceWriteAccess: false,
+    networkAccess: false,
+    arbitraryPathAccess: false,
+  },
+  consentScope: {
+    schemaVersion: 2,
+    revision: 1,
+    sourceId: agentSource.id,
+    adapterId: agentSource.adapterId,
+    adapterVersion: 1,
+    dataCategories: ["agent-memory-summary", "agent-durable-memory-registry"],
+    purposes: ["local-creature-derivation", "automatic-read-only-sync"],
+    readOnly: true,
+    sourceLocatorHash: "e".repeat(64),
+    automaticSync: true,
+  },
+  consentScopeHash: agentConsentScopeHash,
+};
+
+const approvedAgentState: MemoryState = {
+  storeSchemaVersion: 4,
+  sourceCount: 1,
+  eventCount: 2,
+  signalCount: 1,
+  activeSource: {
+    sourceId: agentSource.id,
+    adapterId: agentSource.adapterId,
+    displayName: agentSource.displayName,
+    automaticSync: true,
+    syncStatus: "synced",
+    lastSuccessfulSyncAt: "2026-08-13T02:05:00Z",
+    syncedRecordCount: 2,
+  },
+  marks: [
+    {
+      id: "effect_agent_halo",
+      style: "memory-halo",
+      signalType: "agent-memory-continuity",
+      confidence: 1,
+      derivationVersion: 1,
+      explanationKey: "approved_agent_memories_created_halo",
+      lineage: agentPreview.records.map((record) => ({
+        memoryEventId: `event_${record.id}`,
+        memoryEventSchemaVersion: 1,
+        sourceId: agentSource.id,
+        sourceLabel: agentSource.displayName,
+        adapterId: agentSource.adapterId,
+        adapterVersion: 1,
+        sourceRecordId: record.id,
+        sourceTimestamp: record.sourceTimestamp,
+        contentRedacted: true,
+        characterCount: record.characterCount,
+        contentHash: record.contentHash,
+        consentScopeHash: agentConsentScopeHash,
+        consentRevision: 1,
+      })),
+    },
+  ],
+};
+
+const missingAgentState: MemoryState = {
+  ...approvedAgentState,
+  eventCount: 0,
+  signalCount: 0,
+  marks: [],
+  activeSource: {
+    ...approvedAgentState.activeSource!,
+    syncStatus: "source-missing",
+    syncedRecordCount: 0,
+  },
+};
+
 function createClient(initialState: MemoryState = emptyMemoryState) {
   const approveImport = vi.fn(async () => approvedState);
   const forgetSource = vi.fn(async () => emptyMemoryState);
@@ -179,6 +278,7 @@ function createClient(initialState: MemoryState = emptyMemoryState) {
     cancelPreview,
     approveImport,
     forgetSource,
+    syncCodexMemories: vi.fn(async () => initialState),
   };
   return { client, approveImport, forgetSource, cancelPreview };
 }
@@ -217,6 +317,77 @@ const quietDetailShell: DetailShellClient = {
 };
 
 describe("First real memory vertical slice", () => {
+  test("approves the complete Agent-memory scope once and exposes local auto-sync without raw text", async () => {
+    const user = userEvent.setup();
+    const approveImport = vi.fn(async () => approvedAgentState);
+    const syncCodexMemories = vi.fn(async () => approvedAgentState);
+    const client: MemoryClient = {
+      available: true,
+      listSources: vi.fn(async () => [agentSource, source]),
+      getState: vi.fn(async () => emptyMemoryState),
+      previewSource: vi.fn(async (sourceId) => {
+        expect(sourceId).toBe(agentSource.id);
+        return agentPreview;
+      }),
+      listCodexThreads: vi.fn(async () => ({ catalogId: "catalog", candidates: [] })),
+      previewCodexThread: vi.fn(async () => threadPreview),
+      cancelPreview: vi.fn(async () => undefined),
+      approveImport,
+      forgetSource: vi.fn(async () => emptyMemoryState),
+      syncCodexMemories,
+    };
+    render(
+      <App
+        detailEvents={quietDetailEvents}
+        detailShell={quietDetailShell}
+        memoryClient={client}
+      />,
+    );
+
+    await user.click(await screen.findByRole("radio", { name: /Local Agent memories/i }));
+    await user.click(screen.getByRole("button", { name: "Review Agent memory scope" }));
+    const records = await screen.findAllByText("CONTENT HIDDEN FROM THE WEBVIEW");
+    expect(records).toHaveLength(2);
+    expect(screen.getAllByText("Agent-memory document")).toHaveLength(2);
+    const recordChecks = screen.getAllByRole("checkbox").slice(0, 2);
+    expect(recordChecks.every((checkbox) => checkbox.hasAttribute("disabled"))).toBe(true);
+    await user.click(screen.getByRole("checkbox", { name: /approve read-only access/i }));
+    await user.click(screen.getByRole("button", { name: "Approve & store 2 records locally" }));
+
+    expect(approveImport).toHaveBeenCalledWith({
+      previewId: agentPreview.previewId,
+      sourceId: agentSource.id,
+      selectedRecordIds: ["memory-summary", "durable-memory-registry"],
+      consentScopeHash: agentConsentScopeHash,
+    });
+    expect(await screen.findByTestId("derived-agent-memory-halo")).toBeInTheDocument();
+    expect(screen.getByText("Codex Agent memories connected · local read-only auto-sync")).toBeInTheDocument();
+    expect(screen.queryByText(/Synthetic summary|durable entries/i)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Sync now" }));
+    expect(syncCodexMemories).toHaveBeenCalledTimes(1);
+  });
+
+  test("withdraws the Agent-memory claim when the approved source is missing", async () => {
+    const { client } = createClient(missingAgentState);
+    render(
+      <App
+        detailEvents={quietDetailEvents}
+        detailShell={quietDetailShell}
+        memoryClient={client}
+      />,
+    );
+
+    expect(
+      await screen.findByText(
+        "Codex Agent-memory source unavailable · local effects withdrawn",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Codex Agent memories connected · local read-only auto-sync"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("derived-agent-memory-halo")).not.toBeInTheDocument();
+  });
+
   test("finishes first-run setup before revealing the detail dashboard", async () => {
     const user = userEvent.setup();
     const fixture = createClient();
@@ -501,6 +672,7 @@ describe("First real memory vertical slice", () => {
       cancelPreview: vi.fn(),
       approveImport: vi.fn(),
       forgetSource: vi.fn(),
+      syncCodexMemories: vi.fn(),
     };
     const resetOnboarding = vi.fn();
     render(
@@ -524,7 +696,7 @@ describe("First real memory vertical slice", () => {
     expect(unavailableClient.previewCodexThread).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole("button", { name: "繁中" }));
-    expect(screen.getByText("從核准工作，到可解釋的印記")).toBeInTheDocument();
+    expect(screen.getByText("讓核准的 Agent 記憶，塑造一個生命")).toBeInTheDocument();
     expect(screen.getByText("需要桌面版執行環境")).toBeInTheDocument();
     expect(screen.getByText("瀏覽器預覽 · 記憶存取關閉")).toBeInTheDocument();
   });

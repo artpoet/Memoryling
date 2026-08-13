@@ -33,6 +33,8 @@ const copy = {
     prototype: "Memory access is off · no approved sources",
     prototypeActive: "Fixture pilot active · real memory access is off",
     prototypeThreadActive: "1 Codex work record active · durable memory access is off",
+    prototypeAgentActive: "Codex Agent memories connected · local read-only auto-sync",
+    prototypeAgentMissing: "Codex Agent-memory source unavailable · local effects withdrawn",
     prototypeBrowser: "Browser preview · memory access is off",
     tagline: "Your agent memories, alive.",
     intro:
@@ -44,6 +46,8 @@ const copy = {
       "A completion star appeared because you approved one synthetic Codex memory.",
     approvedThreadCreatureLine:
       "A completion star appeared because you approved one Codex work record.",
+    approvedAgentCreatureLine:
+      "A memory halo appeared because you approved local Codex Agent memories.",
     creatureLines: [
       "I woke up between the things you finished and the things still glowing.",
       "When memory access arrives, every mark on me will have a reason.",
@@ -58,10 +62,13 @@ const copy = {
     conceptBadge: "CONCEPT",
     memoryLabel: "Memory signals",
     noSignals: "No source-backed signals",
-    noSignalsBody: "Approve the synthetic fixture above to create the first real lineage path.",
+    noSignalsBody: "Approve the Codex Agent-memory scope above to create the primary lineage path.",
     activeSignal: "A completion left a star",
     activeSignalMeta: "completion · persisted · explainable",
     activeSignalBody: "Its complete source → event → signal → mark lineage is available above.",
+    activeAgentSignal: "Approved Agent memories formed a halo",
+    activeAgentSignalMeta: "local Agent memory · auto-synced · explainable",
+    activeAgentSignalBody: "Its redacted source → event → continuity → halo lineage is available above.",
     initiativeLabel: "Bounded initiative",
     plannedBadge: "PLANNED",
     quietHours: "Quiet hours",
@@ -72,8 +79,8 @@ const copy = {
       "Memoryling may decide when to speak, but it never decides your limits.",
     privacyLabel: "Local-first promise",
     privacyBody:
-      "Approved records stay local and read-only at the source. Codex durable memories remain disconnected; raw records, credentials, and private files are never silently uploaded.",
-    roadmap: "Local fixture and experimental work-record lineage available",
+      "Approved Agent memories stay local and read-only at the source. Raw memories remain hidden from the WebView and are never sent to Daily Scout or silently uploaded.",
+    roadmap: "Local Codex Agent-memory auto-sync available",
     brandHome: "Memoryling home",
     languageLabel: "Language",
     dashboardLabel: "Memoryling status dashboard",
@@ -88,6 +95,8 @@ const copy = {
     prototype: "記憶存取關閉 · 尚無核准來源",
     prototypeActive: "Fixture 試行中 · 真實記憶存取關閉",
     prototypeThreadActive: "1 筆 Codex 工作紀錄已啟用 · durable memory 存取關閉",
+    prototypeAgentActive: "Codex Agent 記憶已連線 · 本機唯讀自動同步",
+    prototypeAgentMissing: "Codex Agent 記憶來源不可用 · 本機效果已撤回",
     prototypeBrowser: "瀏覽器預覽 · 記憶存取關閉",
     tagline: "讓你的 Agent 記憶，長成一個生命。",
     intro:
@@ -97,6 +106,7 @@ const copy = {
     creatureStateActive: "一筆核准記憶正在塑造我",
     approvedCreatureLine: "你核准了一筆合成 Codex 記憶，因此完成之星出現了。",
     approvedThreadCreatureLine: "你核准了一筆 Codex 工作紀錄，因此完成之星出現了。",
+    approvedAgentCreatureLine: "你核准了本機 Codex Agent 記憶，因此記憶光環出現了。",
     creatureLines: [
       "我在你完成的事，和那些還亮著的事之間醒來。",
       "未來我身上的每個變化，都必須有記憶可以解釋。",
@@ -111,10 +121,13 @@ const copy = {
     conceptBadge: "概念示意",
     memoryLabel: "記憶訊號",
     noSignals: "尚無具來源鏈的訊號",
-    noSignalsBody: "核准上方合成 fixture 後，才會建立第一條真實來源鏈。",
+    noSignalsBody: "核准上方 Codex Agent 記憶範圍後，才會建立主要來源鏈。",
     activeSignal: "一個完成事件留下了星星",
     activeSignalMeta: "完成 · 已持久化 · 可解釋",
     activeSignalBody: "完整的來源 → 事件 → 訊號 → 印記鏈，可在上方檢視。",
+    activeAgentSignal: "核准的 Agent 記憶形成了光環",
+    activeAgentSignalMeta: "本機 Agent 記憶 · 自動同步 · 可解釋",
+    activeAgentSignalBody: "已遮罩的來源 → 事件 → 連續性 → 光環鏈，可在上方檢視。",
     initiativeLabel: "有限主動性",
     plannedBadge: "規劃中",
     quietHours: "安靜時段",
@@ -124,8 +137,8 @@ const copy = {
     principle: "記憶獸可以決定何時開口，但永遠不能替你決定界線。",
     privacyLabel: "Local-first 承諾",
     privacyBody:
-      "核准紀錄留在本機，來源維持唯讀；Codex durable memories 仍未連線，原始紀錄、憑證與私密檔案不會被偷偷上傳。",
-    roadmap: "桌面版已具備 fixture 與實驗性工作紀錄來源鏈",
+      "核准的 Agent 記憶留在本機，來源維持唯讀；原始記憶不會進入 WebView，也不會交給 Daily Scout 或被偷偷上傳。",
+    roadmap: "桌面版已具備本機 Codex Agent 記憶自動同步",
     brandHome: "Memoryling 首頁",
     languageLabel: "語言",
     dashboardLabel: "Memoryling 狀態面板",
@@ -169,9 +182,14 @@ export function DetailSurface({
   const refreshGeneration = useRef(0);
   const t = copy[locale];
   const activeMark = memoryState.marks[0];
-  const hasApprovedMemory = Boolean(activeMark);
+  const hasApprovedMemory = memoryState.sourceCount > 0;
+  const hasDerivedMemory = Boolean(activeMark);
   const hasApprovedThread =
     activeMark?.lineage[0]?.adapterId === "codex-app-server-thread";
+  const hasApprovedAgentMemory =
+    memoryState.activeSource?.adapterId === "codex-local-memory-store";
+  const isAgentMemorySourceMissing =
+    hasApprovedAgentMemory && memoryState.activeSource?.syncStatus === "source-missing";
 
   useEffect(() => {
     if (!productSetupClient.available) return;
@@ -237,9 +255,11 @@ export function DetailSurface({
   }, [detailEvents, memoryClient]);
 
   const creatureLine = useMemo(() => {
-    const lines = hasApprovedMemory
+    const lines = hasDerivedMemory
       ? [
-          hasApprovedThread
+          hasApprovedAgentMemory
+            ? t.approvedAgentCreatureLine
+            : hasApprovedThread
             ? t.approvedThreadCreatureLine
             : t.approvedCreatureLine,
           ...t.creatureLines,
@@ -247,10 +267,12 @@ export function DetailSurface({
       : t.creatureLines;
     return lines[lineIndex % lines.length];
   }, [
-    hasApprovedMemory,
+    hasDerivedMemory,
+    hasApprovedAgentMemory,
     hasApprovedThread,
     lineIndex,
     t.approvedCreatureLine,
+    t.approvedAgentCreatureLine,
     t.approvedThreadCreatureLine,
     t.creatureLines,
   ]);
@@ -260,7 +282,11 @@ export function DetailSurface({
     : hasApprovedMemory
       ? hasApprovedThread
         ? t.prototypeThreadActive
-        : t.prototypeActive
+        : hasApprovedAgentMemory
+          ? isAgentMemorySourceMissing
+            ? t.prototypeAgentMissing
+            : t.prototypeAgentActive
+          : t.prototypeActive
       : t.prototype;
 
   async function resetPetGuide() {
@@ -367,14 +393,15 @@ export function DetailSurface({
           >
             <CreatureBody
               hasCompletionStar={
-                hasApprovedMemory && activeMark.style === "completion-star"
+                activeMark?.style === "completion-star"
               }
+              hasMemoryHalo={activeMark?.style === "memory-halo"}
             />
           </button>
 
           <div className="creature-caption">
             <p>{t.creatureName}</p>
-            <span>{hasApprovedMemory ? t.creatureStateActive : t.creatureState}</span>
+            <span>{hasDerivedMemory ? t.creatureStateActive : t.creatureState}</span>
           </div>
 
           <div className="speech-card" aria-live="polite">
@@ -423,18 +450,18 @@ export function DetailSurface({
             <span className="panel-icon violet">✦</span>
             <p>{t.memoryLabel}</p>
           </div>
-          {hasApprovedMemory ? (
+          {hasDerivedMemory ? (
             <>
               <ul className="signal-list">
                 <li>
                   <span className="signal-orb signal-2" />
                   <span>
-                    <strong>{t.activeSignal}</strong>
-                    <small>{t.activeSignalMeta}</small>
+                    <strong>{hasApprovedAgentMemory ? t.activeAgentSignal : t.activeSignal}</strong>
+                    <small>{hasApprovedAgentMemory ? t.activeAgentSignalMeta : t.activeSignalMeta}</small>
                   </span>
                 </li>
               </ul>
-              <p className="why-copy">{t.activeSignalBody}</p>
+              <p className="why-copy">{hasApprovedAgentMemory ? t.activeAgentSignalBody : t.activeSignalBody}</p>
             </>
           ) : (
             <div className="empty-signal-state">

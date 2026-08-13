@@ -12,14 +12,14 @@ export interface SourceOption {
 export interface PreviewRecord {
   id: string;
   sourceTimestamp: string;
-  kind: "completion";
+  kind: "completion" | "agent-memory-document";
   textPreview?: string;
   characterCount: number;
   contentHash: string;
 }
 
 export interface ConsentScope {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   revision: 1;
   sourceId: string;
   adapterId: string;
@@ -27,6 +27,8 @@ export interface ConsentScope {
   dataCategories: string[];
   purposes: string[];
   readOnly: true;
+  sourceLocatorHash?: string;
+  automaticSync?: boolean;
 }
 
 export interface ImportPreview {
@@ -79,11 +81,13 @@ export interface LineageSource {
 
 export interface CreatureMark {
   id: string;
-  style: "completion-star";
-  signalType: "completion";
+  style: "completion-star" | "memory-halo";
+  signalType: "completion" | "agent-memory-continuity";
   confidence: number;
   derivationVersion: number;
-  explanationKey: "approved_completion_created_star";
+  explanationKey:
+    | "approved_completion_created_star"
+    | "approved_agent_memories_created_halo";
   lineage: LineageSource[];
 }
 
@@ -93,6 +97,15 @@ export interface MemoryState {
   eventCount: number;
   signalCount: number;
   marks: CreatureMark[];
+  activeSource?: {
+    sourceId: string;
+    adapterId: string;
+    displayName: string;
+    automaticSync: boolean;
+    syncStatus: "manual" | "synced" | "source-missing" | "needs-attention";
+    lastSuccessfulSyncAt?: string;
+    syncedRecordCount: number;
+  };
 }
 
 export interface ApproveImportRequest {
@@ -115,10 +128,11 @@ export interface MemoryClient {
   cancelPreview(previewId: string): Promise<void>;
   approveImport(request: ApproveImportRequest): Promise<MemoryState>;
   forgetSource(sourceId: string): Promise<MemoryState>;
+  syncCodexMemories(): Promise<MemoryState>;
 }
 
 export const emptyMemoryState: MemoryState = {
-  storeSchemaVersion: 3,
+  storeSchemaVersion: 4,
   sourceCount: 0,
   eventCount: 0,
   signalCount: 0,
@@ -141,4 +155,5 @@ export const nativeMemoryClient: MemoryClient = {
     invoke<MemoryState>("approve_memory_import", { request }),
   forgetSource: (sourceId) =>
     invoke<MemoryState>("forget_memory_source", { sourceId }),
+  syncCodexMemories: () => invoke<MemoryState>("sync_codex_memories"),
 };

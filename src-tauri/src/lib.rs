@@ -23,6 +23,7 @@ pub fn run() {
             memory::get_memory_state,
             memory::approve_memory_import,
             memory::forget_memory_source,
+            memory::sync_codex_memories,
             memory::get_creature_render_state,
             daily_scout::get_daily_scout_state,
             daily_scout::save_openai_api_key,
@@ -46,6 +47,7 @@ pub fn run() {
         .on_window_event(desktop_shell::handle_window_event)
         .setup(|app| {
             desktop_shell::setup(app)?;
+            memory::setup(app);
             daily_scout::setup(app);
             Ok(())
         })
@@ -115,6 +117,7 @@ mod invoke_security_tests {
                 "forget_memory_source",
                 json!({ "sourceId": "codex.synthetic.first-memory" }),
             ),
+            ("sync_codex_memories", json!({})),
             ("get_daily_scout_state", json!({})),
             (
                 "save_openai_api_key",
@@ -159,6 +162,7 @@ mod invoke_security_tests {
                     memory::get_memory_state,
                     memory::approve_memory_import,
                     memory::forget_memory_source,
+                    memory::sync_codex_memories,
                     daily_scout::get_daily_scout_state,
                     daily_scout::save_openai_api_key,
                     daily_scout::test_openai_api_key,
@@ -215,6 +219,7 @@ mod invoke_security_tests {
                 memory::get_memory_state,
                 memory::approve_memory_import,
                 memory::forget_memory_source,
+                memory::sync_codex_memories,
                 daily_scout::get_daily_scout_state,
                 daily_scout::save_openai_api_key,
                 daily_scout::test_openai_api_key,

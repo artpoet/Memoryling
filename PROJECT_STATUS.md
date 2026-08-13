@@ -4,23 +4,24 @@ AS_OF: 2026-08-13 (Asia/Taipei)
 
 ## Current milestone
 
-The v0.4.0 source tree adds the optional BYOK **Daily Memory Scout** to the version-bound experimental Codex work-record pilot and verified v0.2.0 pet-first baseline. When explicitly enabled, it sends only a visible allowlisted coarse work summary to fixed OpenAI Responses／Web Search, reserves at most one attempt per local date, and returns a short cited pet message. The ordinary pet remains API-free and durable-memory access remains off. No real API key, paid request, private-record UAT, or packaged v0.4.0 acceptance is claimed.
+The v0.5.0 source tree makes the current local **Codex Agent-memory store** the primary source: one explicit source-level consent is followed by bounded read-only local sync at startup, every 15 minutes, and on demand. Adapter v1 reads only top-level `memory_summary.md` and `MEMORY.md`; raw text remains Rust／SQLite-only and derives one explainable memory halo. The work-record pilot is supplementary, Daily Memory Scout remains separately consented and cannot use Agent-memory text, and v0.2.0 remains the installed baseline. No private-memory UAT, paid request, or packaged v0.5.0 acceptance is claimed.
 
 Extended pet-shell environment acceptance and the WebView2-missing branch remain required before public distribution, but they do not justify rebuilding the completed shell. Do not begin the Codex for Open Source application before the recorded product, release, adoption, and maintainer-loop gates.
 
 ## Overall state
 
-- Stage: v0.4.0 source-only Daily Memory Scout on the experimental work-record pilot; v0.2.0 remains the last installed-UAT artifact
+- Stage: v0.5.0 source-only Codex Agent-memory auto-sync vertical slice; v0.2.0 remains the last installed-UAT artifact
 - Product surface: bilingual transparent pet plus on-demand detail surface; browser stays an honest detail-only preview
 - Synthetic Codex-shaped source pipeline: implemented end to end
-- Codex work-record pilot: implemented in source for explicit one-record selection; private-content UAT not performed
+- Codex Agent-memory connector: implemented in source with one-time exact-root consent and automatic two-file read-only sync; private-content UAT not performed
+- Codex work-record pilot: retained as a supplementary exact-version one-record source; private-content UAT not performed
 - Daily Memory Scout: implemented in source, off by default; synthetic provider／citation／once-per-day proof passes, real paid smoke not authorized or performed
-- Codex durable-memory access: not implemented; no supported export API or stable third-party file contract is available
-- Local store: SQLite schema v3 under Tauri app-local data, including import consent plus Daily Scout settings, attempt ledger, cited insight, and source lineage; API key is separate in Windows Credential Manager
+- Codex memory format boundary: official docs describe current generated local files, but no stable third-party schema; adapter v1 is allowlisted and fail-closed
+- Local store: SQLite schema v4 under Tauri app-local data, including source consent／sync state, lineage, and Daily Scout state; API key is separate in Windows Credential Manager
 - GitHub repository: public at https://github.com/artpoet/Memoryling
 - Default branch: main
 - CI: historical first-memory／packaging, v0.2.0 pet-first, v0.3.0 work-record, and v0.4.0 Daily Scout bundles pass GitHub Actions
-- Release: unsigned v0.2.0 Windows x64 current-user installer passed installed UAT; v0.4.0 has no packaged artifact or public release
+- Release: unsigned v0.2.0 Windows x64 current-user installer passed installed UAT; v0.5.0 has no packaged artifact or public release
 - Codex for Open Source readiness: product direction is relevant and the repository meets the basic public／maintainer form, but there is no public release, real-source proof, external adoption, or maintainer loop yet; do not submit until the recorded readiness gates are met
 - Creature visual baseline: the accepted violet `seed`／legacy-compatible `memory-seed-egg-v1` body now uses the `procedural-svg-v8` layered runtime renderer, with a broad pointed upper-teardrop／rounded-lower-arc shell, restrained translucent facets, original-size synchronized eyes at `x=92／148`, a prominent memory core, and cheek-hugging side plates whose pale-lilac surfaces visibly cross the main body silhouette while a thin dark-violet edge and softly blurred outer falloff explain thickness without hard cutoffs; the required access-off truth remains quiet inline text, while AI concept art and PNG icons are reference／packaging material only and later stages remain reference-only
 - First-run creation: a bilingual native first-launch flow now asks only for language and whether to keep the local pet or securely prepare an OpenAI key for Daily Scout; local-only is the recommended default, no content is transmitted, and Daily Scout remains disabled until its later context review and purpose-specific consent
@@ -65,12 +66,17 @@ Extended pet-shell environment acceptance and the WebView2-missing branch remain
 - stored BYOK only through Windows Credential Manager; Rust fixes the OpenAI endpoint, pinned `gpt-5.6-terra`, `store: false`, required Web Search, limits, timeout, explicit current-update／fallback-tip classification, and annotation-only HTTPS citation validation
 - added SQLite migration 0003, transactional one-attempt-per-local-date reservation, app-running schedule, honest no-retry failure, source-linked insight deletion, and separate disable／clear-history／delete-key／reset controls
 - added a compact bilingual Daily Scout setup／insight panel, official API links, immediate key-field clearing, and a neutral pet-only ready state; all ten new commands are main-only under both ACL and caller-label guards
+- refreshed official Codex memory evidence and accepted ADR-0007, superseding one-record work history as the product's primary source
+- implemented `codex-local-memory-store` v1 with exact-root hashing, a non-symlink two-file allowlist, UTF-8／2 MiB per-file／4 MiB total guards, and content-redacted preview
+- added schema-v2 source consent for automatic in-scope local sync, plus startup／15-minute／manual scheduling, transactional replacement, missing-source withdrawal／recovery, and last-valid-state preservation
+- added SQLite migration 0004／schema v4 sync state, aggregate Agent-memory continuity, a render-safe `codex-local` state and memory halo, complete local disconnect, and nine-command ACL／caller denial coverage
+- proved the new path with synthetic temporary files and frontend／pet tests only; no user-owned Agent memory was read
 
 ## Product truth
 
-The fixture pipeline remains real and persistent. The v0.4.0 source retains the experimental work-record path: only after the user asks to browse does Rust list neutral, content-minimized candidates; only one explicitly selected completed record may be read; its content remains Rust-only until redacted preview and exact consent; and only Memoryling's local approved copy is forgotten. The connector does not scan tool-home／arbitrary files, parse `~/.codex/memories`, write to Codex, or call a model.
+The v0.5.0 primary path asks the user to approve one exact Codex Agent-memory root once, then automatically checks only `memory_summary.md` and `MEMORY.md`. It does not enumerate other Codex-home state, display raw text, write to Codex, or call a model. Sync and forgetting recompute the local lineage graph transactionally. The fixture and exact-version one-record path remain supplementary.
 
-Daily Memory Scout is the one separately labeled network exception. It is off by default and unavailable to the synthetic fixture. After key save, outbound-context review, cost／retention disclosure, and explicit consent, Rust may automatically make one OpenAI Web Search attempt per local date while the app runs. It sends no source prose; only the exact coarse summary displayed in settings leaves the device. The WebView cannot control endpoint, key, model, tools, or instructions. Full insight and citations stay in the detail surface; the pet sees only a neutral ready bit. Browser mode makes no request. Durable／real-memory access remains visibly off.
+Daily Memory Scout is the one separately labeled network exception. It is off by default and unavailable to synthetic fixtures and Agent-memory documents. Only a separately approved work record can compile the visible coarse context. The WebView cannot control endpoint, key, model, tools, or instructions; full insight and citations stay in detail while the pet sees only a neutral ready bit. Browser mode makes no request. Agent-memory access stays local and read-only.
 
 The user-confirmed future growth direction allows many bounded variants within one living family, rather than a fixed pre-authored pet roster. The current concept forms only test family grammar, silhouette range, material language, and adjacent transitions. The information priority is observable Agent activity first, accumulated journey／outcomes second, and collaboration style third: activity alone controls the main silhouette and motion; journey gates permanent reshaping and controls maturity／milestones without selecting a silhouette; collaboration can add only a bounded local rhythm. Coarse content domain is a second layer limited to material, surface, or pattern accents and cannot select a species or sensitive personality label. A future real connector uses one narrow `SourceConsentScope` for one exact source, data categories, purposes, adapter version, and rule versions; new in-scope records may then be derived locally without per-record prompts. Another source needs another scope, while a category／purpose expansion needs a new consent revision. Recent use affects only expiring render hints. Permanent reshaping requires multiple deduplicated, independent, outcome-qualified evidence groups; calendar time, record volume, tokens, Agent count, and app-open time are not XP. The resulting lineage-backed profile compiles with identity, stage, and a finite module catalog into a deterministic `MorphologyRecipe`; correction, source disablement, or forgetting recomputes it. No Agent monitoring exists. Distant forms may differ greatly, but every adjacent change retains a versioned evolution bridge. The exact scope schema, evidence mapping, thresholds, module catalog, renderer, and visual limits remain proposed and unimplemented; this is not a claim about the current CSS creature, completion-star fixture, or exploratory ImageGen concepts.
 
@@ -96,17 +102,18 @@ The desktop is now pet-first: normal presence is one transparent floating creatu
 
 ## Verification evidence
 
-- PASS — 38 frontend tests cover native-label routing, browser honesty, fixture／work-record flows, Daily Scout consent gating, immediate key-field clearing, citation-only links, neutral pet readiness, reset races, bilingual boundaries, and the accepted programmatic seed-renderer contract
-- PASS — 47 Rust tests cover fixture／work-record parsing, process bounds, consent migration, one-source enforcement, persistence／recomputation, coarse-context minimization, explicit low-value fallback labeling, OpenAI response／citation rejection, one-attempt success／failure idempotency, source invalidation, ACL／caller guards, and pet-shell lifecycle／geometry; one private-read live smoke stays explicitly ignored
+- PASS — 41 frontend tests cover native-label routing, browser honesty, primary Agent-memory approval／redaction／sync／missing-source states, fixture／work-record fallbacks, Daily Scout consent gating, citation-only links, neutral pet readiness, reset races, bilingual boundaries, and the programmatic seed renderer
+- PASS — 50 Rust tests cover Agent-memory two-file guards, source-level consent, schema-v4 migration, automatic-sync state, missing／recovery／forgetting semantics, fixture／work-record parsing, process bounds, one-source enforcement, coarse-context minimization, OpenAI response／citation rejection, one-attempt idempotency, ACL／caller guards, and pet-shell lifecycle／geometry; one private-source live smoke stays explicitly ignored
 - PASS — production capabilities and the independent caller-label guard deny the full sensitive manifest from `pet`, including all ten Daily Scout settings／credential／network／external-link／full-insight commands; `main` retains a positive invoke path
 - PASS — `npm run check`, `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings`
+- PASS — local browser smoke rendered the full English primary Agent-memory page, switched to Traditional Chinese, preserved the explicit browser memory-off／desktop-required state and Daily Scout exclusion, and reported no browser warnings or errors; no source was read and no native connector behavior was imitated
 - PASS — Windows CI for source v0.4.0 implementation commit `c3b59f8`: https://github.com/artpoet/Memoryling/actions/runs/31664739429
 - PASS — the pet entry bundle excludes full-memory client identifiers and detail UI; browser mode renders only the honest detail preview
 - PASS — restrictive CSP remains; broad `core:default` was replaced by exact `main`／`pet` capabilities, and the pet has no cross-window mutation permission
 - PASS — exact local `codex-cli 0.134.0` content-minimized live `thread/list` smoke returned only neutral candidates and left no Codex child process; it did not invoke `thread/read` or output IDs, titles, paths, summaries, or content
 - PASS — source v0.4.0 native desktop smoke observed the transparent pet, native Open／close／Quit lifecycle, English／Traditional Chinese Daily Scout value copy, OFF／ordinary-pet-no-API state, key／official links, synthetic-ineligible context, daily timing, consent／cost／retention copy, and disabled enable control; no key was entered, no source was browsed, and no request was made
 - PASS — programmatic seed renderer v8 visual QA compared the accepted concept, annotated plate edge, full render, and enlarged edge crop; the bright plates protrude beyond the shell with a thin rim and soft falloff, while the face and body proportions stay unchanged
-- PENDING — one explicitly authorized paid Daily Scout smoke and packaged v0.4.0 native acceptance; synthetic tests do not substitute for provider-account or paid behavior
+- PENDING — one explicitly authorized paid Daily Scout smoke and packaged v0.5.0 native acceptance; synthetic tests do not substitute for provider-account or paid behavior
 - PENDING — one exact user-authorized private work-record preview／consent／approve／restart／redacted-lineage／forget UAT; no private record has been selected or read
 - PASS — `npm run build:windows` produced the v0.2.0 NSIS installer, release executable, and synthetic fixture resource
 - PASS — raw release UAT observed transparent pet-only launch, 360 × 430 Traditional Chinese onboarding → 320 × 320 dismissed bounds, native right-click and Shift+F10 menus, pet↔detail close／minimize lifecycle, explicit native Quit, and one-process relaunch
@@ -143,7 +150,7 @@ Remote evidence:
 
 ## Codex for Open Source readiness
 
-Memoryling can truthfully apply as a public MIT project maintained by `artpoet`, and its source-traceable／reversible architecture is relevant to the Codex ecosystem. It is not yet a competitive maintainer-program application: the repository remains young, has no public Release or demonstrated external maintainer loop, and the new work-record pilot has no authorized private-data UAT or packaged beta.
+Memoryling can truthfully apply as a public MIT project maintained by `artpoet`, and its source-traceable／reversible architecture is relevant to the Codex ecosystem. It is not yet a competitive maintainer-program application: the repository remains young, has no public Release or demonstrated external maintainer loop, and the Agent-memory connector has no authorized private-data UAT or packaged beta.
 
 The internal decision is **do not submit yet**. With the pet shell complete, prove one real-source sequence, close release-environment checks, publish an honest beta and demo, then demonstrate genuine external testing plus at least one public feedback／issue → fix → follow-up release maintainer loop. The complete program facts, dynamic evidence warning, readiness gates, application drafts, and API-credit privacy boundary live in [the Codex for Open Source readiness plan](docs/research/2026-08-12_codex-for-open-source-readiness.md). Suggested tester counts are internal credibility targets, not official OpenAI thresholds.
 
@@ -151,8 +158,8 @@ The internal decision is **do not submit yet**. With the pet shell complete, pro
 
 - the scaffold icons were replaced with generated test artwork, but the new artwork has not received public-release signoff
 - accessibility requires a dedicated keyboard and screen-reader audit
-- no stable Codex durable-memory API／schema is available; the work-record pilot is version-bound to exact CLI `0.134.0`, is not a production connector, and must fail closed on drift
-- private-record UAT remains pending exact source／scope authorization; source v0.4.0 has not been packaged, installed, signed, or publicly released
+- Codex generated-memory files have no stable third-party schema; the two-file adapter and supplementary exact-CLI work-record path must version and fail closed on drift
+- private Agent-memory／thread UAT remains pending exact source／scope authorization; source v0.5.0 has not been packaged, installed, signed, or publicly released
 - Daily Memory Scout has no real paid request or provider-account proof; an explicit non-private live-smoke authorization and packaged native UAT remain separate gates
 - Daily Scout relevance／low-value fallback has bounded unit fixtures, not the planned broad synthetic quality evaluation or external tester evidence
 - conversation model strategy remains intentionally open
@@ -167,9 +174,9 @@ The internal decision is **do not submit yet**. With the pet shell complete, pro
 
 At the next wakeup, explain these choices and wait for the user to select one:
 
-1. **Validate the real flow (recommended):** one user-named completed Codex work record with exact `read`／Memoryling local-storage／local-derivation authorization, plus a separate authorization for one paid Daily Scout request. The user enters the API key through the product UI. Complete selection → redacted preview → consent → local effect → one cited insight → restart／no-rerun → disable／clear／key deletion → source forget, recording only content-free evidence.
+1. **Validate the Agent-memory flow (recommended):** obtain exact authorization for one private Codex memory source and its read／Memoryling local-storage／local-derivation／automatic-sync UAT. Complete preview → source consent → halo → restart → changed-file sync → missing／recovery → forget, recording content-free evidence only. A paid Scout request remains a separate later authorization.
 2. **Build the first real growth slice:** use synthetic fixtures only to implement one bounded, lineage-bearing, explainable, reversible morphology change from the Phase 2 drafts／ADR-0004. No private record, paid request, runtime image generation, silent scope expansion, or usage-volume XP.
-3. **Prepare an installable v0.4.0 test build:** package the current source and run synthetic-only native acceptance for setup, pet／detail lifecycle, fixture path, Daily Scout off-state, restart, uninstall, and checksums. Keep it unsigned and internal-test-only.
+3. **Prepare an installable v0.5.0 test build:** package the current source and run synthetic-only native acceptance for setup, Agent-memory fixture harness, pet／detail lifecycle, Daily Scout off-state, restart, uninstall, and checksums. Keep it unsigned and internal-test-only.
 
 If the user has not chosen, do not silently substitute shell UAT or packaging. A generic request to continue never authorizes a private record, API key lookup, paid request, public release, or application submission. Environment-incompatible checks remain PENDING／DEFERRED.
 
@@ -177,7 +184,7 @@ If the user has not chosen, do not silently substitute shell UAT or packaging. A
 
 Paste-ready instruction:
 
-> 請依 `AI-WAKEUP.md` 的順序喚醒，核對 `PROJECT_STATUS.md`、專案規則、`main`／`origin/main` 與禁止重做事項。醒來後先不要動手，請用不超過六個短點、白話告訴我：現在已完成什麼、還缺什麼，以及我現在只要從哪三個下一步選一個；請明確標出建議選項與哪些會用到私人紀錄、API Key 或費用，然後等我選。沒有我的明確同意，不得讀私人 Codex 工作紀錄、找現成 Key、發出付費請求、製作／發布公開版本，或提交 Codex for Open Source 申請。
+> 請依 `AI-WAKEUP.md` 的順序喚醒，核對 `PROJECT_STATUS.md`、專案規則、`main`／`origin/main` 與禁止重做事項。醒來後先不要動手，請用不超過六個短點、白話告訴我：現在已完成什麼、還缺什麼，以及我現在只要從哪三個下一步選一個；請明確標出建議選項與哪些會用到私人 Agent 記憶、私人工作紀錄、API Key 或費用，然後等我選。沒有我的明確同意，不得讀私人 Codex Agent 記憶或工作紀錄、找現成 Key、發出付費請求、製作／發布公開版本，或提交 Codex for Open Source 申請。
 
 Expected wakeup outcome: the next agent first returns the plain-language three-choice reminder from **Next bundle**, recommends validating the real flow, and waits. After the user chooses, it completes only that one bounded slice end to end.
 
@@ -190,7 +197,7 @@ Expected wakeup outcome: the next agent first returns the plain-language three-c
 - do not recommend bypassing SmartScreen or weakening Windows security controls
 - do not add open-ended AI chat before the memory lineage path exists
 - do not describe the fixture pilot as access to the user's real Codex memories
-- do not call thread-history work records “Codex memories,” parse generated memory state, widen the exact CLI pin, or revive arbitrary file access without a new supported-format decision
+- do not call thread-history work records “Codex Agent memories,” read beyond ADR-0007's exact two-file generated-memory allowlist, widen the exact CLI pin, or revive arbitrary file access without a new supported-format decision
 - do not rerun private `thread/read` without exact source authorization or claim that content-minimized catalog smoke is private-data UAT
 - do not widen Daily Scout beyond its consented coarse-context, fixed-OpenAI, once-per-date, Web-Search-only boundary; do not treat generic continuation as paid-request authorization
 - do not add cloud sync, telemetry, or any other remote memory processing by assumption

@@ -8,7 +8,7 @@ The only packaged Memoryling build with completed installation UAT is the **pet-
 
 It does **not** read real Codex memory, scan a Codex tool-home, accept arbitrary files, or connect to a production memory source. The app must continue to show that durable-memory access is off, including while the synthetic fixture pilot is active.
 
-Separately, the repository source tree is at v0.4.0. It includes the version-bound experimental **Codex work-record／thread-history** pilot and the optional **Daily Memory Scout**. Neither is present in the tested v0.2.0 installer; private-record, paid API, and packaged v0.4.0 acceptance remain unclaimed.
+Separately, the repository source tree is at v0.5.0. It includes the primary read-only **Codex Agent-memory** connector, supplementary version-bound **work-record／thread-history** pilot, and optional **Daily Memory Scout**. None is present in the tested v0.2.0 installer; private-memory, paid API, and packaged v0.5.0 acceptance remain unclaimed.
 
 This test build is not a signed or public release-ready package.
 
@@ -58,12 +58,25 @@ The exact v0.2.0 artifact, size, hash, and completed install／lifecycle／retai
 
 ## Use the pet-first shell
 
-1. A brand-new v0.4.0 source build opens one first-run creation screen. Choose English or Traditional Chinese, then keep the recommended local-only pet or optionally save an OpenAI API key in Windows Credential Manager. Saving a key does not test it, enable Daily Scout, send context, or perform Web Search; those actions still require the later review and consent flow. Existing installations with older shell settings skip this new first-run screen.
+1. A brand-new v0.5.0 source build opens one first-run creation screen. Choose English or Traditional Chinese, then keep the recommended local-only pet or optionally save an OpenAI API key in Windows Credential Manager. Saving a key does not test it, enable Daily Scout, send context, or perform Web Search; those actions still require the later review and consent flow. Existing installations with older shell settings skip this new first-run screen.
 2. After setup, normal launch shows the floating pet instead of opening the full detail window. An eligible first run may also show the one-time bilingual pet guide.
 3. To open details, right-click the pet, then choose **Open Memoryling**. When the pet already has keyboard focus, Enter, Space, the Menu key, or `Shift+F10` opens the same native menu.
 4. Drag the pet to reposition it. Closing or minimizing the detail window returns to the pet; opening or restoring details hides it so only one Memoryling surface is normally visible.
 5. Use the native menu or system tray to show, hide, or open Memoryling. `Win+B` can reach the Windows tray, but that exact keyboard recovery path still needs dedicated packaged acceptance.
 6. Choose **Quit Memoryling** to end the resident process. Hiding the pet or closing details is not Quit.
+
+## Development source only: connect Codex Agent memories
+
+This path is implemented in source v0.5.0, not the accepted v0.2.0 installer. Automated tests use synthetic temporary files; no private-memory acceptance is claimed.
+
+1. Open details and choose **Codex · Local Agent memories**. Memoryling reads only enough to prepare a redacted preview of the two allowlisted documents; it never shows their text.
+2. Confirm the preview lists only `memory-summary` and／or `durable-memory-registry`, exact adapter／category／purpose scope, read-only behavior, and automatic local sync. Individual document checkboxes are fixed because consent is source-level.
+3. Accept the one-time consent and choose **Approve & store**. A memory halo should appear and status should show read-only auto-sync.
+4. Use **Sync now** for an immediate check. Memoryling otherwise checks at startup and every 15 minutes while running.
+5. If the source disappears, the UI should report it and withdraw the halo without deleting consent. When the same source returns, sync should restore derived state. Unsafe or changed scope reports attention needed and preserves the last valid copy.
+6. Choose **Forget this source** to remove Memoryling's consent, local copy, lineage, sync state, and halo. The original Codex memory files must remain unchanged.
+
+Agent-memory text is local-only and is never eligible for Daily Memory Scout. Do not capture private text in screenshots, logs, issues, or test evidence.
 
 ## Run the fixture-only memory tour
 
@@ -107,7 +120,7 @@ Forgetting removes the app's local imported copy and supported downstream graph.
 
 ## Development source only: experimental Codex work-record pilot
 
-OpenAI does not currently publish a stable Codex durable-memory export API or a compatibility-guaranteed memory-file schema for this integration. The v0.4.0 source implementation therefore evaluates **Codex work records／thread history**, not “Codex memories,” through a narrow local App Server stdio boundary. The App Server host remains experimental and unsupported for production.
+The v0.5.0 source retains **Codex work records／thread history** as a supplementary one-record path through a narrow local App Server stdio boundary. The App Server host remains experimental and unsupported for production; this path is separate from the primary Agent-memory connector above.
 
 This pilot is fail-closed and requires the standard local Codex Desktop CLI to report exactly `codex-cli 0.134.0`. It does not claim compatibility with earlier or later CLI versions. Its intended developer flow is:
 
@@ -125,7 +138,7 @@ Durable-memory access must remain visibly off. As of 2026-08-12, private-thread 
 
 ## Development source only: optional Daily Memory Scout
 
-The v0.4.0 source detail window introduces **Daily Memory Scout** as a compact opt-in panel. The ordinary pet does not need an API. To enable it:
+The v0.5.0 source detail window retains **Daily Memory Scout** as a compact opt-in panel. The ordinary pet does not need an API, and Agent-memory documents are never eligible input. To enable it:
 
 1. First approve one supported Codex work record. Synthetic fixture data is never sent.
 2. Paste a personal OpenAI API key and save it to Windows Credential Manager. The field clears immediately and the saved key cannot be shown again. Use the in-app official links to create a key or read the API guide.
@@ -143,7 +156,7 @@ Memoryling's current-user app data is stored under:
 
 The folder can include:
 
-- `memoryling.sqlite3`, containing approved normalized fixture／work-record text, hashes, lineage, derived state, and—when enabled—Daily Scout settings, attempt status, cited insights, and source lineage;
+- `memoryling.sqlite3`, containing approved normalized Agent-memory／fixture／work-record text, hashes, consent, sync state, lineage, derived state, and—when enabled—Daily Scout settings, attempt status, cited insights, and source lineage;
 - the OpenAI API key is separate and stored in Windows Credential Manager, not this folder;
 - `desktop-shell-v1.json` and a possible `desktop-shell-v1.json.bak`, containing only the content-free first-run completion bit and local shell settings such as onboarding, always-on-top, and safe pet position state;
 - WebView runtime data such as `EBWebView`.
@@ -156,7 +169,7 @@ Do not share, attach, print, or commit a real local database. Although the curre
 
 ## Troubleshooting boundaries
 
-- **The app says durable-memory access is off:** expected. The tested v0.2.0 installer has no real source connector, and the v0.4.0 source pilot reads explicitly selected work history rather than Codex durable memory.
+- **The app says memory access is off:** expected in the v0.2.0 installer, browser preview, before Agent-memory consent, or while an approved source is missing. Source v0.5.0 shows `codex-local` only while approved local Agent-memory events are available.
 - **Daily Scout is disabled:** save a key, approve one supported work record, review the outbound context, and consent. It deliberately stays off in browser preview and for the synthetic fixture.
 - **Today's search failed:** it will not retry automatically today. Check the API account or connection, then wait until the next local date; do not delete history to force a second paid attempt.
 - **The Codex work browser says the CLI version is unsupported:** expected fail-closed behavior unless the standard local Codex Desktop CLI reports exactly `codex-cli 0.134.0`. Do not bypass the pin or point the app at an arbitrary executable.

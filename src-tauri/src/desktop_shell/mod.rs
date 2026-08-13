@@ -486,6 +486,7 @@ mod tests {
                 "get_memory_state",
                 "approve_memory_import",
                 "forget_memory_source",
+                "sync_codex_memories",
                 "get_daily_scout_state",
                 "save_openai_api_key",
                 "test_openai_api_key",

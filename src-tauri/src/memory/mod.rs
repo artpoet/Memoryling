@@ -1,4 +1,5 @@
 mod adapter;
+mod codex_memory;
 mod codex_thread;
 pub(crate) mod model;
 pub(crate) mod store;
@@ -190,7 +191,9 @@ impl PendingImports {
 #[tauri::command]
 pub(crate) fn list_memory_sources(_caller: MainCaller) -> Result<Vec<SourceOption>, String> {
     record_sensitive_handler_entry();
-    adapter::list_sources()
+    let mut sources = vec![codex_memory::source_option()];
+    sources.extend(adapter::list_sources()?);
+    Ok(sources)
 }
 
 #[tauri::command]
@@ -201,6 +204,11 @@ pub(crate) fn preview_memory_source<R: tauri::Runtime>(
     source_id: String,
 ) -> Result<ImportPreview, String> {
     record_sensitive_handler_entry();
+    if source_id == model::CODEX_MEMORY_SOURCE_ID {
+        let (mut preview, prepared) = codex_memory::preview_source()?;
+        preview.preview_id = pending.insert(prepared)?;
+        return Ok(preview);
+    }
     let source_path = app
         .path()
         .resolve(
@@ -294,8 +302,10 @@ pub(crate) fn approve_memory_import<R: tauri::Runtime>(
     let state = pending.use_for_approval(&request.preview_id, &request.source_id, |prepared| {
         let provided_scope_hash = request.consent_scope_hash.as_deref();
         if provided_scope_hash.is_some_and(|hash| hash != prepared.consent_scope_hash.as_str())
-            || (prepared.source.adapter_id == model::CODEX_THREAD_ADAPTER_ID
-                && provided_scope_hash != Some(prepared.consent_scope_hash.as_str()))
+            || (matches!(
+                prepared.source.adapter_id.as_str(),
+                model::CODEX_THREAD_ADAPTER_ID | model::CODEX_MEMORY_ADAPTER_ID
+            ) && provided_scope_hash != Some(prepared.consent_scope_hash.as_str()))
         {
             return Err(
                 "The consent scope changed. Preview the selected source again.".to_string(),
@@ -305,6 +315,91 @@ pub(crate) fn approve_memory_import<R: tauri::Runtime>(
     })?;
     crate::desktop_shell::emit_creature_state_changed(&app);
     Ok(state)
+}
+
+fn sync_agent_memory_if_approved<R: tauri::Runtime>(
+    app: &AppHandle<R>,
+) -> Result<Option<MemoryState>, String> {
+    let store = store_for(app)?;
+    let Some(scope) = store.approved_agent_memory_scope()? else {
+        return Ok(None);
+    };
+    let root = match codex_memory::configured_memories_root() {
+        Ok(root) => root,
+        Err(_) => {
+            return store
+                .record_agent_sync_failure("needs-attention", "source-config-invalid", false)
+                .map(Some)
+        }
+    };
+    if scope.source_locator_hash.as_deref() != Some(codex_memory::root_fingerprint(&root).as_str())
+    {
+        return store
+            .record_agent_sync_failure("needs-attention", "source-location-changed", false)
+            .map(Some);
+    }
+    let (_, stored_scope_hash) = adapter::consent_scope_contract(&scope)?;
+    match codex_memory::prepare_import() {
+        Ok(prepared) if prepared.consent_scope_hash == stored_scope_hash => {
+            store.sync_agent_memory(&prepared).map(Some)
+        }
+        Ok(_) => store
+            .record_agent_sync_failure("needs-attention", "consent-scope-changed", false)
+            .map(Some),
+        Err(codex_memory::AgentMemoryReadFailure::SourceMissing) => store
+            .record_agent_sync_failure("source-missing", "source-missing", true)
+            .map(Some),
+        Err(failure) => store
+            .record_agent_sync_failure("needs-attention", failure.code(), false)
+            .map(Some),
+    }
+}
+
+#[tauri::command]
+pub(crate) async fn sync_codex_memories<R: tauri::Runtime>(
+    _caller: MainCaller,
+    app: AppHandle<R>,
+    pending: State<'_, PendingImports>,
+) -> Result<MemoryState, String> {
+    record_sensitive_handler_entry();
+    let source_operation = pending.source_operation();
+    let app_for_sync = app.clone();
+    let state = tauri::async_runtime::spawn_blocking(move || {
+        let _source_guard = source_operation
+            .lock()
+            .map_err(|_| "Memoryling could not reserve the local source operation.".to_string())?;
+        sync_agent_memory_if_approved(&app_for_sync)?
+            .ok_or_else(|| "Codex Agent memory is not approved for automatic sync.".to_string())
+    })
+    .await
+    .map_err(|_| "The local Agent memory sync stopped unexpectedly.".to_string())??;
+    crate::desktop_shell::emit_creature_state_changed(&app);
+    Ok(state)
+}
+
+pub(crate) fn setup<R: tauri::Runtime>(app: &tauri::App<R>) {
+    let first_handle = app.handle().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        if sync_agent_memory_if_approved(&first_handle)
+            .ok()
+            .flatten()
+            .is_some()
+        {
+            crate::desktop_shell::emit_creature_state_changed(&first_handle);
+        }
+    });
+
+    let periodic_handle = app.handle().clone();
+    std::thread::spawn(move || loop {
+        std::thread::sleep(Duration::from_secs(15 * 60));
+        if sync_agent_memory_if_approved(&periodic_handle)
+            .ok()
+            .flatten()
+            .is_some()
+        {
+            crate::desktop_shell::emit_creature_state_changed(&periodic_handle);
+        }
+    });
 }
 
 #[tauri::command]

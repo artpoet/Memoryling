@@ -4,6 +4,7 @@ import { ProceduralMemorySeed } from "./ProceduralMemorySeed";
 
 export interface CreatureBodyProps {
   hasCompletionStar?: boolean;
+  hasMemoryHalo?: boolean;
   motionEnabled?: boolean;
   showOrbits?: boolean;
   stage?: CreatureStage;
@@ -12,6 +13,7 @@ export interface CreatureBodyProps {
 
 export function CreatureBody({
   hasCompletionStar = false,
+  hasMemoryHalo = false,
   motionEnabled = true,
   showOrbits = true,
   stage = "seed",
@@ -29,6 +31,9 @@ export function CreatureBody({
         data-body-module={bodyModule}
         data-stage={stage}
       >
+        {hasMemoryHalo && (
+          <span className="derived-memory-halo" data-testid="derived-agent-memory-halo" />
+        )}
         <ProceduralMemorySeed bodyModule={bodyModule} stage={stage} />
         {hasCompletionStar && (
           <span

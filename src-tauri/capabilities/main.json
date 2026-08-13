@@ -13,6 +13,7 @@
     "allow-get-memory-state",
     "allow-approve-memory-import",
     "allow-forget-memory-source",
+    "allow-sync-codex-memories",
     "allow-get-daily-scout-state",
     "allow-save-openai-api-key",
     "allow-test-openai-api-key",

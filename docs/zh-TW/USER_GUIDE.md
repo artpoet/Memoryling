@@ -8,7 +8,7 @@
 
 它**不會**讀取真實 Codex 記憶、不會掃描 Codex tool-home、不接受任意檔案，也沒有連接正式記憶來源。即使合成 fixture 試行正在運作，App 仍必須顯示「持久記憶存取關閉」。
 
-另外，Repo source tree 已進入 v0.4.0，包含綁定特定版本的實驗性 **Codex 工作紀錄／thread history** 試行，以及選配的**每日記憶情報**。兩者都不在已測試的 v0.2.0 安裝器內；私人紀錄、付費 API 與 v0.4.0 打包版驗收都還沒有完成證據。
+另外，Repo source tree 已進入 v0.5.0，包含主要的唯讀 **Codex Agent 記憶** connector、補充用的版本綁定 **工作紀錄／thread history** 試行，以及選配的**每日記憶情報**。它們都不在已測試的 v0.2.0 安裝器內；私人記憶、付費 API 與 v0.5.0 打包版驗收都還沒有完成證據。
 
 這個測試版尚未簽章，也不是已可公開發布的正式安裝包。
 
@@ -58,12 +58,25 @@
 
 ## 使用 pet-first 外殼
 
-1. 全新的 v0.4.0 source build 會先開啟一次建立流程。選擇 English 或繁體中文，再保留建議的本機寵物，或選擇把 OpenAI API key 存入 Windows Credential Manager。保存 key 不會測試連線、不會開啟每日情報、不會傳送脈絡，也不會進行 Web Search；這些動作仍要通過後續檢視與同意流程。已有舊版 shell 設定的安裝會略過這個新流程。
+1. 全新的 v0.5.0 source build 會先開啟一次建立流程。選擇 English 或繁體中文，再保留建議的本機寵物，或選擇把 OpenAI API key 存入 Windows Credential Manager。保存 key 不會測試連線、不會開啟每日情報、不會傳送脈絡，也不會進行 Web Search；這些動作仍要通過後續檢視與同意流程。已有舊版 shell 設定的安裝會略過這個新流程。
 2. 完成設定後，一般啟動會先顯示浮動 pet，不會直接開啟完整詳細視窗。符合條件的第一次啟動也可能顯示一次性的雙語 pet 指南。
 3. 若要開啟詳細內容，先在 pet 上按右鍵，再選擇 **開啟 Memoryling**。pet 已有鍵盤焦點時，Enter、Space、Menu key 或 `Shift+F10` 會開啟同一個原生選單。
 4. 拖曳 pet 可移動位置。關閉或最小化詳細視窗會回到 pet；開啟或還原詳細視窗會隱藏 pet，因此一般狀態只會看到一個 Memoryling 表面。
 5. 可透過原生選單或系統匣顯示、隱藏或開啟 Memoryling。`Win+B` 可前往 Windows 系統匣，但這條精確的鍵盤救援路徑仍需專門的 packaged acceptance。
 6. 選擇 **結束 Memoryling** 才會結束常駐 process。隱藏 pet 或關閉詳細內容都不等於 Quit。
+
+## 僅供開發版 source 使用：連接 Codex Agent 記憶
+
+這條路徑已在 source v0.5.0 實作，不在已驗收的 v0.2.0 安裝器內。自動測試只使用暫存的合成記憶檔；尚未宣稱私人記憶驗收。
+
+1. 開啟詳細視窗，選擇 **Codex · Local Agent memories**。Memoryling 只會準備兩個白名單文件的遮罩預覽，不顯示文字內容。
+2. 確認預覽只列出 `memory-summary` 與／或 `durable-memory-registry`，並清楚顯示 adapter、類別、用途、唯讀與自動本機同步。個別文件 checkbox 會固定，因為這是來源層級同意。
+3. 接受一次性同意並選擇**核准並儲存**；記憶光環應出現，狀態應顯示唯讀自動同步。
+4. 可按**立即同步**立刻檢查；否則 Memoryling 會在啟動時與運行期間每 15 分鐘檢查。
+5. 來源消失時，畫面應顯示異常並撤回光環，但保留同意等待同一來源恢復。不安全或範圍改變時，會保留上次有效副本並顯示需要處理。
+6. 選擇**遺忘這個來源**會移除 Memoryling 的同意、本機副本、來源鏈、同步狀態與光環；Codex 原始記憶檔必須保持不變。
+
+Agent 記憶文字只留在本機，也永遠不會成為每日記憶情報的輸入。不要把私人文字放進截圖、log、issue 或測試證據。
 
 ## 執行 fixture-only 記憶流程
 
@@ -107,7 +120,7 @@ Memoryling 會把核准後的正規化 fixture 紀錄與來源鏈存入 App 本�
 
 ## 僅供開發版 source 使用：實驗性 Codex 工作紀錄試行
 
-OpenAI 目前並未針對這項整合公開穩定的 Codex 持久記憶匯出 API，或具有相容性保證的記憶檔案 schema。因此，v0.4.0 source implementation 透過狹窄的本機 App Server stdio 邊界評估的是 **Codex 工作紀錄／thread history**，不是「Codex 記憶」。App Server host 本身仍屬實驗性，也不支援 production workload。
+v0.5.0 source 保留 **Codex 工作紀錄／thread history**，作為透過狹窄本機 App Server stdio 邊界的一筆補充來源。App Server host 仍屬實驗性且不支援 production workload；這條路徑與上方主要 Agent 記憶 connector 分開。
 
 這項試行採 fail-closed，並要求標準本機 Codex Desktop CLI 必須完全回報 `codex-cli 0.134.0`；它不宣稱支援更早或更晚的 CLI 版本。開發版預期流程如下：
 
@@ -125,7 +138,7 @@ adapter 為唯讀，不接受任意路徑、不掃描 Codex 持久記憶檔案�
 
 ## 僅供開發版 source 使用：選配的每日記憶情報
 
-v0.4.0 source 的詳細視窗新增精簡的**每日記憶情報**面板；普通寵物不需要 API。啟用流程如下：
+v0.5.0 source 的詳細視窗保留精簡的**每日記憶情報**面板；普通寵物不需要 API，Agent 記憶文件也永遠不會成為輸入。啟用流程如下：
 
 1. 先核准一筆受支援的 Codex 工作紀錄；合成 fixture 永遠不會送出。
 2. 貼上個人的 OpenAI API key，安全儲存到 Windows Credential Manager。欄位會立即清空，已存 key 不能再次顯示；畫面提供官方申請與說明捷徑。
@@ -143,7 +156,7 @@ Memoryling 的目前使用者 App 資料位於：
 
 這個資料夾可能包含：
 
-- `memoryling.sqlite3`：核准後的正規化 fixture／工作紀錄文字、hash、來源鏈、衍生狀態，以及啟用時的每日情報設定、嘗試狀態、附來源情報與來源鏈；
+- `memoryling.sqlite3`：核准後的正規化 Agent 記憶／fixture／工作紀錄文字、hash、同意、同步狀態、來源鏈、衍生狀態，以及啟用時的每日情報設定、嘗試狀態、附來源情報與來源鏈；
 - OpenAI API key 另外存放在 Windows Credential Manager，不在這個資料夾；
 - `desktop-shell-v1.json` 與可能存在的 `desktop-shell-v1.json.bak`：只包含不含內容的首次設定完成狀態，以及 onboarding、always-on-top 與安全 pet 位置等本機 shell 設定；
 - `EBWebView` 等 WebView runtime 資料。
@@ -156,7 +169,7 @@ Memoryling 的目前使用者 App 資料位於：
 
 ## 疑難排解邊界
 
-- **App 顯示「持久記憶存取關閉」：**這是正確狀態；已測試的 v0.2.0 安裝器沒有真實來源 connector，而 v0.4.0 source 試行讀取的是使用者明確選取的工作紀錄，不是 Codex 持久記憶。
+- **App 顯示「記憶存取關閉」：**在 v0.2.0 安裝器、browser preview、尚未核准 Agent 記憶，或已核准來源暫時消失時，這是正確狀態。Source v0.5.0 只有在核准的本機 Agent 記憶事件可用時才顯示 `codex-local`。
 - **每日記憶情報不能開啟：**請先存 key、核准一筆支援的工作紀錄、檢查外送脈絡並同意。Browser preview 與合成 fixture 會刻意保持關閉。
 - **今天搜尋失敗：**今天不會自動重試。請檢查 API 帳戶或連線，等下一個本機日期再試；不要靠刪除歷史強迫第二次付費嘗試。
 - **Codex 工作紀錄瀏覽器顯示 CLI 版本不受支援：**除非標準本機 Codex Desktop CLI 完全回報 `codex-cli 0.134.0`，否則這是預期的 fail-closed 行為。不要繞過 pin，也不要把 App 指向任意執行檔。

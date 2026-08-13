@@ -2,13 +2,14 @@
 
 ## Status
 
-This document separates the intended product architecture from the subset implemented as of 2026-08-13. The source tree is now v0.4.0: it keeps the v0.2.0 pet-first fixture pipeline, the version-bound experimental Codex work／thread-history pilot, and adds an opt-in BYOK Daily Memory Scout. The pilot is not Codex durable memory or a production connector. Daily Scout is a separate, explicit network boundary and does not change the ordinary local-pet path. The verified v0.2.0 installer remains the packaged no-redo baseline; no v0.4.0 installer, private-thread UAT, or paid live API smoke is claimed.
+This document separates the intended product architecture from the subset implemented as of 2026-08-13. The source tree is now v0.5.0: it adds the one-time approved, two-file Codex Agent-memory source as the primary local path while retaining the v0.2.0 fixture pipeline, the supplementary version-bound work-record pilot, and the separately consented BYOK Daily Memory Scout. The Agent-memory adapter is versioned and fail-closed because its generated-file schema is not a stable third-party contract. The verified v0.2.0 installer remains the packaged no-redo baseline; no v0.5.0 installer, private-source UAT, or paid live API smoke is claimed.
 
 ## System shape
 
-    Explicitly selected local sources
+    Explicitly approved local sources
+        ├─ Codex Agent-memory root (primary; two-file allowlist)
         ├─ bundled fictional fixture
-        └─ experimental Codex work／thread history (not durable memory)
+        └─ experimental Codex work／thread history (supplementary)
         → read-only source adapters
         → import preview and consent gate
         → normalized local memory events
@@ -18,20 +19,20 @@ This document separates the intended product architecture from the subset implem
         └─→ optional coarse-context compiler → OpenAI Web Search → cited daily insight
         → bilingual Tauri UI
 
-Both implemented source paths produce only one deterministic, user-confirmed completion event and one completion-star effect. The bundled fixture is test infrastructure. The Codex work-record path is a source-only compatibility pilot around an experimental local host, not evidence of a supported Codex memory interface or production readiness.
+The primary Agent-memory path aggregates all currently available allowlisted documents into one deterministic continuity signal and one memory halo. The fixture and work-record paths still produce one user-confirmed completion event and one completion-star effect. The fixture is test infrastructure; the work-record path is a source-only compatibility pilot around an experimental local host, not Agent-memory access or production-readiness evidence.
 
 ## Layers
 
 | Layer | Responsibility | Current state |
 |---|---|---|
 | Desktop shell | Native window, lifecycle, notifications | 0.2.0 pre-creates transparent `pet` and hidden `main` windows; Rust owns native menu, tray, single-instance recovery, show／hide／focus, close／minimize／restore compensation, explicit Quit, and pet position recovery |
-| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual pet and detail surfaces plus fixture／work-record selection, redacted preview, consent, lineage, forgetting, Daily Scout setup／result controls, one-time onboarding, reduced-motion handling, and a visible durable-memory-off state in desktop and browser |
-| Source adapters | Read an explicitly selected local source without mutating it | Fixture adapter v1 reads one fixed bundled JSON resource; experimental `codex-app-server-thread` v1 uses only local App Server stdio `thread/list` and `thread/read` behind an exact CLI version pin, without direct Codex tool-home access |
-| Import gate | Preview scope, explain access, obtain consent | Implemented for the fixture and the experimental one-thread pilot; source content and raw identifiers remain in Rust, while the UI receives only a redacted, scope-bound preview |
-| Normalizer | Convert source records into a versioned local event schema | Schema v1 supports the fixture's `completion` record only |
-| Derivation engine | Produce traits, tensions, story hooks, reminder candidates | One deterministic `completion` signal and `completion-star` world effect only |
-| Local store | Persist normalized events, consent scopes, derived effects, lineage, and settings | SQLite schema v3 stores one approved source plus Daily Scout consent, once-per-date attempts, insights, citations, and source lineage under Tauri app-local data; the OpenAI key stays outside SQLite in Windows Credential Manager |
-| Daily Scout | Compile minimized approved-work context and optionally fetch one cited insight | Source v0.4.0: Rust-only fixed OpenAI Responses API／Web Search boundary, pinned model, `store: false`, one attempt per local date, and no background service; off by default |
+| Experience UI | Creature, habitat, stories, controls, explanations | Bilingual pet and detail surfaces plus primary Agent-memory consent／sync, supplementary fixture／work-record flows, redacted preview, lineage, forgetting, Daily Scout controls, onboarding, reduced-motion handling, and honest connected／missing／off states |
+| Source adapters | Read an explicitly approved local source without mutating it | Primary `codex-local-memory-store` v1 reads exactly two generated files after source consent; fixture v1 reads one fixed JSON resource; supplementary `codex-app-server-thread` v1 uses bounded local App Server stdio behind an exact CLI pin |
+| Import gate | Preview scope, explain access, obtain consent | Implemented for all three paths; Agent-memory preview approves the complete allowlisted source once, while fixture records and one work record retain their narrower flows; private content stays in Rust |
+| Normalizer | Convert source records into a versioned local event schema | Event schema v1 accepts `agent-memory-document` and `completion` under adapter-specific validation |
+| Derivation engine | Produce traits, tensions, story hooks, reminder candidates | Deterministic aggregate Agent-memory continuity → memory halo plus completion → completion star |
+| Local store | Persist normalized events, consent scopes, derived effects, lineage, and settings | SQLite schema v4 stores one approved source, source-sync status, derived lineage, and Daily Scout state under Tauri app-local data; the OpenAI key stays outside SQLite in Windows Credential Manager |
+| Daily Scout | Compile minimized approved-work context and optionally fetch one cited insight | Source v0.4.0 boundary retained: Rust-only fixed OpenAI Responses API／Web Search, pinned model, `store: false`, one attempt per local date, and an app-running scheduler; off by default and Agent-memory-ineligible |
 | Conversation layer | Ground dialogue in approved local context | Not implemented; provider decision open |
 | Reminder policy | Enforce quiet hours, budget, urgency, and snooze state | UI concept only |
 
@@ -49,7 +50,21 @@ Proposed [ADR-0006](adr/0006-optional-byok-daily-memory-scout.md) defines this s
 
 The current proof is synthetic and content-free: OpenAI response parsing, citation rejection, context minimization, schema migration, credential abstraction, success／failure once-per-date behavior, ACL separation, and bilingual UI flows have automated coverage. A real API request would be paid and may involve ordinary OpenAI abuse-monitoring retention, so it remains an explicit acceptance gate rather than an inferred pass.
 
-## Experimental Codex work-record pilot introduced in source v0.3.0
+## Primary Codex Agent-memory connector introduced in source v0.5.0
+
+Accepted [ADR-0007](adr/0007-codex-agent-memory-auto-sync.md) makes the current local Codex Agent-memory store the primary source. The user chooses the source once and approves schema-v2 consent for the exact root, adapter v1, two data categories, local derivation, and automatic read-only sync. Individual memory documents are not separately selected.
+
+1. Rust resolves `CODEX_HOME\memories` or `%USERPROFILE%\.codex\memories`; consent stores only a hash of that exact root. UI and SQLite receive the generic `codex-home://memories` locator.
+2. The adapter checks only top-level `memory_summary.md` and `MEMORY.md`. It does not enumerate rollout summaries, sessions, evidence, databases, prompts, logs, or other Codex-home content. Root and file symlinks, non-regular files, invalid UTF-8, empty files, files over 2 MiB, and combined input over 4 MiB fail closed.
+3. Preview contains logical document IDs, modified timestamps, character counts, and hashes only. Raw text never enters frontend IPC, pet DTOs, native labels, logs, fixtures, or screenshots.
+4. Approval requires the exact scope hash and complete allowlisted document set. Migration 0004 advances SQLite to schema v4, expands event／signal／effect allowlists, and adds `source_sync_state`.
+5. Startup, a 15-minute in-process interval, and `Sync now` re-read only an already approved source. A successful change transactionally replaces local events and recomputes one aggregate `agent-memory-continuity` signal and `memory-halo` effect with complete lineage.
+6. If the same approved source disappears, its local events and effects are withdrawn while consent remains for recovery. Invalid, oversized, unreadable, or location-changed input keeps the last valid state and reports `needs-attention`. Forgetting deletes the Memoryling-local source, scope, sync state, lineage, and effects but never changes Codex.
+7. Daily Scout's compiler remains restricted to `codex-app-server-thread`; Agent-memory documents can never enter its outbound context.
+
+Official documentation describes the current local memory location and generated artifacts but does not promise a stable third-party schema. Adapter-v1 filenames are therefore a fail-closed product contract, not an OpenAI compatibility guarantee. Automated evidence uses synthetic temporary files only; private-memory UAT requires separate exact authorization.
+
+## Supplementary Codex work-record pilot introduced in source v0.3.0
 
 Official OpenAI documentation exposes the documented `thread/list` and `thread/read` method names without requiring the opt-in `experimentalApi` capability, but it still labels the overall App Server command／transport experimental and unsupported for production. Memoryling therefore treats this integration as a version-bound work／thread-history pilot, never as durable-memory access. The supporting evidence and decision boundary are recorded in the [Codex source-format evaluation](research/2026-08-12_codex-source-format-evaluation.md) and proposed [ADR-0005](adr/0005-codex-thread-history-source-pilot.md).
 
@@ -62,7 +77,7 @@ The implementation boundary is deliberately narrow:
 5. Migration 0002 advances the local store to `PRAGMA user_version = 2` and adds `source_consent_scopes`. The current schema allows one active approved source total. A new thread requires forgetting the current Memoryling source and completing a fresh list → select → preview → consent flow.
 6. External lineage keeps only redacted or opaque hashes, adapter／mapping versions, scope hash, consent revision, timestamps, and exclusion reasons. Approved normalized text stays only in the local Memoryling database and never crosses frontend IPC, logs, pet DTOs, native labels, notifications, or repository fixtures.
 7. Forgetting deletes or recomputes Memoryling's local source, event, signal, effect, explanation, render state, cache, and lineage. It never edits, archives, deletes, resumes, or otherwise mutates the original Codex thread.
-8. The `main` capability and the independent Rust caller-label guard both protect all eight sensitive commands: fixture list／preview, Codex list／preview, cancel, full state, approve, and forget. `pet` cannot invoke any of them.
+8. The `main` capability and independent Rust caller-label guard protect all nine sensitive memory commands, including Agent-memory sync. `pet` cannot invoke any of them.
 9. CLI-version verification and the App Server request share one 10-second operation deadline. Stdout size and line length are capped, stderr is not surfaced, and timeout／failure uses bounded child-process cleanup rather than an unbounded wait. The adapter uses local stdio only and opens no WebSocket, model, telemetry, cloud, or network boundary.
 
 Synthetic contract tests and a content-free live `thread/list` compatibility smoke cover the implemented boundary. The live smoke did not select a candidate or call `thread/read`. Access to one real private thread remains a separate exact-source authorization and UAT gate; until that passes, ADR-0005 stays Proposed and durable-memory access remains visibly off.
@@ -83,7 +98,7 @@ Both WebViews are pre-created hidden; Rust setup shows only `pet`, avoiding hand
 
 The build uses `tauri_build::AppManifest::commands` and exact local-only `main`／`pet` capabilities; neither surface inherits `core:default`, remote scopes, wildcards, or deny-pattern ambiguity. Fixture／Codex content commands and all Daily Scout management／network commands are `main`-only and also require a `MainCaller` whose WebView and native-window labels both match. `pet` receives only render-safe state, shell state, menu, onboarding, and its guarded drag command plus event listen／unlisten. The drag command acts only on the caller's pet window, so pet JavaScript cannot select and drag `main` through a generic core window API. Production-authority and empty-authority invoke harnesses prove both ACL and caller-label denial across the full sensitive-command manifest; a `main` list invoke is the positive control.
 
-`CreatureRenderState` contains only bounded appearance parameters, neutral fixture state, opaque mark IDs, and a 64-hex revision. Approve and forget emit the same content-free `{revision}` notification to both surfaces, which then refetch their typed state; event-delivery failure does not roll back a committed memory transaction. No memory text, path, locator, explanation, source identity, or content hash enters pet IPC, native menu labels, tray labels, window titles, or operating-system notifications. Closing details cancels any pending preview in Rust before hiding because hiding a WebView does not unmount it; minimizing preserves the preview.
+`CreatureRenderState` v5 contains only bounded appearance parameters, coarse `off`／`codex-local` access, opaque completion-star／memory-halo mark IDs, and a 64-hex revision. Approve, sync, and forget emit the same content-free `{revision}` notification to both surfaces, which then refetch their typed state; event-delivery failure does not roll back a committed memory transaction. No memory text, path, locator, explanation, source identity, or content hash enters pet IPC, native menu labels, tray labels, window titles, or operating-system notifications. Closing details cancels any pending preview in Rust before hiding because hiding a WebView does not unmount it; minimizing preserves the preview.
 
 Right-click is the primary entry. When `pet` has focus, Enter／Space／Menu key／`Shift+F10` invokes the same native menu at a fixed pet anchor. Native menu, transparent pet, onboarding, one-detail-window lifecycle, minimize／restore, single-instance recovery, and explicit native Quit passed the core Windows smoke; position persistence／clamp and tray actions have automated coverage. A normal Explorer-launched current-user NSIS install and the actual installed Start shortcut passed both cold launch and resident single-instance relaunch: the second launch focused the existing detail surface without creating another process. Direct tray-action and `Win+B` traversal remain pending live acceptance.
 
@@ -105,7 +120,7 @@ Pet position is stored in a content-free JSON record with monitor identity, work
 
 - `source_imports` retains the adapter ID and version, display label, fixed locator, and source-content hash.
 - `memory_events` retains schema version 1, an opaque source-record ID, source and observed timestamps, the approved normalized text, and its content hash.
-- The current schema accepts only `completion`; future record kinds require explicit schema and derivation work.
+- Event schema v1 accepts `completion` and `agent-memory-document` only through their matching adapters; future record kinds require explicit schema and derivation work.
 
 ### DerivedSignal
 
@@ -123,11 +138,11 @@ The complete source → event → signal → effect graph is queried back from S
 
 ## Future creature-growth boundary
 
-Everything in this section is a future Phase 2 proposal unless explicitly identified as current fixture, work-record pilot, or Daily Scout behavior. Source v0.4.0 persists one versioned import consent-scope row for the one approved source, but that scope exists only to bind the import contract and local derivation purpose. Daily Scout's separate consent authorizes only its coarse daily-search context; neither scope authorizes automatic future-record intake, source expansion, live Agent observation, A／B／C evidence classification, outcome-group accumulation, or creature-morphology compilation.
+Everything in this section is a future Phase 2 proposal unless explicitly identified as current fixture, Agent-memory connector, work-record pilot, or Daily Scout behavior. Source v0.5.0 implements automatic future updates only inside the unchanged schema-v2 Codex Agent-memory scope. It does not authorize source expansion, live Agent observation, A／B／C evidence classification, outcome-group accumulation, or morphology compilation. Daily Scout retains separate consent and excludes Agent-memory text.
 
 ### Future expanded source-consent scope
 
-The implemented schema-v1 `SourceConsentScope` binds one explicit consent to one specific read-only source and adapter version, one allowlisted data category, and one named local derivation purpose. The future growth design would expand this into a reusable ongoing scope in which new records inside every unchanged boundary may be normalized and deterministically derived without per-record prompts. Another source, a new category or purpose, or materially changed mapping semantics must still stop at a new scope-revision preview and fresh consent before that expansion contributes anything.
+The implemented Agent-memory schema-v2 `SourceConsentScope` binds one explicit consent to one exact root hash, adapter version, two allowlisted document categories, local derivation, and automatic read-only sync. Fixture and work-record scopes remain schema v1 and import-bound. Another source, a new category or purpose, or materially changed mapping semantics must stop at a new scope-revision preview and fresh consent.
 
 Disabling and re-enabling a consent scope are not implemented. The future rule remains that disabling a scope makes its evidence ineligible for active derivation and triggers the same deterministic downstream recomputation as forgetting or correcting evidence; it never writes to or deletes the source. That lifecycle and retention UX requires synthetic acceptance before any broader private-data testing.
 
@@ -171,7 +186,7 @@ Path contributions, other structural growth contributions, and existing WorldEff
 2. The adapter enforces a size limit, UTF-8 JSON, source identity, format version, and the supported record kind. Unknown input fails closed.
 3. A preview token binds approval to the records prepared in Rust memory. Previewing or canceling does not persist source content, although desktop startup may initialize an empty SQLite schema.
 4. Explicit approval writes the selected normalized record, canonical consent scope and hash, source contract, hashes, signal, effect, and lineage in local transactions.
-5. The database lives at Tauri's app-local data directory as `memoryling.sqlite3`. Migration 0001 established the fixture tables; migration 0002 adds `source_consent_scopes` and sets `PRAGMA user_version = 2`. A known v1 fixture store is backfilled deterministically; unknown source or future schema versions fail closed.
+5. The database lives at Tauri's app-local data directory as `memoryling.sqlite3`. Migrations 0001–0003 established fixture, consent, and Daily Scout state; migration 0004 adds Agent-memory event types and sync state and sets `PRAGMA user_version = 4`. Known earlier stores migrate deterministically; unknown future schemas fail closed.
 6. Forgetting clears derived state, deletes the selected local source and its cascading consent scope／events, then re-runs deterministic derivation over supported records that remain, all in one transaction. The current store permits only one approved source total.
 
 SQLite foreign keys and `secure_delete` are enabled for each connection. This supports application-level deletion; it is not a promise of cryptographic or physically irrecoverable erasure from storage media or backups.
@@ -188,11 +203,12 @@ A connector must:
 6. fail closed when a format is unknown;
 7. never collect credentials from source files.
 
-The fixture adapter satisfies this contract for its fixed synthetic resource. The v0.4.0 `codex-app-server-thread` adapter applies the same contract to one explicitly selected completed Codex work thread through the exact pinned local CLI, but remains experimental because App Server is not production-supported. It does not establish a Codex durable-memory format, export contract, or permission to scan arbitrary home directories. A future production adapter still requires an officially supported interface, a fresh privacy review, and its own acceptance evidence.
+The fixture adapter satisfies this contract for its fixed synthetic resource. The v0.5.0 `codex-local-memory-store` adapter is the primary, source-consented two-file connector described above. The `codex-app-server-thread` adapter remains a supplementary version-bound path for one explicitly selected completed thread. Neither authorizes arbitrary home-directory scanning or source writes.
 
 ## Trust boundaries
 
 - **Bundled fixture:** fictional, repository-visible, fixed-path, read-only test input. It is not user memory.
+- **Codex Agent-memory source:** one exact local `memories` root with two top-level allowlisted generated files; read-only, content-redacted at IPC, and auto-synced only after source-level consent.
 - **Experimental Codex App Server source:** one user-selected work thread read through fixed local stdio `thread/list`／`thread/read`; it is untrusted, read-only, version-bound, and not a durable-memory source. Raw identifiers and selected text remain Rust-only.
 - **Pending preview:** source content prepared in Rust process memory and bound to a short-lived catalog／preview token until approved or discarded. The frontend receives only redacted metadata and hashes.
 - **Local Memoryling store:** contains the one approved normalized record, canonical consent scope and hash, content-free external lineage, and derived state; never print or commit the database.
@@ -203,10 +219,10 @@ The fixture adapter satisfies this contract for its fixed synthetic resource. Th
 
 - embedded local model versus optional remote conversation provider;
 - a production-supported Codex durable-memory export／API or supported successor to the experimental App Server pilot;
-- migration strategy after SQLite schema v3;
+- migration strategy after SQLite schema v4;
 - remaining Windows resident-shell acceptance across live DPI／monitor／taskbar changes, desktop hitbox, accessibility, and session shutdown;
 - derivations and signal-to-genome mappings beyond the deterministic completion-star boundary;
 - approved-activity taxonomy, signal-to-profile mapping, quantization rules, and mapping-version migration;
 - final EvolutionBridge grammar for stage and recipe changes, stage names, and renderer implementation after synthetic visual prototyping.
 
-Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-first SQLite boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md), the proposed pet-first shell in [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md), the proposed content-derived route model in [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md), and the proposed version-bound Codex thread-history pilot in [ADR-0005](adr/0005-codex-thread-history-source-pilot.md).
+Major decisions are recorded in [docs/adr](adr/INDEX.md), including the fixture-first SQLite boundary in [ADR-0002](adr/0002-sqlite-v1-fixture-first-memory.md), pet-first shell in [ADR-0003](adr/0003-pet-first-two-window-desktop-shell.md), proposed growth model in [ADR-0004](adr/0004-deterministic-content-derived-evolution-paths.md), supplementary work-record pilot in [ADR-0005](adr/0005-codex-thread-history-source-pilot.md), and accepted primary Agent-memory source in [ADR-0007](adr/0007-codex-agent-memory-auto-sync.md).

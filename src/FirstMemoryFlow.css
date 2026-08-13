@@ -295,6 +295,27 @@
   font-weight: 750;
 }
 
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(132, 255, 217, 0.18);
+  border-radius: 13px;
+  background: rgba(85, 191, 158, 0.06);
+  color: #9a90a8;
+  font-size: 11px;
+}
+
+.sync-status strong {
+  color: #dffdf2;
+}
+
+.sync-status .secondary-button {
+  margin-left: auto;
+}
+
 .primary-button,
 .secondary-button,
 .danger-button {

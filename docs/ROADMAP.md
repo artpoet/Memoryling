@@ -52,9 +52,18 @@ Fixture and local-store foundation completed:
 - [x] deterministic completion star, source lineage, and “Why did this happen?” inspector
 - [x] application-level deletion and deterministic recomputation for the supported fixture path
 
+Primary Agent-memory source completed in the source v0.5.0 tree:
+
+- [x] refresh official-source research and accept [ADR-0007](adr/0007-codex-agent-memory-auto-sync.md), superseding the work-record pilot as the primary source
+- [x] implement one-time schema-v2 source consent for the exact Codex `memories` root, two top-level allowlisted generated files, local derivation, and automatic read-only sync
+- [x] keep raw Agent-memory text Rust／SQLite-only and expose only redacted preview metadata, hashes, sync status, and content-minimized pet state
+- [x] add startup, 15-minute, and manual synchronization with transactional replacement／recomputation, missing-source withdrawal／recovery, and last-valid-state preservation for unsafe input
+- [x] add SQLite schema v4 sync state, aggregate memory-continuity signal, visible memory halo, complete local forgetting, and explicit exclusion from Daily Scout
+- [x] pass synthetic temporary-file adapter, full-scope consent, sync, missing／recovery, redaction, render-safe, ACL, and frontend flow coverage without reading private Agent memory
+
 Experimental work-record pilot completed in the source v0.3.0 tree:
 
-- [x] verify from official documentation that no stable Codex durable-memory export API or compatibility-guaranteed memory-file schema is available; direct tool-home parsing is not an approved integration
+- [x] record the historical 2026-08-12 conclusion; current official memory-location evidence and the new bounded connector supersede its primary-source recommendation while retaining the no-stable-third-party-schema warning
 - [x] document the distinction between durable memory and a version-bound Codex work／thread-history pilot in the [source-format evaluation](research/2026-08-12_codex-source-format-evaluation.md) and proposed [ADR-0005](adr/0005-codex-thread-history-source-pilot.md)
 - [x] implement a Rust-only fixed local Codex Desktop executable boundary, exact `codex-cli 0.134.0` fail-closed pin, and local App Server stdio calls limited to documented `thread/list` and `thread/read`
 - [x] implement user-triggered content-minimized listing, Rust-only raw identifiers, exactly one selected completed thread, last-completed `final_answer` extraction, content-free preview, explicit completion confirmation, and canonical consent hash
@@ -64,14 +73,16 @@ Experimental work-record pilot completed in the source v0.3.0 tree:
 
 Remaining gates for this phase:
 
+- [ ] obtain separate authorization for one exact private Agent-memory source and its read／local-storage／derivation／automatic-sync UAT scope
+- [ ] complete content-free private UAT for preview → consent → halo → restart → automatic change sync → missing-source withdrawal／recovery → forget, without recording memory text
 - [ ] obtain separate authorization naming one exact completed private thread and the UAT scope before any private `thread/read`
 - [ ] complete private UAT for list → one selection → redacted preview → consent → one effect → restart → explanation → forget, recording only content-free pass／fail evidence and proving the original thread remains unchanged
-- [ ] complete packaged v0.3.0 synthetic compatibility UAT; the verified v0.2.0 installer remains the historical no-redo artifact and does not prove the new connector path
-- [ ] wait for or adopt a production-supported Codex durable-memory export／API or supported successor interface, then perform a fresh privacy review and compatibility decision
+- [ ] complete packaged v0.5.0 synthetic compatibility UAT; the verified v0.2.0 installer remains the historical no-redo artifact and does not prove the new connector path
+- [ ] monitor official Codex memory storage guidance; any filename, scope, or semantic drift requires a new adapter version and privacy review
 
-Exit condition: one production-supported, user-selected Codex memory source can create one explainable, removable creature change without any network request. An experimental work thread is not a durable memory and cannot satisfy this condition.
+Exit condition: one explicitly approved Codex Agent-memory source can create, update, withdraw, recover, explain, and remove a creature change locally without any network request, with private and packaged acceptance recorded.
 
-**Exit status: not met.** The v0.3.0 source implementation proves the synthetic contract and a content-free live listing boundary, but no private thread was read, no v0.3.0 installer was accepted, and no production-supported Codex memory interface exists.
+**Exit status: not met.** The v0.5.0 source implements the bounded Agent-memory vertical slice and synthetic proof, but no private Agent-memory UAT or v0.5.0 installer acceptance has run. Generated Codex memory files also remain a versioned integration surface rather than a stable third-party schema.
 
 ## Cross-phase track — Public beta and OSS maintainer evidence
 
@@ -96,7 +107,7 @@ Design foundation recorded: the user confirmed the biological／organic plus res
 
 - [ ] persistent creature traits and visual marks
 - [ ] versioned identity core, growth contributions, recomputable creature genome, and evolution stages
-- [ ] extend the current import-only, one-source `SourceConsentScope` into a reusable growth scope with disable／re-enable and correction controls; derive future records automatically only within unchanged boundaries, and require a new revision preview／consent before category／purpose／mapping expansion
+- [ ] extend the current one-source Agent-memory auto-sync scope with disable／re-enable and correction controls; reuse future records only within unchanged boundaries, and require a new revision preview／consent before category／purpose／mapping expansion
 - [ ] implement the A／C／B evidence contract: A Agent-use behavior alone shapes primary morphology, C outcome-qualified history gates reshaping／advances maturity／creates lineage marks without selecting a silhouette, and B collaboration mode affects only bounded local movement
 - [ ] restrict approved content-domain influence to a secondary material／surface accent rather than stage, main form, or personality inference
 - [ ] derive `EphemeralActivityHint` from newly normalized in-scope records as a content-minimized, memory-only TTL state that cannot enter SQLite, contributions, maturity, or permanent recipes

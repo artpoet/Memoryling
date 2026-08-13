@@ -1,12 +1,19 @@
 use serde::{Deserialize, Serialize};
 
+fn is_false(value: &bool) -> bool {
+    !*value
+}
+
 pub const MEMORY_EVENT_SCHEMA_VERSION: i64 = 1;
-pub const STORE_SCHEMA_VERSION: i64 = 3;
+pub const STORE_SCHEMA_VERSION: i64 = 4;
 pub const DERIVATION_VERSION: i64 = 1;
 pub const CODEX_ADAPTER_ID: &str = "codex-durable-memory";
 pub const CODEX_ADAPTER_VERSION: i64 = 1;
 pub const CODEX_THREAD_ADAPTER_ID: &str = "codex-app-server-thread";
 pub const CODEX_THREAD_ADAPTER_VERSION: i64 = 1;
+pub const CODEX_MEMORY_ADAPTER_ID: &str = "codex-local-memory-store";
+pub const CODEX_MEMORY_ADAPTER_VERSION: i64 = 1;
+pub const CODEX_MEMORY_SOURCE_ID: &str = "codex.local-memories";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -42,6 +49,10 @@ pub struct ConsentScopeV1 {
     pub data_categories: Vec<String>,
     pub purposes: Vec<String>,
     pub read_only: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_locator_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub automatic_sync: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -83,7 +94,7 @@ pub struct ApproveImportRequest {
     pub consent_scope_hash: Option<String>,
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct NormalizedMemoryEvent {
     pub id: String,
     pub schema_version: i64,
@@ -95,7 +106,7 @@ pub(crate) struct NormalizedMemoryEvent {
     pub content_hash: String,
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct PreparedImport {
     pub source: SourceOption,
     pub source_content_hash: String,
@@ -163,6 +174,21 @@ pub struct MemoryState {
     pub event_count: usize,
     pub signal_count: usize,
     pub marks: Vec<CreatureMark>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub active_source: Option<ActiveMemorySource>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ActiveMemorySource {
+    pub source_id: String,
+    pub adapter_id: String,
+    pub display_name: String,
+    pub automatic_sync: bool,
+    pub sync_status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_successful_sync_at: Option<String>,
+    pub synced_record_count: usize,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
@@ -193,6 +219,7 @@ pub enum DailyScoutRenderState {
 #[serde(rename_all = "kebab-case")]
 pub enum RealMemoryAccess {
     Off,
+    CodexLocal,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
@@ -201,6 +228,7 @@ pub enum ImportState {
     Empty,
     FixtureApproved,
     ThreadApproved,
+    AgentMemoryApproved,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
@@ -244,4 +272,5 @@ pub struct CreatureRenderMark {
 #[serde(rename_all = "kebab-case")]
 pub enum CreatureRenderMarkStyle {
     CompletionStar,
+    MemoryHalo,
 }

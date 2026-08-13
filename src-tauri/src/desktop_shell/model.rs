@@ -163,8 +163,10 @@ mod tests {
 
     #[test]
     fn product_setup_state_exposes_only_completion() {
-        let mut settings = ShellSettings::default();
-        settings.setup_complete = true;
+        let settings = ShellSettings {
+            setup_complete: true,
+            ..ShellSettings::default()
+        };
         let json = serde_json::to_string(&settings.product_setup_state())
             .expect("setup state should serialize");
         assert_eq!(json, r#"{"schemaVersion":1,"setupComplete":true}"#);

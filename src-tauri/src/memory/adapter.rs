@@ -197,6 +197,8 @@ pub(crate) fn fixture_consent_contract(
         data_categories: vec!["synthetic-completion".to_string()],
         purposes: vec!["local-creature-derivation".to_string()],
         read_only: true,
+        source_locator_hash: None,
+        automatic_sync: false,
     };
     let (consent_scope_json, consent_scope_hash) = consent_scope_contract(&consent_scope)?;
     Ok((consent_scope, consent_scope_json, consent_scope_hash))

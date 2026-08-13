@@ -6,16 +6,18 @@ use sha2::{Digest, Sha256};
 use super::{
     adapter::stable_id,
     model::{
-        BodyModule, CreatureEnvelope, CreatureMark, CreatureMotion, CreaturePalette,
-        CreatureRenderMark, CreatureRenderMarkStyle, CreatureRenderState, CreatureStage,
-        DailyScoutRenderState, ImportState, LineageSource, MemoryState, PreparedImport,
-        RealMemoryAccess, CODEX_THREAD_ADAPTER_ID, DERIVATION_VERSION, STORE_SCHEMA_VERSION,
+        ActiveMemorySource, BodyModule, ConsentScopeV1, CreatureEnvelope, CreatureMark,
+        CreatureMotion, CreaturePalette, CreatureRenderMark, CreatureRenderMarkStyle,
+        CreatureRenderState, CreatureStage, DailyScoutRenderState, ImportState, LineageSource,
+        MemoryState, PreparedImport, RealMemoryAccess, CODEX_MEMORY_ADAPTER_ID,
+        CODEX_THREAD_ADAPTER_ID, DERIVATION_VERSION, STORE_SCHEMA_VERSION,
     },
 };
 
 const MIGRATION_0001: &str = include_str!("../../migrations/0001_first_memory.sql");
 const MIGRATION_0002: &str = include_str!("../../migrations/0002_source_consent_scope.sql");
 const MIGRATION_0003: &str = include_str!("../../migrations/0003_daily_memory_scout.sql");
+const MIGRATION_0004: &str = include_str!("../../migrations/0004_agent_memory_sync.sql");
 
 pub(crate) struct MemoryStore {
     path: PathBuf,
@@ -67,6 +69,14 @@ impl MemoryStore {
             })
         {
             return Err("The approval contains an unknown memory record.".to_string());
+        }
+        if prepared.source.adapter_id == CODEX_MEMORY_ADAPTER_ID
+            && selected.len() != prepared.events.len()
+        {
+            return Err(
+                "Agent memory consent covers the complete allowlisted source, not individual files."
+                    .to_string(),
+            );
         }
 
         let mut connection = self.open_connection()?;
@@ -155,6 +165,19 @@ impl MemoryStore {
                 .map_err(|error| local_store_error("save normalized memory", error))?;
         }
 
+        if prepared.source.adapter_id == CODEX_MEMORY_ADAPTER_ID {
+            transaction
+                .execute(
+                    "INSERT INTO source_sync_state
+                        (source_id, automatic_sync, sync_status, last_attempt_at,
+                         last_successful_sync_at, synced_record_count, error_code)
+                     VALUES (?1, 1, 'synced', strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                             strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), ?2, NULL)",
+                    params![prepared.source.id, prepared.events.len() as i64],
+                )
+                .map_err(|error| local_store_error("save automatic sync state", error))?;
+        }
+
         rederive(&transaction)?;
         let state = state_from_connection(&transaction)?;
         transaction
@@ -189,6 +212,142 @@ impl MemoryStore {
         Ok(state)
     }
 
+    pub(crate) fn approved_agent_memory_scope(&self) -> Result<Option<ConsentScopeV1>, String> {
+        let connection = self.open_connection()?;
+        let scope_json = connection
+            .query_row(
+                "SELECT scs.scope_json
+                 FROM source_consent_scopes scs
+                 JOIN source_imports si ON si.source_id = scs.source_id
+                 WHERE si.adapter_id = ?1",
+                params![CODEX_MEMORY_ADAPTER_ID],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .map_err(|error| local_store_error("read approved Agent memory scope", error))?;
+        scope_json
+            .map(|json| {
+                serde_json::from_str(&json)
+                    .map_err(|_| "The approved Agent memory consent scope is invalid.".to_string())
+            })
+            .transpose()
+    }
+
+    pub(crate) fn sync_agent_memory(
+        &self,
+        prepared: &PreparedImport,
+    ) -> Result<MemoryState, String> {
+        if prepared.source.adapter_id != CODEX_MEMORY_ADAPTER_ID
+            || !prepared.consent_scope.automatic_sync
+        {
+            return Err("The prepared source is not an automatic Agent memory source.".to_string());
+        }
+        let mut connection = self.open_connection()?;
+        let transaction = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|error| local_store_error("begin Agent memory sync", error))?;
+        let stored_scope_hash = transaction
+            .query_row(
+                "SELECT scs.scope_hash
+                 FROM source_consent_scopes scs
+                 JOIN source_imports si ON si.source_id = scs.source_id
+                 WHERE si.source_id = ?1 AND si.adapter_id = ?2",
+                params![prepared.source.id, CODEX_MEMORY_ADAPTER_ID],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .map_err(|error| local_store_error("verify Agent memory consent", error))?
+            .ok_or_else(|| "Codex Agent memory is not approved for automatic sync.".to_string())?;
+        if stored_scope_hash != prepared.consent_scope_hash {
+            return Err(
+                "The Codex Agent memory source location or consent scope changed.".to_string(),
+            );
+        }
+
+        clear_derivations(&transaction)?;
+        transaction
+            .execute(
+                "DELETE FROM memory_events WHERE source_id = ?1",
+                params![prepared.source.id],
+            )
+            .map_err(|error| local_store_error("replace Agent memory events", error))?;
+        transaction
+            .execute(
+                "UPDATE source_imports SET source_content_hash = ?2 WHERE source_id = ?1",
+                params![prepared.source.id, prepared.source_content_hash],
+            )
+            .map_err(|error| local_store_error("update Agent memory source", error))?;
+        insert_all_events(&transaction, prepared)?;
+        rederive(&transaction)?;
+        transaction
+            .execute(
+                "UPDATE source_sync_state
+                 SET sync_status = 'synced',
+                     last_attempt_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                     last_successful_sync_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                     synced_record_count = ?2,
+                     error_code = NULL
+                 WHERE source_id = ?1",
+                params![prepared.source.id, prepared.events.len() as i64],
+            )
+            .map_err(|error| local_store_error("record Agent memory sync", error))?;
+        let state = state_from_connection(&transaction)?;
+        transaction
+            .commit()
+            .map_err(|error| local_store_error("commit Agent memory sync", error))?;
+        Ok(state)
+    }
+
+    pub(crate) fn record_agent_sync_failure(
+        &self,
+        status: &str,
+        error_code: &str,
+        clear_source_events: bool,
+    ) -> Result<MemoryState, String> {
+        if !matches!(status, "source-missing" | "needs-attention") {
+            return Err("The Agent memory sync status is invalid.".to_string());
+        }
+        let mut connection = self.open_connection()?;
+        let transaction = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|error| local_store_error("begin Agent memory sync recovery", error))?;
+        let source_id = transaction
+            .query_row(
+                "SELECT source_id FROM source_imports WHERE adapter_id = ?1",
+                params![CODEX_MEMORY_ADAPTER_ID],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .map_err(|error| local_store_error("find approved Agent memory source", error))?
+            .ok_or_else(|| "Codex Agent memory is not approved for automatic sync.".to_string())?;
+        if clear_source_events {
+            clear_derivations(&transaction)?;
+            transaction
+                .execute(
+                    "DELETE FROM memory_events WHERE source_id = ?1",
+                    params![source_id],
+                )
+                .map_err(|error| local_store_error("clear unavailable Agent memories", error))?;
+            rederive(&transaction)?;
+        }
+        transaction
+            .execute(
+                "UPDATE source_sync_state
+                 SET sync_status = ?2,
+                     last_attempt_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+                     synced_record_count = CASE WHEN ?3 THEN 0 ELSE synced_record_count END,
+                     error_code = ?4
+                 WHERE source_id = ?1",
+                params![source_id, status, clear_source_events, error_code],
+            )
+            .map_err(|error| local_store_error("record Agent memory sync failure", error))?;
+        let state = state_from_connection(&transaction)?;
+        transaction
+            .commit()
+            .map_err(|error| local_store_error("commit Agent memory sync recovery", error))?;
+        Ok(state)
+    }
+
     pub(crate) fn open_connection(&self) -> Result<Connection, String> {
         if let Some(parent) = self.path.parent() {
             fs::create_dir_all(parent).map_err(|_| {
@@ -217,14 +376,19 @@ impl MemoryStore {
         match version {
             0 => migration
                 .execute_batch(&format!(
-                    "{MIGRATION_0001}\n{MIGRATION_0002}\n{MIGRATION_0003}"
+                    "{MIGRATION_0001}\n{MIGRATION_0002}\n{MIGRATION_0003}\n{MIGRATION_0004}"
                 ))
                 .map_err(|error| local_store_error("apply schema migrations", error))?,
             1 => {
                 migrate_v1_to_v2(&migration)?;
                 migrate_v2_to_v3(&migration)?;
+                migrate_v3_to_v4(&migration)?;
             }
-            2 => migrate_v2_to_v3(&migration)?,
+            2 => {
+                migrate_v2_to_v3(&migration)?;
+                migrate_v3_to_v4(&migration)?;
+            }
+            3 => migrate_v3_to_v4(&migration)?,
             STORE_SCHEMA_VERSION => {}
             _ => return Err("The local Memoryling database schema is not supported.".to_string()),
         }
@@ -234,6 +398,39 @@ impl MemoryStore {
 
         Ok(connection)
     }
+}
+
+fn migrate_v3_to_v4(transaction: &Transaction<'_>) -> Result<(), String> {
+    transaction
+        .execute_batch(MIGRATION_0004)
+        .map_err(|error| local_store_error("apply Agent memory sync migration", error))
+}
+
+fn insert_all_events(
+    transaction: &Transaction<'_>,
+    prepared: &PreparedImport,
+) -> Result<(), String> {
+    for event in &prepared.events {
+        transaction
+            .execute(
+                "INSERT INTO memory_events
+                    (id, schema_version, source_id, source_record_id, source_timestamp,
+                     kind, normalized_text, content_hash)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                params![
+                    event.id,
+                    event.schema_version,
+                    event.source_id,
+                    event.source_record_id,
+                    event.source_timestamp,
+                    event.kind,
+                    event.normalized_text,
+                    event.content_hash
+                ],
+            )
+            .map_err(|error| local_store_error("save normalized Agent memory", error))?;
+    }
+    Ok(())
 }
 
 fn migrate_v2_to_v3(transaction: &Transaction<'_>) -> Result<(), String> {
@@ -313,7 +510,12 @@ fn rederive(transaction: &Transaction<'_>) -> Result<(), String> {
             .map_err(|error| local_store_error("collect derivation inputs", error))?
     };
 
+    let mut agent_memory_event_ids = Vec::new();
     for (event_id, kind) in inputs {
+        if kind == "agent-memory-document" {
+            agent_memory_event_ids.push(event_id);
+            continue;
+        }
         if kind != "completion" {
             continue;
         }
@@ -353,6 +555,48 @@ fn rederive(transaction: &Transaction<'_>) -> Result<(), String> {
                 params![effect_id, signal_id],
             )
             .map_err(|error| local_store_error("save effect lineage", error))?;
+    }
+
+    if !agent_memory_event_ids.is_empty() {
+        let version = DERIVATION_VERSION.to_string();
+        let joined_ids = agent_memory_event_ids.join("|");
+        let signal_id = stable_id(
+            "signal",
+            &[&joined_ids, "agent-memory-continuity", &version],
+        );
+        let effect_id = stable_id("effect", &[&signal_id, "memory-halo", &version]);
+        transaction
+            .execute(
+                "INSERT INTO derived_signals
+                    (id, signal_type, confidence, derivation_version)
+                 VALUES (?1, 'agent-memory-continuity', 1.0, ?2)",
+                params![signal_id, DERIVATION_VERSION],
+            )
+            .map_err(|error| local_store_error("save Agent memory signal", error))?;
+        for event_id in agent_memory_event_ids {
+            transaction
+                .execute(
+                    "INSERT INTO derived_signal_sources (signal_id, memory_event_id)
+                     VALUES (?1, ?2)",
+                    params![signal_id, event_id],
+                )
+                .map_err(|error| local_store_error("save Agent memory lineage", error))?;
+        }
+        transaction
+            .execute(
+                "INSERT INTO world_effects
+                    (id, effect_type, effect_style, state, explanation_key, derivation_version)
+                 VALUES (?1, 'visual-mark', 'memory-halo', 'active',
+                         'approved_agent_memories_created_halo', ?2)",
+                params![effect_id, DERIVATION_VERSION],
+            )
+            .map_err(|error| local_store_error("save Agent memory world effect", error))?;
+        transaction
+            .execute(
+                "INSERT INTO world_effect_signals (effect_id, signal_id) VALUES (?1, ?2)",
+                params![effect_id, signal_id],
+            )
+            .map_err(|error| local_store_error("save Agent memory effect lineage", error))?;
     }
 
     Ok(())
@@ -415,7 +659,10 @@ fn state_from_connection(connection: &Connection) -> Result<MemoryState, String>
                 .query_map(params![effect_id], |row| {
                     let adapter_id = row.get::<_, String>(4)?;
                     let normalized_text = row.get::<_, String>(8)?;
-                    let content_redacted = adapter_id == CODEX_THREAD_ADAPTER_ID;
+                    let content_redacted = matches!(
+                        adapter_id.as_str(),
+                        CODEX_THREAD_ADAPTER_ID | CODEX_MEMORY_ADAPTER_ID
+                    );
                     Ok(LineageSource {
                         memory_event_id: row.get(0)?,
                         memory_event_schema_version: row.get(1)?,
@@ -451,12 +698,40 @@ fn state_from_connection(connection: &Connection) -> Result<MemoryState, String>
         });
     }
 
+    let active_source = connection
+        .query_row(
+            "SELECT si.source_id, si.adapter_id, si.display_name,
+                    COALESCE(ss.automatic_sync, 0), COALESCE(ss.sync_status, 'manual'),
+                    ss.last_successful_sync_at,
+                    COALESCE(ss.synced_record_count,
+                        (SELECT COUNT(*) FROM memory_events me WHERE me.source_id = si.source_id))
+             FROM source_imports si
+             LEFT JOIN source_sync_state ss ON ss.source_id = si.source_id
+             ORDER BY si.source_id LIMIT 1",
+            [],
+            |row| {
+                let record_count = row.get::<_, i64>(6)?;
+                Ok(ActiveMemorySource {
+                    source_id: row.get(0)?,
+                    adapter_id: row.get(1)?,
+                    display_name: row.get(2)?,
+                    automatic_sync: row.get::<_, i64>(3)? == 1,
+                    sync_status: row.get(4)?,
+                    last_successful_sync_at: row.get(5)?,
+                    synced_record_count: usize::try_from(record_count).unwrap_or(0),
+                })
+            },
+        )
+        .optional()
+        .map_err(|error| local_store_error("read active memory source", error))?;
+
     Ok(MemoryState {
         store_schema_version: STORE_SCHEMA_VERSION,
         source_count,
         event_count,
         signal_count,
         marks,
+        active_source,
     })
 }
 
@@ -473,36 +748,39 @@ fn creature_render_state_from_connection(
         .map_err(|error| local_store_error("read render-safe import state", error))?;
     let import_state = match approved_adapter.as_deref() {
         None => ImportState::Empty,
+        Some(CODEX_MEMORY_ADAPTER_ID) => ImportState::AgentMemoryApproved,
         Some(CODEX_THREAD_ADAPTER_ID) => ImportState::ThreadApproved,
         Some(_) => ImportState::FixtureApproved,
     };
-    let completion_star_count = connection
+    let effect_style = connection
         .query_row(
-            "SELECT COUNT(*)
-             FROM world_effects
-             WHERE state = 'active' AND effect_style = 'completion-star'",
+            "SELECT effect_style FROM world_effects WHERE state = 'active' ORDER BY id LIMIT 1",
             [],
-            |row| row.get::<_, i64>(0),
+            |row| row.get::<_, String>(0),
         )
+        .optional()
         .map_err(|error| local_store_error("read render-safe creature state", error))?;
-
-    let marks = if completion_star_count > 0 {
-        vec![CreatureRenderMark {
+    let marks = match effect_style.as_deref() {
+        Some("completion-star") => vec![CreatureRenderMark {
             id: "mark-1".to_string(),
             style: CreatureRenderMarkStyle::CompletionStar,
-        }]
-    } else {
-        Vec::new()
+        }],
+        Some("memory-halo") => vec![CreatureRenderMark {
+            id: "mark-1".to_string(),
+            style: CreatureRenderMarkStyle::MemoryHalo,
+        }],
+        _ => Vec::new(),
     };
     let import_revision_value = match import_state {
         ImportState::Empty => "empty",
         ImportState::FixtureApproved => "fixture-approved",
         ImportState::ThreadApproved => "thread-approved",
+        ImportState::AgentMemoryApproved => "agent-memory-approved",
     };
-    let marks_revision_value = if marks.is_empty() {
-        "none"
-    } else {
-        "completion-star"
+    let marks_revision_value = match marks.first().map(|mark| mark.style) {
+        None => "none",
+        Some(CreatureRenderMarkStyle::CompletionStar) => "completion-star",
+        Some(CreatureRenderMarkStyle::MemoryHalo) => "memory-halo",
     };
     let daily_scout_enabled = connection
         .query_row(
@@ -532,9 +810,29 @@ fn creature_render_state_from_connection(
         DailyScoutRenderState::Waiting => "scout-waiting",
         DailyScoutRenderState::Ready => "scout-ready",
     };
+    let agent_memory_event_count = if approved_adapter.as_deref() == Some(CODEX_MEMORY_ADAPTER_ID) {
+        connection
+            .query_row(
+                "SELECT COUNT(*) FROM memory_events WHERE source_id = ?1",
+                params![super::model::CODEX_MEMORY_SOURCE_ID],
+                |row| row.get::<_, i64>(0),
+            )
+            .map_err(|error| local_store_error("read Agent memory availability", error))?
+    } else {
+        0
+    };
+    let real_memory_access = if agent_memory_event_count > 0 {
+        RealMemoryAccess::CodexLocal
+    } else {
+        RealMemoryAccess::Off
+    };
+    let access_revision_value = match real_memory_access {
+        RealMemoryAccess::Off => "off",
+        RealMemoryAccess::CodexLocal => "codex-local",
+    };
     let revision = Sha256::digest(
         format!(
-            "4|off|{import_revision_value}|compact|seed|memory-seed-egg-v1|violet-mint|calm|{marks_revision_value}|{daily_scout_revision_value}"
+            "5|{access_revision_value}|{import_revision_value}|compact|seed|memory-seed-egg-v1|violet-mint|calm|{marks_revision_value}|{daily_scout_revision_value}"
         )
         .as_bytes(),
     )
@@ -543,9 +841,9 @@ fn creature_render_state_from_connection(
     .collect();
 
     Ok(CreatureRenderState {
-        schema_version: 4,
+        schema_version: 5,
         revision,
-        real_memory_access: RealMemoryAccess::Off,
+        real_memory_access,
         import_state,
         envelope: CreatureEnvelope::Compact,
         stage: CreatureStage::Seed,
@@ -582,7 +880,8 @@ mod tests {
     use super::*;
     use crate::memory::{
         adapter::{consent_scope_contract, prepare_import, preview_source},
-        model::{ConsentScopeV1, CODEX_THREAD_ADAPTER_VERSION},
+        codex_memory,
+        model::{ConsentScopeV1, CreatureRenderMarkStyle, CODEX_THREAD_ADAPTER_VERSION},
     };
 
     fn fixture_path() -> PathBuf {
@@ -623,6 +922,8 @@ mod tests {
             data_categories: vec!["user-confirmed-completion".to_string()],
             purposes: vec!["local-creature-derivation".to_string()],
             read_only: true,
+            source_locator_hash: None,
+            automatic_sync: false,
         };
         let (json, hash) = consent_scope_contract(&prepared.consent_scope)
             .expect("thread consent scope should serialize");
@@ -822,6 +1123,116 @@ mod tests {
             fixture_bytes_before
         );
         drop(connection);
+
+        fs::remove_dir_all(directory).expect("temporary store should be removable");
+    }
+
+    #[test]
+    fn agent_memory_approval_sync_missing_recovery_and_forgetting_are_atomic() {
+        let (store, directory) = temporary_store();
+        let memory_root = directory.join("synthetic-codex-home").join("memories");
+        fs::create_dir_all(&memory_root).expect("synthetic memory root should exist");
+        fs::write(
+            memory_root.join("memory_summary.md"),
+            "# Synthetic summary\nNo private data.",
+        )
+        .expect("synthetic summary should be written");
+        fs::write(
+            memory_root.join("MEMORY.md"),
+            "# Synthetic registry\n- initial fixture",
+        )
+        .expect("synthetic registry should be written");
+        let prepared = codex_memory::prepare_import_at(&memory_root)
+            .expect("synthetic Agent memories should parse");
+        let selected = prepared
+            .events
+            .iter()
+            .map(|event| event.source_record_id.clone())
+            .collect::<Vec<_>>();
+
+        let partial_error = store
+            .approve_import(&prepared, &selected[..1])
+            .expect_err("Agent memory files cannot be approved individually");
+        assert!(partial_error.contains("complete allowlisted source"));
+
+        let approved = store
+            .approve_import(&prepared, &selected)
+            .expect("complete Agent memory scope should be approved");
+        assert_eq!(approved.event_count, 2);
+        assert_eq!(approved.signal_count, 1);
+        assert_eq!(approved.marks[0].style, "memory-halo");
+        assert_eq!(approved.marks[0].lineage.len(), 2);
+        assert!(approved.marks[0]
+            .lineage
+            .iter()
+            .all(|source| source.content_redacted && source.memory_text.is_none()));
+        let active = approved
+            .active_source
+            .as_ref()
+            .expect("active source should be visible");
+        assert!(active.automatic_sync);
+        assert_eq!(active.sync_status, "synced");
+        assert_eq!(active.synced_record_count, 2);
+        let render = store
+            .creature_render_state()
+            .expect("render-safe Agent state should load");
+        assert_eq!(render.real_memory_access, RealMemoryAccess::CodexLocal);
+        assert_eq!(render.import_state, ImportState::AgentMemoryApproved);
+        assert_eq!(render.marks[0].style, CreatureRenderMarkStyle::MemoryHalo);
+
+        let old_hash = approved.marks[0].lineage[0].content_hash.clone();
+        fs::write(
+            memory_root.join("MEMORY.md"),
+            "# Synthetic registry\n- updated fixture\n- another safe entry",
+        )
+        .expect("synthetic registry should update");
+        let updated = codex_memory::prepare_import_at(&memory_root)
+            .expect("updated Agent memories should parse");
+        let synced = store
+            .sync_agent_memory(&updated)
+            .expect("approved Agent memories should sync");
+        assert_eq!(synced.event_count, 2);
+        assert!(synced.marks[0]
+            .lineage
+            .iter()
+            .any(|source| source.content_hash != old_hash));
+
+        fs::remove_dir_all(&memory_root).expect("exact synthetic root should be removable");
+        let missing = store
+            .record_agent_sync_failure("source-missing", "source-missing", true)
+            .expect("missing source should withdraw downstream effects");
+        assert_eq!(missing.source_count, 1);
+        assert_eq!(missing.event_count, 0);
+        assert!(missing.marks.is_empty());
+        assert_eq!(missing.active_source.unwrap().sync_status, "source-missing");
+        assert_eq!(
+            store
+                .creature_render_state()
+                .expect("missing Agent source render state should load")
+                .real_memory_access,
+            RealMemoryAccess::Off
+        );
+
+        fs::create_dir_all(&memory_root).expect("synthetic memory root should recover");
+        fs::write(
+            memory_root.join("MEMORY.md"),
+            "# Recovered synthetic registry",
+        )
+        .expect("recovered fixture should be written");
+        let recovered = codex_memory::prepare_import_at(&memory_root)
+            .expect("recovered Agent memory should parse");
+        let recovered_state = store
+            .sync_agent_memory(&recovered)
+            .expect("same approved root should recover automatically");
+        assert_eq!(recovered_state.event_count, 1);
+        assert_eq!(recovered_state.marks[0].style, "memory-halo");
+
+        let forgotten = store
+            .forget_source(&prepared.source.id)
+            .expect("disconnect should remove only Memoryling's local source");
+        assert_eq!(forgotten.source_count, 0);
+        assert!(forgotten.active_source.is_none());
+        assert!(memory_root.join("MEMORY.md").is_file());
 
         fs::remove_dir_all(directory).expect("temporary store should be removable");
     }

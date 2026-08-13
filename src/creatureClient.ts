@@ -7,17 +7,21 @@ export const PET_SHELL_STATE_CHANGED = "memoryling://pet-shell-state-changed";
 
 export interface CreatureMarkRenderState {
   id: string;
-  style: "completion-star";
+  style: "completion-star" | "memory-halo";
 }
 
 export type CreatureStage = "seed";
 export type CreatureBodyModule = "memory-seed-egg-v1";
 
 export interface CreatureRenderState {
-  schemaVersion: 4;
+  schemaVersion: 5;
   revision: string;
-  realMemoryAccess: "off";
-  importState: "empty" | "fixture-approved" | "thread-approved";
+  realMemoryAccess: "off" | "codex-local";
+  importState:
+    | "empty"
+    | "fixture-approved"
+    | "thread-approved"
+    | "agent-memory-approved";
   envelope: "compact";
   stage: CreatureStage;
   bodyModule: CreatureBodyModule;
@@ -93,7 +97,7 @@ export const nativeDetailShellClient: DetailShellClient = {
 };
 
 export const baselineCreatureRenderState: CreatureRenderState = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   revision: "0".repeat(64),
   realMemoryAccess: "off",
   importState: "empty",
@@ -125,12 +129,13 @@ export function sanitizeCreatureRenderState(
   if (!value || typeof value !== "object") return baselineCreatureRenderState;
   const state = value as Partial<CreatureRenderState>;
   const valid =
-    state.schemaVersion === 4 &&
+    state.schemaVersion === 5 &&
     isValidRevision(state.revision) &&
-    state.realMemoryAccess === "off" &&
+    (state.realMemoryAccess === "off" || state.realMemoryAccess === "codex-local") &&
     (state.importState === "empty" ||
       state.importState === "fixture-approved" ||
-      state.importState === "thread-approved") &&
+      state.importState === "thread-approved" ||
+      state.importState === "agent-memory-approved") &&
     state.envelope === "compact" &&
     state.stage === "seed" &&
     state.bodyModule === "memory-seed-egg-v1" &&
@@ -145,13 +150,13 @@ export function sanitizeCreatureRenderState(
         Boolean(mark) &&
         typeof mark.id === "string" &&
         OPAQUE_MARK_ID_PATTERN.test(mark.id) &&
-        mark.style === "completion-star",
+        (mark.style === "completion-star" || mark.style === "memory-halo"),
     );
   if (!valid) return baselineCreatureRenderState;
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     revision: state.revision!,
-    realMemoryAccess: "off",
+    realMemoryAccess: state.realMemoryAccess!,
     importState: state.importState!,
     envelope: "compact",
     stage: "seed",

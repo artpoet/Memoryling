@@ -1,5 +1,7 @@
 # Codex source format evaluation
 
+> Update (2026-08-13): current official Codex documentation now describes local memory files under the Codex home. The primary-source conclusion here is superseded by [the updated research](2026-08-13_codex-local-memory-source-update.md) and [ADR-0007](../adr/0007-codex-agent-memory-auto-sync.md). This file remains historical evidence for the supplementary thread-history pilot.
+
 AS_OF: 2026-08-12 (Asia/Taipei)
 
 ## Decision summary

@@ -6,21 +6,36 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ## [Unreleased]
 
+> Source v0.5.0 development milestone. The primary path is now a one-time approved local Codex Agent-memory source with read-only automatic sync. No private-memory UAT or packaged v0.5.0 acceptance is claimed; v0.2.0 remains the installed no-redo baseline.
+
+### Added
+
+- `codex-local-memory-store` v1 connector for the exact configured Codex `memories` root, restricted to top-level `memory_summary.md` and `MEMORY.md`, with symlink／type／UTF-8／size／root-hash fail-closed guards
+- Schema-v2 source-level consent for local derivation and future automatic in-scope sync without per-document selection; previews are content-redacted and expose only logical IDs, timestamps, character counts, and hashes
+- Startup, 15-minute, and manual sync with SQLite migration 0004／schema v4 `source_sync_state`, transactional event replacement, missing-source withdrawal／recovery, last-valid-state preservation, and complete local disconnect
+- Aggregate `agent-memory-continuity` derivation, visible memory halo, render-safe `codex-local` state, bilingual connection／sync／forget UX, and primary-source documentation in accepted ADR-0007
+- Synthetic temporary-file, full-scope consent, sync, recovery, redaction, pet-safe DTO, ACL, and frontend vertical-slice coverage; no private memory was read
+
 ### Changed
 
+- Codex Agent memory replaces manual work-record selection as the recommended primary source; the exact-version App Server work-record pilot remains a supplementary compatibility path
+- Daily Scout remains restricted to a separately approved work record and explicitly excludes Agent-memory documents from outbound context
 - Refined the deterministic programmatic seed renderer through v8: broader teardrop／rounded-base proportions, synchronized eye geometry, layered biological facets, bright side plates that protrude beyond the body, and a restrained soft outer shadow; AI concept art remains reference-only rather than a runtime asset
 - Added a plain-language fresh-session handoff that makes the next agent summarize the current state, present three bounded next-step choices, label private／paid consequences, and wait for the user's selection before acting
 
 ### Validated
 
-- 38 frontend tests and 47 Rust tests pass with one explicitly ignored private-read live smoke; renderer-v8 visual QA, TypeScript／Vite build, Rust checks, formatting, Final Gate, and Windows CI run `31681343720` pass
+- 41 frontend tests pass, including complete Agent-memory source approval, content-redacted preview, manual sync, missing-source honesty, halo rendering, browser-off behavior, and English／Traditional Chinese parity
+- 50 Rust tests pass with one explicitly ignored private-source live smoke, including two-file allowlisting, size／UTF-8／symlink guards, schema-v4 migration, consent binding, automatic-sync state, missing／recovery semantics, forgetting, render-safe DTOs, and ACL／caller denial
+- Production TypeScript／Vite build, Rust compile, rustfmt, and Clippy with warnings denied pass
+- Local browser smoke observed the primary Agent-memory copy, honest memory-off desktop-runtime boundary, responsive full-page layout, Traditional Chinese switch, local-only／Daily Scout exclusions, and zero browser warnings or errors; it did not read a source or imitate native sync
 
 ### Planned
 
-- Separately authorized exact-source private-thread UAT for the pinned experimental work-record pilot
-- Packaged v0.4.0 synthetic compatibility UAT; the verified v0.2.0 installer remains the historical no-redo artifact
+- Separately authorized exact-source private Agent-memory UAT, plus optional private-thread UAT for the supplementary work-record pilot
+- Packaged v0.5.0 synthetic compatibility UAT; the verified v0.2.0 installer remains the historical no-redo artifact
 - Explicitly authorized paid Daily Scout smoke using only reviewed coarse context, followed by packaged native acceptance
-- A production-supported, user-selected Codex durable-memory export／API or supported successor interface, followed by a fresh privacy review
+- Monitor official Codex memory storage guidance; any filename, scope, or semantic drift requires adapter versioning and fresh privacy review
 - Native reminder delivery with quiet hours and daily budgets
 - Remaining packaged pet-shell acceptance for accessibility, 125–200% and mixed DPI, monitor／taskbar topology changes, tray keyboard recovery, and Windows session shutdown
 

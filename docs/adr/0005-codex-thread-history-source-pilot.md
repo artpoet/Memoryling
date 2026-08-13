@@ -1,6 +1,6 @@
 # ADR-0005: Codex thread-history source pilot
 
-- Status: Proposed
+- Status: Superseded as primary by [ADR-0007](0007-codex-agent-memory-auto-sync.md); retained as a supplementary compatibility source
 - Date: 2026-08-12
 - Related: [ADR-0001](0001-local-first-derived-memory.md), [ADR-0002](0002-sqlite-v1-fixture-first-memory.md), [ADR-0004](0004-deterministic-content-derived-evolution-paths.md)
 - Research: [Codex source format evaluation](../research/2026-08-12_codex-source-format-evaluation.md)

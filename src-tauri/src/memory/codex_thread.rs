@@ -288,6 +288,8 @@ fn prepare_thread_import(
         data_categories: vec!["user-confirmed-completion".to_string()],
         purposes: vec!["local-creature-derivation".to_string()],
         read_only: true,
+        source_locator_hash: None,
+        automatic_sync: false,
     };
     let consent_scope_json = serde_json::to_string(&consent_scope)
         .map_err(|_| "Memoryling could not bind the consent scope.".to_string())?;
