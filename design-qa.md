@@ -2,9 +2,9 @@
 
 - Source visual truth: `C:\Users\user\AppData\Local\Temp\memoryling-approved-seed-crop.png`
 - User annotation for edge thickness: `C:\Users\user\AppData\Local\Temp\codex-clipboard-bbc3e051-1a81-4bdc-a167-fb041e31c39d.png`
-- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v6-edge-rims-pass2.png`
-- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-ai-v5-v6-outer-rims-full.png`
-- Focused annotated comparison: `C:\Users\user\AppData\Local\Temp\memoryling-marked-v5-v6-outer-rims-focus.png`
+- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v7-bright-protrusion.png`
+- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-v7-bright-protrusion-comparison.png`
+- Focused annotated comparison: `C:\Users\user\AppData\Local\Temp\memoryling-v7-bright-protrusion-focus.png`
 - State: seed-stage pet, neutral resting frame, no completion mark
 - Viewport: implementation rendered headlessly at 320 × 320 CSS px and device scale 1
 - Dimensions: source concept crop 190 × 230 px; implementation 320 × 320 px
@@ -12,17 +12,17 @@
 
 ## Findings
 
-- No actionable P0／P1／P2 mismatch remains for the corrected meaning of plate thickness. Renderer v6 removes the mistakenly centered thickness block and restores a clean balanced lower seam.
-- Two code-generated dark-violet rim shapes now sit behind the left／right side plates and extend beyond the main shell silhouette through the outside midsection. The focused comparison aligns directly with the user's orange-marked regions.
-- Pass 1 allowed the rims to extend too far around the bottom and read like extra wings. Pass 2 shortens and lightens them so they taper away before the base, reading as plate thickness rather than a new appendage or full outline.
+- No actionable P0／P1／P2 mismatch remains for the clarified meaning of plate thickness. Renderer v7 keeps the clean lower seam while making the pale-lilac plate surface—not the dark backing—the visible protruding layer.
+- Each code-generated pale-lilac side plate now crosses the main shell silhouette by roughly 6–7 viewBox units through the outside midsection, and its highlight follows that new outer curve. A dark-violet rim extends only another roughly 2–3 units behind it, so the focused comparison reads as a raised bright plate with a thin depth edge.
+- V6's predominantly dark exposed rim was a P2 interpretation error because the bright surface still appeared trapped inside the body. V7 corrects the layer order and contour rather than merely changing the rim color.
 - The accepted v5 shell width, pointed apex, rounded base, eye size／spacing, memory core, and restrained facets remain unchanged.
 - The procedural renderer remains cleaner and less irregular than the AI reference. This is an accepted P3 difference: production must remain deterministic, layer-addressable program-generated SVG rather than a raster asset.
 
 ## Required fidelity surfaces
 
 - Fonts and typography: not applicable to the creature-only comparison; pet status typography is unchanged.
-- Spacing and layout rhythm: the full silhouette and face retain v5 proportions; only the side-plate outer contour expands locally by roughly 5–8 viewBox units. The rim retracts before the rounded base and remains inside the unchanged 320 × 320 compact envelope.
-- Colors and tokens: violet body, indigo eyes, mint core, pale-lilac plates, restrained glow, and low-opacity lavender facet planes remain consistent with the accepted concept family. The exposed side rims are translucent dark violet rather than black.
+- Spacing and layout rhythm: the full silhouette and face retain v5 proportions; only the bright side-plate outer contour expands locally by roughly 6–7 viewBox units, followed by a roughly 2–3-unit shadow edge. Both layers retract before the rounded base and remain inside the unchanged 320 × 320 compact envelope.
+- Colors and tokens: violet body, indigo eyes, mint core, pale-lilac plates, restrained glow, and low-opacity lavender facet planes remain consistent with the accepted concept family. The protruding region continues the pale-lilac plate gradient and highlight; the backing edge is translucent dark violet rather than black.
 - Image quality and asset fidelity: the implementation is vector-sharp and transparent. No generated raster, embedded `<image>`, or runtime bitmap is used; the accepted AI image is reference-only by explicit product decision.
 - Copy and content: no creature copy changed; the required access-off text remains outside the renderer.
 - Accessibility and behavior: paired blink is one motion unit and the existing reduced-motion path remains intact; the pet's accessible label and interaction surface are unchanged.
@@ -43,9 +43,11 @@
 12. V5 pass 1 established the overlap but made the rear plate too dark, reading as a hole. Pass 2 restored the shared petal gradient and narrowed／lightened the thickness edge. The final full and focused comparisons show a subtle right-back／left-front overlap with no remaining P0／P1／P2 issue.
 13. User clarified with an annotated screenshot that “thickness” meant the left／right plate edges should protrude beyond the body outline, not that the two inner plates should overlap at the center. A red-light contract required two outer rims and no center thickness layer before implementation.
 14. V6 pass 1 moved thickness to the correct sides but extended too far toward the bottom, resembling extra wings. Pass 2 shortened and softened the rims. The final full and annotated focused comparisons show the protrusion at the requested side edges with a clean lower seam and no remaining P0／P1／P2 issue.
+15. User review identified that V6 still exposed mostly a dark rim, so the protrusion did not visibly continue the bright plate surface. A red-light contract first required a V7 renderer and exact wider bright-side-plate paths; it failed against V6 before implementation.
+16. V7 expands the pale-lilac surfaces beyond the body, moves their highlights onto the new outer curves, and reduces the dark backing to a thin edge. The final full and focused comparisons show bright material across the marked protruding regions with no remaining actionable P0／P1／P2 issue.
 
 ## Follow-up polish
 
-- P3: future renderer work could add slightly more irregular biological contour variation, without changing the accepted v6 facet contrast or side-rim protrusion and without importing a raster pet asset.
+- P3: future renderer work could add slightly more irregular biological contour variation, without changing the accepted v7 facet contrast or bright-surface protrusion and without importing a raster pet asset.
 
 final result: passed

@@ -24,7 +24,7 @@ export function ProceduralMemorySeed({
       aria-hidden="true"
       className="memory-seed-renderer"
       data-body-module={bodyModule}
-      data-renderer="procedural-svg-v6"
+      data-renderer="procedural-svg-v7"
       data-stage={stage}
       data-testid="memoryling-seed-renderer"
       focusable="false"
@@ -130,16 +130,16 @@ export function ProceduralMemorySeed({
       </g>
 
       <g className="seed-petals" stroke="#d8caff" strokeOpacity="0.2" strokeWidth="1">
-        <path className="seed-side-plate-rim" d="M45 126C37 142 37 162 46 180C55 197 70 209 88 215L91 209C74 203 61 191 52 175C44 158 44 142 50 131Z" fill="#3f2c77" opacity="0.6" stroke="none" />
-        <path className="seed-side-plate-rim" d="M195 126C203 142 203 162 194 180C185 197 170 209 152 215L149 209C166 203 179 191 188 175C196 158 196 142 190 131Z" fill="#3f2c77" opacity="0.6" stroke="none" />
-        <path className="seed-side-plate" d="M45 128C66 142 93 174 113 219C90 214 66 198 52 176C43 161 41 142 45 128Z" fill={`url(#${leafGradient})`} />
-        <path className="seed-side-plate" d="M195 128C174 142 147 174 127 219C150 214 174 198 188 176C197 161 199 142 195 128Z" fill={`url(#${leafGradient})`} />
+        <path className="seed-side-plate-rim" d="M43 124C33 142 33 163 44 183C53 199 67 210 84 216L87 211C72 205 59 194 51 178C41 160 40 142 46 129Z" fill="#3f2c77" opacity="0.54" stroke="none" />
+        <path className="seed-side-plate-rim" d="M197 124C207 142 207 163 196 183C187 199 173 210 156 216L153 211C168 205 181 194 189 178C199 160 200 142 194 129Z" fill="#3f2c77" opacity="0.54" stroke="none" />
+        <path className="seed-side-plate" d="M43 126C66 141 94 174 113 219C89 214 63 198 49 177C38 160 36 141 43 126Z" fill={`url(#${leafGradient})`} />
+        <path className="seed-side-plate" d="M197 126C174 141 146 174 127 219C151 214 177 198 191 177C202 160 204 141 197 126Z" fill={`url(#${leafGradient})`} />
         <path className="seed-inner-plate" d="M68 174C91 181 108 198 120 219C97 217 77 199 68 174Z" fill={`url(#${petalGradient})`} />
         <path className="seed-inner-plate" d="M172 174C149 181 132 198 120 219C143 217 163 199 172 174Z" fill={`url(#${petalGradient})`} />
         <path d="M78 179C96 187 109 201 118 215" fill="none" opacity="0.2" stroke="#f1eaff" strokeLinecap="round" strokeWidth="1.5" />
         <path d="M163 183C148 190 136 203 126 217" fill="none" opacity="0.17" stroke="#d8caff" strokeLinecap="round" strokeWidth="1.4" />
-        <path d="M52 143C71 157 91 181 106 207" fill="none" opacity="0.34" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />
-        <path d="M188 143C169 157 149 181 134 207" fill="none" opacity="0.28" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />
+        <path d="M43 140C41 153 44 166 51 177C61 193 79 205 101 212" fill="none" opacity="0.34" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />
+        <path d="M197 140C199 153 196 166 189 177C179 193 161 205 139 212" fill="none" opacity="0.28" stroke="#eee7ff" strokeLinecap="round" strokeWidth="2" />
       </g>
 
       <g fill="#cbb9ff" opacity="0.36">

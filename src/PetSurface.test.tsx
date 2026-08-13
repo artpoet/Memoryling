@@ -128,7 +128,7 @@ describe("pet surface", () => {
 
     const renderer = await screen.findByTestId("memoryling-seed-renderer");
     expect(renderer.tagName).toBe("svg");
-    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v6");
+    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v7");
     expect(renderer).toHaveAttribute("data-stage", "seed");
     expect(renderer).toHaveAttribute(
       "data-body-module",
@@ -156,8 +156,8 @@ describe("pet surface", () => {
         rim.getAttribute("d"),
       ),
     ).toEqual([
-      "M45 126C37 142 37 162 46 180C55 197 70 209 88 215L91 209C74 203 61 191 52 175C44 158 44 142 50 131Z",
-      "M195 126C203 142 203 162 194 180C185 197 170 209 152 215L149 209C166 203 179 191 188 175C196 158 196 142 190 131Z",
+      "M43 124C33 142 33 163 44 183C53 199 67 210 84 216L87 211C72 205 59 194 51 178C41 160 40 142 46 129Z",
+      "M197 124C207 142 207 163 196 183C187 199 173 210 156 216L153 211C168 205 181 194 189 178C199 160 200 142 194 129Z",
     ]);
     expect(renderer.querySelectorAll(".seed-shell-facet")).toHaveLength(4);
 
@@ -189,7 +189,12 @@ describe("pet surface", () => {
         eye.getAttribute("transform"),
       ),
     ).toEqual([null, null]);
-    expect(renderer.querySelectorAll(".seed-side-plate")).toHaveLength(2);
+    const sidePlates = renderer.querySelectorAll(".seed-side-plate");
+    expect(sidePlates).toHaveLength(2);
+    expect(Array.from(sidePlates, (plate) => plate.getAttribute("d"))).toEqual([
+      "M43 126C66 141 94 174 113 219C89 214 63 198 49 177C38 160 36 141 43 126Z",
+      "M197 126C174 141 146 174 127 219C151 214 177 198 191 177C202 160 204 141 197 126Z",
+    ]);
     expect(renderer.querySelectorAll(".seed-inner-plate")).toHaveLength(2);
 
     const accessStatus = screen.getByText("Memory access off");
