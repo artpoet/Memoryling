@@ -1,9 +1,9 @@
 # Memoryling procedural seed visual QA
 
 - Source visual truth: `C:\Users\user\AppData\Local\Temp\memoryling-approved-seed-crop.png`
-- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v4-wide-pass1.png`
-- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-ai-v3-v4-width-comparison.png`
-- Focused proportion comparison: the three-way board presents the source concept, previous v3, and current v4 at equal display height, making both body width and eye spacing directly visible; a second crop is not needed
+- Implementation capture: `C:\Users\user\AppData\Local\Temp\memoryling-procedural-v5-final.png`
+- Full comparison: `C:\Users\user\AppData\Local\Temp\memoryling-ai-v4-v5-final-clean.png`
+- Focused lower-plate comparison: `C:\Users\user\AppData\Local\Temp\memoryling-v4-v5-bottom-depth-final.png`
 - State: seed-stage pet, neutral resting frame, no completion mark
 - Viewport: implementation rendered headlessly at 320 × 320 CSS px and device scale 1
 - Dimensions: source concept crop 190 × 230 px; implementation 320 × 320 px
@@ -11,17 +11,16 @@
 
 ## Findings
 
-- No actionable P0／P1／P2 mismatch remains for the requested width and eye-spacing correction. Renderer v4 increases shell width from 142 to 154 viewBox units (about 8.5%) while preserving the pointed apex, height, and rounded lower arc.
-- Eye centers move symmetrically from `x=95／145` to `x=92／148`, increasing their center distance from 50 to 56 without enlarging the eyes or changing their shared vertical center and synchronized blink. Eye highlights move with their respective eye groups.
-- The plates still wrap the cheeks and meet near the center, but now stop above the outer shell's lowest contour. This prevents the plate seam from visually turning the whole body into a pointed-bottom egg／inverted teardrop.
-- The shadow, highlights, side plates, and inner plates widen with the shell, preventing the central body from expanding while its supporting layers remain visually narrow.
-- The procedural renderer remains smoother and less faceted than the AI reference. This is an accepted P3 difference: the production creature must remain deterministic, layer-addressable program-generated SVG rather than a raster asset.
+- No actionable P0／P1／P2 mismatch remains for the requested facet and lower-plate depth pass. Renderer v5 adds four restrained translucent shell planes; they register as soft refraction at full size without obscuring the face or turning the apex into a hard crown.
+- The lower inner plates are no longer exact mirrors. The right plate is drawn first and sits slightly behind／lower; one narrow darker thickness shape follows it; the left plate is drawn last and overlaps in front. The focused comparison makes the small offset and central occlusion visible without reading as a hole or broken shell.
+- The accepted v4 shell width, pointed apex, rounded base, eye size／spacing, memory core, and outer side plates remain unchanged.
+- The procedural renderer remains cleaner and less irregular than the AI reference. This is an accepted P3 difference: production must remain deterministic, layer-addressable program-generated SVG rather than a raster asset.
 
 ## Required fidelity surfaces
 
 - Fonts and typography: not applicable to the creature-only comparison; pet status typography is unchanged.
-- Spacing and layout rhythm: the body is broader rather than vertically stretched; the face keeps its upper-middle position and gains modest horizontal breathing room. The pointed apex and rounded base remain intact within the unchanged 320 × 320 compact envelope.
-- Colors and tokens: violet body, indigo eyes, mint core, pale-lilac plates, and restrained glow remain consistent with the accepted concept family.
+- Spacing and layout rhythm: the full silhouette and face retain v4 proportions; only the lower inner plates gain a roughly three-unit vertical／horizontal stagger and front-to-back overlap. The pointed apex and rounded base remain intact within the unchanged 320 × 320 compact envelope.
+- Colors and tokens: violet body, indigo eyes, mint core, pale-lilac plates, restrained glow, and low-opacity lavender facet planes remain consistent with the accepted concept family. The plate thickness edge is dark violet rather than black.
 - Image quality and asset fidelity: the implementation is vector-sharp and transparent. No generated raster, embedded `<image>`, or runtime bitmap is used; the accepted AI image is reference-only by explicit product decision.
 - Copy and content: no creature copy changed; the required access-off text remains outside the renderer.
 - Accessibility and behavior: paired blink is one motion unit and the existing reduced-motion path remains intact; the pet's accessible label and interaction surface are unchanged.
@@ -38,9 +37,11 @@
 8. Renderer v3 introduced the pointed apex and wider lower shell. The first review found the inner plates still dragged the silhouette into a center point, so their junction was raised above the outer-shell base. The final equal-height comparison confirms that the shell now owns a continuous rounded bottom contour.
 9. User review identified that v3 remained too narrow overall and asked for slightly wider eye spacing. A red-light contract failed against v3 before implementation. Renderer v4 widened the shell and every dependent contour, then moved each eye three viewBox units outward without changing eye size.
 10. The final three-way equal-height comparison shows v4 is visibly fuller than v3 while remaining a vertical seed form; the eye change is noticeable but restrained, and no P0／P1／P2 proportion issue remains for this request.
+11. User asked to continue the crystal／biological polish and identified that the two lowest plates should be slightly staggered with visible thickness. A red-light contract required four facet layers, explicit back／front plate order, asymmetric paths, and one thickness edge before implementation.
+12. V5 pass 1 established the overlap but made the rear plate too dark, reading as a hole. Pass 2 restored the shared petal gradient and narrowed／lightened the thickness edge. The final full and focused comparisons show a subtle right-back／left-front overlap with no remaining P0／P1／P2 issue.
 
 ## Follow-up polish
 
-- P3: future renderer work could add deterministic faceted highlight planes and slightly more irregular biological edges, without changing the accepted v4 shell geometry or importing a raster pet asset.
+- P3: future renderer work could add slightly more irregular biological contour variation, without changing the accepted v5 facet contrast or lower-plate overlap and without importing a raster pet asset.
 
 final result: passed
