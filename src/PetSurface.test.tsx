@@ -145,7 +145,7 @@ describe("pet surface", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/enter the activation phrase: “Run Memoryling”/i),
+      screen.getByText(/enter the activation phrase: “Wake up, my pet”/i),
     ).toBeInTheDocument();
   });
 
@@ -486,7 +486,7 @@ describe("pet surface", () => {
       await screen.findByText("按右鍵，再選擇開啟 Memoryling。"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「運作 Memoryling」。"),
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("pet-surface")).toHaveAttribute(
       "data-motion",
@@ -498,7 +498,7 @@ describe("pet surface", () => {
       expect(screen.queryByText("Memoryling 已打開")).not.toBeInTheDocument(),
     );
     expect(
-      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「運作 Memoryling」。"),
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。"),
     ).toBeInTheDocument();
   });
 

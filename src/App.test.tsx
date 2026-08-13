@@ -110,7 +110,7 @@ describe("Agent-operated Memoryling detail surface", () => {
     );
 
     expect(screen.getByTestId("browser-shell-boundary")).toBeInTheDocument();
-    expect(screen.getByText("Open Memoryling, then say “Run Memoryling” in your agent project")).toBeInTheDocument();
+    expect(screen.getByText("Open Memoryling, then say “Wake up, my pet” in your agent project")).toBeInTheDocument();
     expect(screen.getByText(/performs no AI or memory read/i)).toBeInTheDocument();
     expect(memoryClient.getState).not.toHaveBeenCalled();
   });
@@ -127,7 +127,7 @@ describe("Agent-operated Memoryling detail surface", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "繁中" }));
-    expect(screen.getByText("先打開 Memoryling，再回 Agent 專案說：「運作 Memoryling」")).toBeInTheDocument();
+    expect(screen.getByText("先打開 Memoryling，再回 Agent 專案說：「醒來吧我的寵物」")).toBeInTheDocument();
     expect(screen.getByText(/這個頁面不會自行執行 AI 或讀取記憶/)).toBeInTheDocument();
   });
 

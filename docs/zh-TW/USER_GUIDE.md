@@ -22,7 +22,7 @@ npm run tauri dev
 1. 透過 Windows EXE、捷徑或開始功能表安裝並打開 Memoryling，讓寵物保持執行。
 2. 在 Codex、Claude Code 或其他支援 AGENTS 的環境開啟想使用的專案。
 3. 讓 Agent 讀取 `AGENTS.md` 與喚醒文件鏈。
-4. 輸入寵物顯示的發動語：**`運作 Memoryling`**、**`執行 Memoryling`** 或 **`Run Memoryling`**。
+4. 輸入寵物顯示的發動語：**`醒來吧我的寵物`** 或 **`Wake up, my pet`**。
 5. Agent 會依 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存更新包並自行執行本機提交工具。
 6. 工具確認相容 App 已開啟，不啟動任何程式；提交更新、等待本機套用，最後在同一段對話回報。
 

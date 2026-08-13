@@ -4,7 +4,7 @@
 
 Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並打開 Windows App，再回到已設定的專案說：
 
-> **運作 Memoryling**
+> **醒來吧我的寵物**
 
 寵物打開後會自己顯示這句發動提醒。目前的 Agent 只使用它原本獲准讀取的脈絡，編譯成一份小型寵物更新，提交給已開啟的 App，並等待本機套用完成；接著由 Memoryling 持續管理外觀、雙語對話、冷卻、期限、安靜時段與每日額度。
 
@@ -24,8 +24,8 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並�
 
 ```text
 安裝並打開 Memoryling
-  → 寵物顯示「運作 Memoryling」發動提醒
-  → 使用者在目前 Agent 專案說「運作 Memoryling」
+  → 寵物顯示「醒來吧我的寵物」發動提醒
+  → 使用者在目前 Agent 專案說「醒來吧我的寵物」
   → Agent 讀取原本已授權的記憶＋近期工作＋專案脈絡
   → Agent skill 編譯 protocol-v1 JSON
   → 本機工具確認相容寵物已開啟
@@ -34,7 +34,7 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並�
   → 寵物依本機確定性規則改變外觀與說話
 ```
 
-專案入口會辨識 `運作 Memoryling`、`執行 Memoryling` 與 `Run Memoryling`。可重複執行的流程在 [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md)，嚴格格式在 [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json)。
+專案入口會辨識 `醒來吧我的寵物` 與 `Wake up, my pet`。可重複執行的流程在 [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md)，嚴格格式在 [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json)。
 
 ## v0.6.0 原始碼目前有什麼
 

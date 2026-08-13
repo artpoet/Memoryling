@@ -13,7 +13,7 @@ AS_OF: 2026-08-13 (Asia/Taipei)
 7. `docs/adr/0010-installed-app-teaches-agent-activation.md`
 8. `docs/adr/0008-agent-operated-memoryling-protocol.md`
 
-If the user says `運作 Memoryling`, `執行 Memoryling`, or `Run Memoryling`, read `skills/memoryling-operation/SKILL.md` and execute the entire bounded workflow: confirm the installed pet is already open, compile, submit, await local application, and report here. Never start an executable from the Agent workflow. If the App is closed, stop before inbox write and tell the user to open the installed Memoryling App before using the phrase again.
+If the user says `醒來吧我的寵物` or `Wake up, my pet`, read `skills/memoryling-operation/SKILL.md` and execute the entire bounded workflow: confirm the installed pet is already open, compile, submit, await local application, and report here. Never start an executable from the Agent workflow. If the App is closed, stop before inbox write and tell the user to open the installed Memoryling App before using the phrase again.
 
 ## Project identity
 

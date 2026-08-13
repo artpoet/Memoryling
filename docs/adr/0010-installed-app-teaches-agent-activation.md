@@ -13,7 +13,7 @@ Automatically launching a desktop App from an Agent phrase hides the normal inst
 
 1. The user installs Memoryling through the Windows EXE installer and opens it through the installed executable, shortcut, or Start menu.
 2. Cold launch remains pet-first. The first-run pet guide names the activation phrase, and an idle pet continues to show the phrase after the guide is dismissed until an Agent operation exists.
-3. `運作 Memoryling`／`Run Memoryling` means compile one authorized operation, submit it to an already-running compatible Memoryling process, wait for bounded local application confirmation, and report in the Agent conversation.
+3. `醒來吧我的寵物`／`Wake up, my pet` means compile one authorized operation, submit it to an already-running compatible Memoryling process, wait for bounded local application confirmation, and report in the Agent conversation.
 4. The Agent workflow never starts an executable. If Memoryling 0.6.0 or newer is not already open, submission fails before inbox write and tells the user to open the installed App before trying the phrase again. If the running App does not consume the inbox within the bounded wait, the helper removes the exact unconfirmed item.
 5. The submit helper trusts only a running `Memoryling.exe` whose product identity is `Memoryling` and whose version is 0.6.0 or newer. An explicit executable path is development-only evidence and must also match a running process.
 6. Manual resident relaunch remains single-instance and returns to the existing pet. It is a normal App action, not part of Agent submission.

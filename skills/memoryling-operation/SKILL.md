@@ -1,6 +1,6 @@
 ---
 name: memoryling-operation
-description: Update an already-open Memoryling from the Agent conversation. Compile authorized context into a bounded bilingual pet update, submit it to the local app, and await application without launching an executable. Use when the user says "運作 Memoryling", "執行 Memoryling", "Run Memoryling", asks to update their open pet, or explicitly invokes $memoryling-operation.
+description: Update an already-open Memoryling from the Agent conversation. Compile authorized context into a bounded bilingual pet update, submit it to the local app, and await application without launching an executable. Use when the user says "醒來吧我的寵物" or "Wake up, my pet", asks to update their open pet, or explicitly invokes $memoryling-operation.
 ---
 
 # Operate Memoryling

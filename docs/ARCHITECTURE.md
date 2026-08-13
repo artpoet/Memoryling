@@ -10,7 +10,7 @@ AS_OF: 2026-08-13. Source version 0.6.0 implements the Agent-operated vertical s
 User installs and opens Memoryling through the Windows EXE
   │ pet shows the activation phrase while idle
   ▼
-User says “Run Memoryling” in the current Agent project
+User says “Wake up, my pet” in the current Agent project
   │
   ▼
 Project Agent skill

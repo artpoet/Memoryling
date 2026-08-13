@@ -12,7 +12,7 @@ Read, in order:
 
 ## Operate Memoryling
 
-When the user says `運作 Memoryling`, `執行 Memoryling`, or `Run Memoryling` in this repository:
+When the user says `醒來吧我的寵物` or `Wake up, my pet` in this repository:
 
 1. Read `skills/memoryling-operation/SKILL.md` completely.
 2. Follow that skill using only context the current Agent is already authorized to read.

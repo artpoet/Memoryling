@@ -10,7 +10,7 @@ Never attach real Agent memories, prompts, credentials, tokens, operation packag
 
 ## Current v0.6.0 core boundary
 
-- The user invokes one bounded update through `運作 Memoryling` or `Run Memoryling` in an Agent project.
+- The user invokes one bounded update through `醒來吧我的寵物` or `Wake up, my pet` in an Agent project.
 - The user installs and opens Memoryling through the Windows EXE, shortcut, or Start menu; the App visibly teaches the activation phrase.
 - The Agent-side helper submits only when a running `Memoryling.exe` has product identity `Memoryling` and version 0.6.0 or newer, then waits for bounded local application confirmation.
 - The current Agent may use only context its environment already authorizes. The slogan grants no new source, account, connector, external-service, or write permission.

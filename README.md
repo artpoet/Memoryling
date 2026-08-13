@@ -4,7 +4,7 @@
 
 Memoryling is a local-first desktop pet for people who already work with AI Agents. Install and open the Windows app, then return to a configured project and say:
 
-> **Run Memoryling**
+> **Wake up, my pet**
 
 The open pet shows this activation reminder itself. The current Agent then uses only context it is already authorized to read, compiles a small pet update, submits it to the running App, and waits for local application. Memoryling carries that update forward through appearance, bilingual dialogue, cooldowns, expiry, quiet hours, and daily limits.
 
@@ -24,8 +24,8 @@ The open pet shows this activation reminder itself. The current Agent then uses 
 
 ```text
 Install and open Memoryling
-  → pet shows “Run Memoryling” activation reminder
-  → user says “Run Memoryling” in the current Agent project
+  → pet shows “Wake up, my pet” activation reminder
+  → user says “Wake up, my pet” in the current Agent project
   → Agent reads already-authorized memory + recent work + project context
   → Agent skill compiles protocol-v1 JSON
   → local helper verifies the compatible pet is already running
@@ -34,7 +34,7 @@ Install and open Memoryling
   → pet appearance and dialogue follow deterministic local rules
 ```
 
-The project entrypoint recognizes `Run Memoryling`, `運作 Memoryling`, and `執行 Memoryling`. The reusable workflow is in [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md); the strict contract is [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json).
+The project entrypoint recognizes `Wake up, my pet` and `醒來吧我的寵物`. The reusable workflow is in [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md); the strict contract is [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json).
 
 ## Current v0.6.0 source
 

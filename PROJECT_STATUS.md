@@ -8,7 +8,7 @@ Source v0.6.0 now implements the user-confirmed **Agent-operated Memoryling** mo
 
 ```text
 install and open Memoryling EXE
-  → pet visibly teaches “運作 Memoryling”／“Run Memoryling”
+  → pet visibly teaches “醒來吧我的寵物”／“Wake up, my pet”
   → user enters the phrase in the current Agent project
   → current Agent reads already-authorized context
   → Agent compiles one bounded operation package
@@ -32,14 +32,14 @@ The core requires no app-side AI API and no direct app scan of Agent memory. The
 - Core network behavior: none; no API key and no model request
 - Legacy compatibility: fixture, one-thread, direct Codex-memory, and Daily Scout code retained but not started or shown as core
 - Installed baseline: unsigned v0.2.0 current-user installer; v0.6.0 package not yet accepted
-- Current build: `Memoryling_0.6.0_x64-setup.exe`, 4,940,692 bytes, SHA-256 `E0608FCE19FE7B91C0F8CCEDB53682211EDE419642E79D6B3CF0065B88D962F9`, `NotSigned`; built but not installed／accepted
+- Current build: `Memoryling_0.6.0_x64-setup.exe`, 4,940,888 bytes, SHA-256 `D0CB52780FEED79A8522DD7D656F60B7CEFA65C3721F02F26B38C1356109A2F0`, `NotSigned`; built but not installed／accepted
 - Repository: public `main` at https://github.com/artpoet/Memoryling
 
 ## Implemented v0.6.0 vertical slice
 
 ### Agent side
 
-- `AGENTS.md` recognizes `運作 Memoryling`, `執行 Memoryling`, and `Run Memoryling`
+- `AGENTS.md` recognizes `醒來吧我的寵物` and `Wake up, my pet`
 - `skills/memoryling-operation/SKILL.md` defines the authorization, minimization, compilation, submission, and reporting workflow
 - skill metadata passes the official `skill-creator` validator
 - protocol reference and JSON Schema define exact fields, counts, enums, IDs, timestamps, hash format, dialogue length, and delivery bounds
@@ -92,7 +92,7 @@ Automated checks, browser smoke, and submit-helper smoke used synthetic data onl
 - PASS — submit helper rejects a mismatched executable and fails before inbox write when the App is closed; the isolated harness changes no Memoryling process count and removes an unconfirmed inbox item after the bounded wait
 - PASS — `npm run build:windows` produced the content-free unsigned v0.6.0 NSIS artifact recorded above
 - PASS — submission to the already-running freshly built release binary consumed the four-card synthetic inbox, left no inbox item, and preserved the same one process／PID before and after
-- PASS — Computer Use observed the Traditional Chinese first-run guide explicitly say `回到你目前工作的 Agent 專案，輸入發動語：「運作 Memoryling」。`; the detailed native surface also showed the three-step installed-App flow
+- PASS — Computer Use observed the Traditional Chinese first-run guide explicitly say `回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。`; the detailed native surface also showed the three-step installed-App flow
 - PASS — official skill validator reported `Skill is valid!` under an isolated temporary PyYAML dependency and UTF-8 mode; system Python was not modified
 - PASS — in-app browser smoke observed the new installed-App／activation-phrase copy in Traditional Chinese and English, verified the memory-off boundary, and found no horizontal overflow (`scrollWidth` 1265 = `clientWidth` 1265)
 - PASS — `git diff --check`
