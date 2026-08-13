@@ -15,9 +15,18 @@ The user meets a quiet creature with little history. As approved memory sources 
 - continuing events that persist across days;
 - a habitat that changes after meaningful completions or unresolved tensions;
 - occasional reminders tied to promises and priorities;
+- when separately enabled, one compact, source-linked daily insight related to the user's recent approved work;
 - curiosity and opinions that remain bounded by user-defined limits.
 
 The creature should feel continuous, not randomly generated. If it changes, the user can ask why.
+
+## Useful companionship
+
+Memoryling should be introduced as a useful companion, not only a desktop pet. The pet makes memory and information approachable; its practical value comes from relevant recall, bounded initiative, and the planned Daily Memory Scout.
+
+> More than a desktop pet. Memoryling grows from the agent memories you approve and, when you choose to connect an API, can bring back one useful, source-linked insight for the work you are doing today.
+
+Daily Memory Scout is planned and optional, not current functionality. Until it ships, public copy must keep the implemented local pet experience separate from this future API-enabled capability.
 
 ## Desktop presence contract
 
