@@ -128,7 +128,7 @@ describe("pet surface", () => {
 
     const renderer = await screen.findByTestId("memoryling-seed-renderer");
     expect(renderer.tagName).toBe("svg");
-    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v7");
+    expect(renderer).toHaveAttribute("data-renderer", "procedural-svg-v8");
     expect(renderer).toHaveAttribute("data-stage", "seed");
     expect(renderer).toHaveAttribute(
       "data-body-module",
@@ -150,6 +150,23 @@ describe("pet surface", () => {
       "M172 174C149 181 132 198 120 219C143 217 163 199 172 174Z",
     ]);
     expect(renderer.querySelectorAll(".seed-plate-thickness")).toHaveLength(0);
+    const softEdgeFilter = renderer.querySelector(
+      "filter[id$='-plate-shadow']",
+    );
+    expect(softEdgeFilter?.querySelector("feGaussianBlur")).toHaveAttribute(
+      "stdDeviation",
+      "2.8",
+    );
+    const sidePlateShadows = renderer.querySelectorAll(
+      ".seed-side-plate-shadow",
+    );
+    expect(sidePlateShadows).toHaveLength(2);
+    expect(
+      Array.from(sidePlateShadows, (shadow) => shadow.getAttribute("filter")),
+    ).toEqual([
+      expect.stringMatching(/^url\(#.+-plate-shadow\)$/),
+      expect.stringMatching(/^url\(#.+-plate-shadow\)$/),
+    ]);
     expect(renderer.querySelectorAll(".seed-side-plate-rim")).toHaveLength(2);
     expect(
       Array.from(renderer.querySelectorAll(".seed-side-plate-rim"), (rim) =>

@@ -18,13 +18,14 @@ export function ProceduralMemorySeed({
   const coreGradient = `${id}-core`;
   const bodyGlow = `${id}-body-glow`;
   const coreGlow = `${id}-core-glow`;
+  const plateShadow = `${id}-plate-shadow`;
 
   return (
     <svg
       aria-hidden="true"
       className="memory-seed-renderer"
       data-body-module={bodyModule}
-      data-renderer="procedural-svg-v7"
+      data-renderer="procedural-svg-v8"
       data-stage={stage}
       data-testid="memoryling-seed-renderer"
       focusable="false"
@@ -66,6 +67,9 @@ export function ProceduralMemorySeed({
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
+        </filter>
+        <filter id={plateShadow} height="180%" width="180%" x="-40%" y="-35%">
+          <feGaussianBlur stdDeviation="2.8" />
         </filter>
       </defs>
 
@@ -130,8 +134,10 @@ export function ProceduralMemorySeed({
       </g>
 
       <g className="seed-petals" stroke="#d8caff" strokeOpacity="0.2" strokeWidth="1">
-        <path className="seed-side-plate-rim" d="M43 124C33 142 33 163 44 183C53 199 67 210 84 216L87 211C72 205 59 194 51 178C41 160 40 142 46 129Z" fill="#3f2c77" opacity="0.54" stroke="none" />
-        <path className="seed-side-plate-rim" d="M197 124C207 142 207 163 196 183C187 199 173 210 156 216L153 211C168 205 181 194 189 178C199 160 200 142 194 129Z" fill="#3f2c77" opacity="0.54" stroke="none" />
+        <path className="seed-side-plate-shadow" d="M43 124C33 142 33 163 44 183C53 199 67 210 84 216L87 211C72 205 59 194 51 178C41 160 40 142 46 129Z" fill="#2e1b60" filter={`url(#${plateShadow})`} opacity="0.5" stroke="none" />
+        <path className="seed-side-plate-shadow" d="M197 124C207 142 207 163 196 183C187 199 173 210 156 216L153 211C168 205 181 194 189 178C199 160 200 142 194 129Z" fill="#2e1b60" filter={`url(#${plateShadow})`} opacity="0.5" stroke="none" />
+        <path className="seed-side-plate-rim" d="M43 124C33 142 33 163 44 183C53 199 67 210 84 216L87 211C72 205 59 194 51 178C41 160 40 142 46 129Z" fill="#3f2c77" opacity="0.42" stroke="none" />
+        <path className="seed-side-plate-rim" d="M197 124C207 142 207 163 196 183C187 199 173 210 156 216L153 211C168 205 181 194 189 178C199 160 200 142 194 129Z" fill="#3f2c77" opacity="0.42" stroke="none" />
         <path className="seed-side-plate" d="M43 126C66 141 94 174 113 219C89 214 63 198 49 177C38 160 36 141 43 126Z" fill={`url(#${leafGradient})`} />
         <path className="seed-side-plate" d="M197 126C174 141 146 174 127 219C151 214 177 198 191 177C202 160 204 141 197 126Z" fill={`url(#${leafGradient})`} />
         <path className="seed-inner-plate" d="M68 174C91 181 108 198 120 219C97 217 77 199 68 174Z" fill={`url(#${petalGradient})`} />

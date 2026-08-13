@@ -21,6 +21,7 @@ const replacements = new Map([
   ["coreGradient", "core"],
   ["bodyGlow", "body-glow"],
   ["coreGlow", "core-glow"],
+  ["plateShadow", "plate-shadow"],
 ]);
 
 svg = svg
