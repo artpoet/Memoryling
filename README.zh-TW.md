@@ -4,7 +4,7 @@
 
 Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並打開 Windows App，再回到已設定的專案說：
 
-> **寵物醒來**
+> **醒來吧我的寵物**
 
 寵物打開後會自己顯示這句發動提醒。目前的 Agent 只使用它原本獲准讀取的脈絡，編譯成一份小型寵物更新，提交給已開啟的 App，並等待本機套用完成；接著由 Memoryling 持續管理外觀、雙語對話、冷卻、期限、安靜時段與每日額度。
 
@@ -17,32 +17,33 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並�
 - **App 不自行呼叫 AI API：** 普通寵物不需要 API key，也不會自行發出模型請求。
 - **本機持續生活：** App 負責狀態、時機、呈現與使用者控制。
 - **最小化交接：** 更新包只有生成後的寵物狀態與雜湊引用，不含原始記憶、prompt、路徑、祕密或 reasoning。
-- **有限主動性：** 環境對話遵守 22:00–09:00 安靜時段與每日兩次額度。
-- **可替換、可清除：** 每次運作會取代上一份操作；使用者也能在本機清除。
+- **有限主動性：** 環境對話採本機 35–70 分鐘節奏，遵守 22:00–09:00 安靜時段，且每日最多七句。
+- **滾動更新、可清除：** 保留的實用句子延續本機使用次數，過時句子會退場；使用者也能清除全部衍生寵物狀態。
 
 ## 運作方式
 
 ```text
 安裝並打開 Memoryling
-  → 寵物顯示「寵物醒來」與複製按鈕
-  → 使用者在目前 Agent 專案貼上或說「寵物醒來」
+  → 寵物顯示「醒來吧我的寵物」與複製按鈕
+  → 使用者在目前 Agent 專案貼上或說「醒來吧我的寵物」
   → Agent 讀取原本已授權的記憶＋近期工作＋專案脈絡
-  → Agent skill 編譯 protocol-v1 JSON
+  → Agent skill 編譯含 48 句對話的 protocol-v2 JSON
   → 本機工具確認相容寵物已開啟
   → 工具寫入唯一收件匣檔案並等待套用
-  → Rust 驗證並只保留最新操作
-  → 寵物依本機確定性規則改變外觀與說話
+  → Rust 驗證、延續保留對話的使用紀錄，並只保留最新操作
+  → 寵物外觀一天最多持續改變一次，並依本機規則說話
 ```
 
-專案入口會辨識 `寵物醒來` 與 `Memoryling, wake up`；要求讀取 `AI-WAKEUP.md` 或喚醒專案時不會誤啟動寵物。可重複執行的流程在 [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md)，嚴格格式在 [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json)。
+專案入口會辨識 `醒來吧我的寵物` 與 `Memoryling, wake up`；要求讀取 `AI-WAKEUP.md` 或喚醒專案時不會誤啟動寵物。可重複執行的流程在 [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md)，嚴格格式在 [`schemas/agent-operation-v2.schema.json`](schemas/agent-operation-v2.schema.json)。
 
-## v0.6.0 原始碼目前有什麼
+## v0.7.0 原始碼目前有什麼
 
 - Tauri 2 pet-first Windows 外殼、透明寵物與詳細視窗
-- SQLite schema v5 Agent 操作持久化
+- SQLite schema v6 Agent 操作、滾動對話與每日外觀持久化
 - render-state schema v6 與粗粒度活動外觀色彩
-- 每次操作 3–12 組英文／繁體中文對話卡
-- 開啟、點擊與有限環境觸發
+- 每次操作固定 48 組英文／繁體中文對話卡：8 句開場、20 句點擊、16 句環境、4 句外觀變化
+- 有證據才變外觀；每個本機日最多一次持續外觀變化，另保留一個待套用計畫
+- 開啟、點擊與有限環境觸發，以及可點掉、七秒自動收起的美觀說話框
 - 唯一檔案收件匣輪詢，以及大小、symlink、schema、ID 嚴格檢查
 - pet-first 手動啟動、可複製的雙語發動提醒、持續顯示的待機提醒與 single-instance recovery
 - 本機清除控制與權威快照替換語意
@@ -71,14 +72,14 @@ cargo fmt --manifest-path src-tauri/Cargo.toml --check
 只能用已提交的合成資料測試交接：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -Path examples/agent-operation-v1.synthetic.json
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -Path examples/agent-operation-v2.synthetic.json
 ```
 
 不要提交或輸出真實 Agent 記憶、prompt、憑證、本機資料庫或由使用者資料衍生的操作包。
 
 ## 產品與發布邊界
 
-v0.6.0 目前是 source vertical slice。未簽章的 v0.2.0 installer 是最後一個完成安裝 UAT 的基準，不能證明新的 Agent-operated 路徑。Code signing、擴大無障礙／mixed-DPI、封裝升級測試與公開發布證據仍未完成。
+v0.7.0 目前是 source vertical slice。未簽章的 v0.2.0 installer 是最後一個完成安裝 UAT 的基準，不能證明這次擴充後的 Agent-operated 路徑。Code signing、擴大無障礙／mixed-DPI、封裝升級測試與公開發布證據仍未完成。
 
 本機狀態位於 `%LOCALAPPDATA%\app.memoryling.desktop`。清除操作只會刪除 Memoryling 的本機衍生更新，不會修改 Agent 擁有的記憶。
 

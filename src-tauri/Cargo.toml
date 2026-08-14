@@ -1,6 +1,6 @@
 [package]
 name = "memoryling"
-version = "0.6.0"
+version = "0.7.0"
 description = "A local-first desktop creature that grows from AI agent memories"
 authors = ["Memoryling contributors"]
 edition = "2021"

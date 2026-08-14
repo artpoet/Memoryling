@@ -106,6 +106,53 @@ html[data-surface="pet"] *::after {
   font-weight: 720;
   line-height: 1.35;
   text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.pet-dialogue::after {
+  position: absolute;
+  right: 52px;
+  bottom: -7px;
+  width: 13px;
+  height: 13px;
+  border-right: 1px solid rgba(130, 231, 197, 0.48);
+  border-bottom: 1px solid rgba(130, 231, 197, 0.48);
+  background: rgba(24, 40, 43, 0.95);
+  content: "";
+  transform: rotate(45deg);
+}
+
+.pet-dialogue-message {
+  display: -webkit-box;
+  width: calc(100% - 28px);
+  max-height: 64px;
+  cursor: pointer;
+  font-family: inherit;
+  appearance: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  animation: pet-dialogue-arrive 180ms ease-out both;
+}
+
+.pet-dialogue-message:hover {
+  border-color: rgba(170, 246, 221, 0.7);
+  background: rgba(29, 49, 51, 0.98);
+}
+
+.pet-dialogue-message:focus-visible {
+  outline: 2px solid #bca9ff;
+  outline-offset: 2px;
+}
+
+@keyframes pet-dialogue-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .pet-surface-onboarding {
@@ -212,6 +259,10 @@ html[data-surface="pet"] *::after {
   .pet-button.pet-reacting .memoryling {
     transform: none;
   }
+
+  .pet-dialogue-message {
+    animation: none;
+  }
 }
 
 @media (forced-colors: active) {
@@ -221,6 +272,11 @@ html[data-surface="pet"] *::after {
     color: CanvasText;
     background: Canvas;
     forced-color-adjust: auto;
+  }
+
+  .pet-dialogue::after {
+    border-color: CanvasText;
+    background: Canvas;
   }
 
   .pet-access-status {

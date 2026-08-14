@@ -5,7 +5,7 @@ fn is_false(value: &bool) -> bool {
 }
 
 pub const MEMORY_EVENT_SCHEMA_VERSION: i64 = 1;
-pub const STORE_SCHEMA_VERSION: i64 = 5;
+pub const STORE_SCHEMA_VERSION: i64 = 6;
 pub const DERIVATION_VERSION: i64 = 1;
 pub const CODEX_ADAPTER_ID: &str = "codex-durable-memory";
 pub const CODEX_ADAPTER_VERSION: i64 = 1;

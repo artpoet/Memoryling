@@ -2,7 +2,7 @@ use std::{
     collections::HashSet,
     fs,
     path::Path,
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 use serde::Deserialize;
@@ -14,9 +14,11 @@ use super::{
     store::MemoryStore,
 };
 
-const INBOX_RELATIVE_PATH: [&str; 2] = ["agent-inbox", "operation-v1.json"];
+const INBOX_RELATIVE_PATH: [&str; 2] = ["agent-inbox", "operation-v2.json"];
 const MAX_OPERATION_BYTES: u64 = 64 * 1024;
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
+const AMBIENT_MINUTES_MIN: u64 = 35;
+const AMBIENT_MINUTES_SPAN: u64 = 36;
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -27,6 +29,7 @@ pub(crate) struct AgentOperationPackage {
     pub agent: AgentDescriptor,
     pub source_digest: String,
     pub profile: AgentProfile,
+    pub appearance_plan: AppearancePlan,
     pub evidence: Vec<OperationEvidence>,
     pub dialogues: Vec<DialogueCard>,
 }
@@ -56,8 +59,21 @@ pub(crate) struct OperationEvidence {
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub(crate) struct AppearancePlan {
+    pub decision: String,
+    pub qualification: String,
+    pub target_activity: Option<AgentActivity>,
+    pub target_journey_state: Option<String>,
+    pub evidence_ids: Vec<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub(crate) struct DialogueCard {
     pub id: String,
+    pub theme_id: String,
+    pub semantic_group: String,
+    pub category: String,
     pub text: LocalizedDialogue,
     pub trigger: String,
     pub priority: u8,
@@ -77,7 +93,7 @@ pub(crate) struct LocalizedDialogue {
 
 impl AgentOperationPackage {
     pub(crate) fn validate(&self) -> Result<(), String> {
-        if self.schema_version != 1
+        if self.schema_version != 2
             || !valid_id(&self.operation_id)
             || !valid_hash(&self.source_digest)
             || OffsetDateTime::parse(&self.generated_at, &Rfc3339).is_err()
@@ -89,9 +105,9 @@ impl AgentOperationPackage {
                 "steady" | "exploring" | "milestone" | "recovering"
             )
             || !(1..=12).contains(&self.evidence.len())
-            || !(3..=12).contains(&self.dialogues.len())
+            || self.dialogues.len() != 48
         {
-            return Err("The Agent operation package does not match protocol v1.".to_string());
+            return Err("The Agent operation package does not match protocol v2.".to_string());
         }
 
         let mut evidence_ids = HashSet::new();
@@ -109,13 +125,58 @@ impl AgentOperationPackage {
             }
         }
 
+        let mut appearance_evidence_ids = HashSet::new();
+        if self.appearance_plan.evidence_ids.iter().any(|id| {
+            !evidence_ids.contains(id.as_str()) || !appearance_evidence_ids.insert(id.as_str())
+        }) {
+            return Err("The Agent appearance plan evidence is invalid.".to_string());
+        }
+        let valid_target_journey = self
+            .appearance_plan
+            .target_journey_state
+            .as_deref()
+            .is_some_and(|value| {
+                matches!(value, "steady" | "exploring" | "milestone" | "recovering")
+            });
+        let appearance_valid = match self.appearance_plan.decision.as_str() {
+            "hold" => {
+                self.appearance_plan.qualification == "insufficient-evidence"
+                    && self.appearance_plan.target_activity.is_none()
+                    && self.appearance_plan.target_journey_state.is_none()
+            }
+            "reset" => {
+                self.appearance_plan.qualification == "source-removed"
+                    && self.appearance_plan.target_activity.is_none()
+                    && self.appearance_plan.target_journey_state.is_none()
+            }
+            "change" => {
+                self.appearance_plan
+                    .target_activity
+                    .is_some_and(|activity| activity != AgentActivity::Off)
+                    && valid_target_journey
+                    && match self.appearance_plan.qualification.as_str() {
+                        "explicit-milestone" => !appearance_evidence_ids.is_empty(),
+                        "consistent-signals" => appearance_evidence_ids.len() >= 2,
+                        _ => false,
+                    }
+            }
+            _ => false,
+        };
+        if !appearance_valid {
+            return Err("The Agent appearance plan is invalid.".to_string());
+        }
+
         let mut dialogue_ids = HashSet::new();
-        let mut has_open_dialogue = false;
-        let mut has_interaction_dialogue = false;
+        let mut opening_count = 0;
+        let mut interaction_count = 0;
+        let mut ambient_count = 0;
+        let mut appearance_count = 0;
         for dialogue in &self.dialogues {
             let mut dialogue_evidence_ids = HashSet::new();
             if !valid_id(&dialogue.id)
                 || !dialogue_ids.insert(dialogue.id.as_str())
+                || !valid_id(&dialogue.theme_id)
+                || !valid_id(&dialogue.semantic_group)
                 || !valid_dialogue(&dialogue.text.en)
                 || !valid_dialogue(&dialogue.text.zh_tw)
                 || !matches!(
@@ -135,11 +196,26 @@ impl AgentOperationPackage {
             {
                 return Err("The Agent operation dialogue deck is invalid.".to_string());
             }
-            has_open_dialogue |= dialogue.trigger == "on-open";
-            has_interaction_dialogue |= dialogue.trigger == "on-interact";
+            match dialogue.category.as_str() {
+                "opening" if dialogue.trigger == "on-open" => opening_count += 1,
+                "interaction" if dialogue.trigger == "on-interact" => interaction_count += 1,
+                "ambient" if dialogue.trigger == "ambient" => ambient_count += 1,
+                "appearance" if dialogue.trigger == "on-open" => appearance_count += 1,
+                _ => {
+                    return Err(
+                        "The Agent dialogue category does not match its trigger.".to_string()
+                    )
+                }
+            }
         }
-        if !has_open_dialogue || !has_interaction_dialogue {
-            return Err("The Agent operation needs opening and interaction dialogue.".to_string());
+        if (
+            opening_count,
+            interaction_count,
+            ambient_count,
+            appearance_count,
+        ) != (8, 20, 16, 4)
+        {
+            return Err("The Agent dialogue deck must contain 8 opening, 20 interaction, 16 ambient, and 4 appearance cards.".to_string());
         }
         Ok(())
     }
@@ -177,7 +253,7 @@ fn valid_hash(value: &str) -> bool {
 fn valid_dialogue(value: &str) -> bool {
     let trimmed = value.trim();
     !trimmed.is_empty()
-        && trimmed.chars().count() <= 240
+        && trimmed.chars().count() <= 160
         && !trimmed.contains('\r')
         && !trimmed.contains('\n')
 }
@@ -212,7 +288,7 @@ fn read_package(path: &Path) -> Result<Option<AgentOperationPackage>, String> {
     let bytes = fs::read(path)
         .map_err(|_| "Memoryling could not read the Agent operation inbox item.".to_string())?;
     let package: AgentOperationPackage = serde_json::from_slice(&bytes)
-        .map_err(|_| "The Agent operation inbox item is not valid protocol-v1 JSON.".to_string())?;
+        .map_err(|_| "The Agent operation inbox item is not valid protocol-v2 JSON.".to_string())?;
     package.validate()?;
     Ok(Some(package))
 }
@@ -242,7 +318,7 @@ pub(crate) fn process_inbox<R: tauri::Runtime>(app: &AppHandle<R>) -> Result<boo
 pub(crate) fn setup<R: tauri::Runtime>(app: &tauri::App<R>) {
     let handle = app.handle().clone();
     std::thread::spawn(move || {
-        let mut next_ambient = Instant::now() + Duration::from_secs(15 * 60);
+        let mut next_ambient = Instant::now() + next_ambient_delay();
         loop {
             if process_inbox(&handle).unwrap_or(false) {
                 crate::desktop_shell::emit_creature_state_changed(&handle);
@@ -261,11 +337,32 @@ pub(crate) fn setup<R: tauri::Runtime>(app: &tauri::App<R>) {
                         crate::desktop_shell::emit_creature_state_changed(&handle);
                     }
                 }
-                next_ambient = Instant::now() + Duration::from_secs(15 * 60);
+                next_ambient = Instant::now() + next_ambient_delay();
+            }
+            if let Ok(store) = super::store_for(&handle) {
+                let before = store
+                    .creature_render_state()
+                    .ok()
+                    .map(|state| state.revision);
+                let after = store
+                    .apply_pending_appearance_if_due()
+                    .ok()
+                    .map(|state| state.revision);
+                if before.is_some() && after.is_some() && before != after {
+                    crate::desktop_shell::emit_creature_state_changed(&handle);
+                }
             }
             std::thread::sleep(POLL_INTERVAL);
         }
     });
+}
+
+fn next_ambient_delay() -> Duration {
+    let seed = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|value| value.as_nanos() as u64)
+        .unwrap_or(0);
+    Duration::from_secs((AMBIENT_MINUTES_MIN + seed % AMBIENT_MINUTES_SPAN) * 60)
 }
 
 pub(crate) fn local_clock() -> (String, String, u8) {
@@ -293,7 +390,7 @@ pub(crate) fn advance_dialogue(
 #[cfg(test)]
 pub(crate) fn synthetic_package() -> AgentOperationPackage {
     AgentOperationPackage {
-        schema_version: 1,
+        schema_version: 2,
         operation_id: "operation.synthetic-001".to_string(),
         generated_at: "2026-08-13T10:00:00Z".to_string(),
         agent: AgentDescriptor {
@@ -305,20 +402,49 @@ pub(crate) fn synthetic_package() -> AgentOperationPackage {
             secondary_activity: Some(AgentActivity::Design),
             journey_state: "milestone".to_string(),
         },
-        evidence: vec![OperationEvidence {
-            id: "evidence.repo".to_string(),
-            kind: "repo-ssot".to_string(),
-            reference_hash: "b".repeat(64),
-            observed_at: "2026-08-13T09:00:00Z".to_string(),
-        }],
-        dialogues: (1..=3)
+        appearance_plan: AppearancePlan {
+            decision: "change".to_string(),
+            qualification: "consistent-signals".to_string(),
+            target_activity: Some(AgentActivity::Building),
+            target_journey_state: Some("milestone".to_string()),
+            evidence_ids: vec!["evidence.repo".to_string(), "evidence.thread".to_string()],
+        },
+        evidence: vec![
+            OperationEvidence {
+                id: "evidence.repo".to_string(),
+                kind: "repo-ssot".to_string(),
+                reference_hash: "b".repeat(64),
+                observed_at: "2026-08-13T09:00:00Z".to_string(),
+            },
+            OperationEvidence {
+                id: "evidence.thread".to_string(),
+                kind: "current-thread".to_string(),
+                reference_hash: "c".repeat(64),
+                observed_at: "2026-08-13T09:30:00Z".to_string(),
+            },
+        ],
+        dialogues: (1..=48)
             .map(|index| DialogueCard {
                 id: format!("dialogue-{index}"),
+                theme_id: format!("theme-{}", (index - 1) % 6 + 1),
+                semantic_group: format!("meaning-{index}"),
+                category: match index {
+                    1..=8 => "opening",
+                    9..=28 => "interaction",
+                    29..=44 => "ambient",
+                    _ => "appearance",
+                }
+                .to_string(),
                 text: LocalizedDialogue {
                     en: format!("Synthetic line {index}."),
                     zh_tw: format!("合成對話 {index}。"),
                 },
-                trigger: if index == 1 { "on-open" } else { "on-interact" }.to_string(),
+                trigger: match index {
+                    1..=8 | 45..=48 => "on-open",
+                    9..=28 => "on-interact",
+                    _ => "ambient",
+                }
+                .to_string(),
                 priority: 1,
                 not_before: None,
                 expires_at: None,
@@ -346,7 +472,9 @@ mod tests {
 
         let mut missing_interaction = synthetic_package();
         for dialogue in &mut missing_interaction.dialogues {
-            dialogue.trigger = "on-open".to_string();
+            if dialogue.category == "interaction" {
+                dialogue.trigger = "on-open".to_string();
+            }
         }
         assert!(missing_interaction.validate().is_err());
 
@@ -360,5 +488,13 @@ mod tests {
         expired.dialogues[0].expires_at = Some("2026-08-13T09:59:59Z".to_string());
         let now = OffsetDateTime::parse("2026-08-13T10:00:00Z", &Rfc3339).unwrap();
         assert!(!dialogue_is_active_at(&expired.dialogues[0], now));
+
+        let mut weak_change = synthetic_package();
+        weak_change.appearance_plan.evidence_ids.truncate(1);
+        assert!(weak_change.validate().is_err());
+
+        let delay = next_ambient_delay();
+        assert!(delay >= Duration::from_secs(35 * 60));
+        assert!(delay <= Duration::from_secs(70 * 60));
     }
 }

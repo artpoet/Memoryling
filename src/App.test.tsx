@@ -127,7 +127,7 @@ describe("Agent-operated Memoryling detail surface", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "繁中" }));
-    expect(screen.getByText("先打開 Memoryling，再回 Agent 專案說：「寵物醒來」")).toBeInTheDocument();
+    expect(screen.getByText("先打開 Memoryling，再回 Agent 專案說：「醒來吧我的寵物」")).toBeInTheDocument();
     expect(screen.getByText(/這個頁面不會自行執行 AI 或讀取記憶/)).toBeInTheDocument();
   });
 

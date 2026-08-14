@@ -12,11 +12,11 @@ Read, in order:
 
 ## Operate Memoryling
 
-When the user says `寵物醒來` or `Memoryling, wake up` in this repository:
+When the user says `醒來吧我的寵物` or `Memoryling, wake up` in this repository:
 
 1. Read `skills/memoryling-operation/SKILL.md` completely.
 2. Follow that skill using only context the current Agent is already authorized to read.
-3. Compile and submit one protocol-v1 operation package to the local Memoryling app.
+3. Compile and submit one protocol-v2 operation package to the local Memoryling app.
 4. Submit only when a compatible installed pet is already open, then wait for local application confirmation.
 5. Report the bounded result in this conversation. Do not ask the user to run the helper manually.
 

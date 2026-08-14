@@ -12,5 +12,6 @@
 | [0008](0008-agent-operated-memoryling-protocol.md) | Agent compiles authorized context; local app owns persistent life | Accepted |
 | [0009](0009-conversation-first-pet-wake.md) | Agent conversation is the primary control surface and wakes the pet | Superseded by ADR-0010 |
 | [0010](0010-installed-app-teaches-agent-activation.md) | Installed App teaches the phrase; Agent updates the open pet | Accepted |
+| [0011](0011-memory-grounded-daily-growth-and-dialogue-v2.md) | Memory-grounded daily growth and rolling dialogue protocol v2 | Accepted |
 
 New ADRs should record context, decision, consequences, rejected alternatives, and privacy impact. Supersede earlier ADRs rather than rewriting their history.

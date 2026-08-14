@@ -1,10 +1,10 @@
-# Memoryling v0.6.0 原始碼測試指南
+# Memoryling v0.7.0 原始碼測試指南
 
 [雙語完整指南](../USER_GUIDE.md) · [繁中 README](../../README.zh-TW.md) · [隱私原則](../PRIVACY_PRINCIPLES.md)
 
 ## 先確認版本邊界
 
-v0.6.0 是 Agent-operated 的原始碼垂直切片；最後完成安裝 UAT 的 artifact 仍是 v0.2.0。尚未宣稱 v0.6.0 packaged acceptance、私人記憶 UAT 或公開發布。
+v0.7.0 是 Agent-operated 的原始碼垂直切片；最後完成安裝 UAT 的 artifact 仍是 v0.2.0。尚未宣稱 v0.7.0 packaged acceptance、私人記憶 UAT 或公開發布。
 
 除非已取得明確授權，否則只使用合成資料。不要貼出、輸出或提交由真實 Agent 記憶衍生的操作包。
 
@@ -22,8 +22,8 @@ npm run tauri dev
 1. 透過 Windows EXE、捷徑或開始功能表安裝並打開 Memoryling，讓寵物保持執行。
 2. 在 Codex、Claude Code 或其他支援 AGENTS 的環境開啟想使用的專案。
 3. 讓 Agent 讀取 `AGENTS.md` 與喚醒文件鏈。
-4. 按寵物顯示的複製按鈕，再把發動語貼到 Agent 專案：**`寵物醒來`** 或 **`Memoryling, wake up`**。
-5. Agent 會依 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存更新包並自行執行本機提交工具。
+4. 按寵物顯示的複製按鈕，再把發動語貼到 Agent 專案：**`醒來吧我的寵物`** 或 **`Memoryling, wake up`**。
+5. Agent 會依 `skills/memoryling-operation/SKILL.md`，先確認 App 已開啟才讀取這次所需記憶，只使用原本已授權的脈絡，建立暫存 protocol-v2 更新包並自行執行本機提交工具。
 6. 工具確認相容 App 已開啟，不啟動任何程式；提交更新、等待本機套用，最後在同一段對話回報。
 
 這個口號只授權一次有限寵物更新；不代表授權新私人來源、雲端 connector、外部 AI 呼叫、信箱、登入帳號、憑證或 Agent 記憶寫入。
@@ -32,22 +32,23 @@ npm run tauri dev
 
 - 詳細頁改為「Agent 更新已套用」。
 - 寵物出現粗粒度活動色彩；milestone 可能出現星號。
-- 先顯示一則開啟對話；點擊後向本機規則引擎要求另一則對話。
+- 先在美觀、可關閉、七秒自動收起的說話框顯示一則開啟對話；點擊後向本機規則引擎要求另一則對話。
 - 對話依英文／繁體中文語言顯示。
-- 22:00–09:00 不顯示環境對話，每日環境對話上限兩則。
+- 環境對話採 35–70 分鐘本機節奏，22:00–09:00 保持安靜，任一句之後至少等待十分鐘，每日上限七則。
+- 有足夠證據才變外觀；每個本機日最多一次持續變化，同日第二個合格計畫等待隔日。
 - UI 不顯示來源路徑、記憶原文、證據雜湊、prompt 或 reasoning。
 
 ## 只測合成收件匣
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -Path examples/agent-operation-v1.synthetic.json
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -Path examples/agent-operation-v2.synthetic.json
 ```
 
-請先打開 Memoryling。工具會確認正在執行的是 Memoryling 0.6.0 以上版本，然後提交並等待套用，不會啟動 App；只輸出有限狀態、operation ID 與對話數。App 成功處理後會刪除收件匣檔案。不合規資料會被拒絕並移除，不會顯示內容。
+請先打開 Memoryling。工具會確認正在執行的是 Memoryling 0.7.0 以上版本，然後提交並等待套用，不會啟動 App；只輸出有限狀態、operation ID 與對話數。App 成功處理後會刪除收件匣檔案。不合規資料會被拒絕並移除，不會顯示內容。
 
 ## 替換與清除
 
-每一份新操作都是 authoritative snapshot，會 transactionally 取代上一份操作與下游對話，不建立隱藏歷史庫。
+每一份新操作都是 authoritative semantic snapshot，會 transactionally 取代上一份操作；內容完全不變的穩定對話只延續使用計數，退場內容會刪除，不建立隱藏歷史庫。
 
 需要立即移除時，在詳細頁選 **清除這次寵物更新**。這只刪除 Memoryling 本機衍生資料，不會修改 Agent 記憶。再次喊口號即可依目前脈絡重建。
 

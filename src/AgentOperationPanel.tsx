@@ -28,7 +28,7 @@ const copy = {
   },
   "zh-TW": {
     eyebrow: "安裝版 APP＋AGENT 發動語 · APP 不自行呼叫 AI API",
-    title: "先打開 Memoryling，再回 Agent 專案說：「寵物醒來」",
+    title: "先打開 Memoryling，再回 Agent 專案說：「醒來吧我的寵物」",
     intro:
       "請先安裝並打開 Windows App；Memoryling 會留在本機等待，由你的 Agent 準備更新。",
     agent: "1 · 打開安裝版寵物",
@@ -38,7 +38,7 @@ const copy = {
     pet: "3 · Memoryling 更新",
     petBody: "已開啟的寵物會在本機套用更新，再依觸發條件、期限、冷卻、安靜時段與每日額度說話。",
     waiting: "Memoryling 已開啟，正在等待",
-    waitingBody: "回到你的 Agent 專案，輸入「寵物醒來」即可開始下一次更新。",
+    waitingBody: "回到你的 Agent 專案，輸入「醒來吧我的寵物」即可開始下一次更新。",
     applied: "最新 Agent 更新已套用",
     appliedBody: (count: number, activity: string) =>
       `${count} 組對話已就緒 · 主要活動：${activity}`,

@@ -94,7 +94,7 @@ const copy = {
     conceptBadge: "概念示意",
     memoryLabel: "記憶訊號",
     noSignals: "尚無具來源鏈的訊號",
-    noSignalsBody: "請讓 App 保持開啟，再回 Agent 專案說「寵物醒來」，建立第一份更新包。",
+    noSignalsBody: "請讓 App 保持開啟，再回 Agent 專案說「醒來吧我的寵物」，建立第一份更新包。",
     activeOperationSignal: "一次 Agent 運作塑造了寵物",
     activeOperationSignalMeta: "記憶＋近期工作 · 本機編譯 · 規則化對話",
     activeOperationSignalBody: "App 只收到生成後的寵物狀態與雜湊證據引用，不會收到原始 Agent 記憶。",

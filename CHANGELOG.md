@@ -6,32 +6,41 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-14
+
+> Source implementation, release-binary smoke, and unsigned package build. The v0.2.0 installer remains the last installed-UAT baseline until the v0.7.0 package is installed and accepted.
+
 ### Added
 
-- accepted ADR-0010 for an installed-App entry that visibly teaches the Agent activation phrase
-- first-run and persistent idle-pet reminders for `Memoryling, wake up`／`寵物醒來`
-- a first-run copy button with visible copied／failed feedback for the locale-specific activation phrase
+- accepted ADR-0011 for protocol-v2 rolling dialogue, evidence-gated appearance, and daily growth limits
+- strict protocol-v2 schema, reference, and 48-card synthetic example with 8 opening, 20 interaction, 16 ambient, and 4 appearance cards
+- SQLite migration 0006 for stable dialogue identity, rolling counters, current／pending appearance, opaque appearance lineage, and daily appearance usage
+- readiness-only helper mode so the Agent confirms the compatible App is open before reading memory for the pet workflow
+- styled three-line pet speech bubble with click dismissal, seven-second auto-hide, reduced-motion handling, and accessible focus
 
 ### Changed
 
-- shortened the exact pet activation phrase to `Memoryling, wake up`／`寵物醒來` and explicitly separated it from project／Agent wake-up requests
-- replaced the earlier technical trigger wording with the simpler official phrase `Wake up, my pet`／`醒來吧我的寵物` across the App, Agent skill, tests, and current documentation
-- normal Agent operation now requires the compatible pet to be open, submits without launching any process, and reports completion in the same conversation
-- cold launch goes directly to the pet with OS-locale selection; the blocking first-run setup screen and its Tauri commands were removed
-- single-instance relaunch returns to the existing pet instead of opening the detail window
+- made `醒來吧我的寵物` the exact Traditional Chinese activation phrase while retaining `Memoryling, wake up` in English and separating both from project／Agent wake-up requests
+- upgraded the inbox and all current workflow references from `operation-v1.json` to `operation-v2.json`
+- retained usage only for stable dialogue IDs whose bilingual text remains identical; changed or absent dialogue is retired without history
+- allowed a persistent visible appearance change only with sufficient evidence and at most once per local day; one later qualified plan may wait for the next day
+- increased ambient initiative from fixed 15-minute opportunities and two lines per day to a randomized 35–70 minute cadence, ten-minute post-dialogue spacing, and seven lines per day
+- favored least-used／least-recently-used eligible dialogue while avoiding the current theme or semantic group when alternatives exist
+- bumped source version to 0.7.0 and SQLite schema version to 6
 
 ### Security and privacy
 
-- opening the App grants no memory access; only the activation phrase authorizes one bounded update
-- a closed, mismatched, or stale App fails before an operation package is written; an unconfirmed inbox item is removed after the bounded wait; submission never launches a process or prints executable paths or package content
+- readiness checking inspects only compatible running-process metadata and occurs before any pet-workflow memory read
+- protocol-v2 keeps raw memory, prompts, source wording, names, paths, secrets, tool output, and reasoning out of the package; each localized line is capped at 160 characters
+- clear now removes rolling counters, current／pending appearance, and their opaque lineage in addition to the current operation
 
 ### Validated
 
-- full frontend／Rust checks, Rust formatting, Clippy, JSON parsing, and official skill validation pass
-- closed App fails before write, a mismatched binary is rejected, and isolated no-launch submission remains available for test harnesses
-- the freshly built release pet consumed the synthetic operation without changing process count or PID
-- Computer Use observed the Traditional Chinese first-run activation reminder and detailed three-step flow
-- English／Traditional Chinese browser inspection confirms installed-App copy, honest native boundary, and no horizontal overflow
+- 31 frontend tests, 53 runnable Rust tests, submit-helper tests, production build, and Rust formatting pass in the first implementation round
+- Rust coverage proves exact 48-card validation, rolling-counter retention, seven ambient deliveries and cap, evidence qualification, daily appearance apply／queue, and complete clear
+- frontend coverage proves exact activation copy and dismissible operation speech-bubble behavior
+- `npm run build:windows` produced `Memoryling_0.7.0_x64-setup.exe`; the freshly built release binary consumed the 48-card synthetic package without launching another process
+- native Computer Use smoke observed the exact Traditional Chinese phrase, applied appearance, distinct click dialogue bubbles, accessible dismiss labels, and automatic hiding
 
 ## [0.6.0] - 2026-08-13
 

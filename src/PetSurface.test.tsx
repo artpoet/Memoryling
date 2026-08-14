@@ -105,11 +105,23 @@ describe("pet surface", () => {
     expect(
       await screen.findByText("Agent operation applied · app memory scanning off"),
     ).toBeInTheDocument();
-    expect(screen.getByText("The shape is becoming clear.")).toBeInTheDocument();
+    expect(await screen.findByText("The shape is becoming clear.")).toBeInTheDocument();
     expect(document.querySelector('[data-agent-activity="design"]')).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Agent-made update/i }),
     ).toBeInTheDocument();
+  });
+
+  test("renders dialogue as a dismissible speech bubble", async () => {
+    const fixture = createClient(agentMemoryState);
+    render(<PetSurface client={fixture.client} />);
+
+    const bubble = await screen.findByRole("button", {
+      name: /Dismiss Memoryling's message/,
+    });
+    expect(bubble).toHaveClass("pet-dialogue-message");
+    fireEvent.click(bubble);
+    expect(screen.queryByText("The shape is becoming clear.")).not.toBeInTheDocument();
   });
 
   test("asks the local rule engine for another dialogue on interaction", async () => {
@@ -487,14 +499,14 @@ describe("pet surface", () => {
       await screen.findByText("按右鍵，再選擇開啟 Memoryling。"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。"),
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。"),
     ).toBeInTheDocument();
     await userEvent.click(
-      screen.getByRole("button", { name: "複製「寵物醒來」" }),
+      screen.getByRole("button", { name: "複製「醒來吧我的寵物」" }),
     );
-    expect(clipboard.writeText).toHaveBeenCalledWith("寵物醒來");
+    expect(clipboard.writeText).toHaveBeenCalledWith("醒來吧我的寵物");
     expect(
-      screen.getByRole("button", { name: "已複製「寵物醒來」" }),
+      screen.getByRole("button", { name: "已複製「醒來吧我的寵物」" }),
     ).toBeInTheDocument();
     expect(screen.getByTestId("pet-surface")).toHaveAttribute(
       "data-motion",
@@ -506,7 +518,7 @@ describe("pet surface", () => {
       expect(screen.queryByText("Memoryling 已打開")).not.toBeInTheDocument(),
     );
     expect(
-      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。"),
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。"),
     ).toBeInTheDocument();
   });
 
@@ -540,13 +552,13 @@ describe("pet surface", () => {
     render(<PetSurface client={fixture.client} clipboard={null} />);
 
     await userEvent.click(
-      await screen.findByRole("button", { name: "複製「寵物醒來」" }),
+      await screen.findByRole("button", { name: "複製「醒來吧我的寵物」" }),
     );
     expect(
       screen.getByRole("button", { name: "複製失敗，請再試一次" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。"),
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。"),
     ).toBeInTheDocument();
   });
 

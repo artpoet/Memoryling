@@ -1,4 +1,9 @@
-use std::{collections::HashSet, fs, path::PathBuf, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+    path::PathBuf,
+    time::Duration,
+};
 
 use rusqlite::{params, Connection, OptionalExtension, Transaction, TransactionBehavior};
 use sha2::{Digest, Sha256};
@@ -21,6 +26,7 @@ const MIGRATION_0002: &str = include_str!("../../migrations/0002_source_consent_
 const MIGRATION_0003: &str = include_str!("../../migrations/0003_daily_memory_scout.sql");
 const MIGRATION_0004: &str = include_str!("../../migrations/0004_agent_memory_sync.sql");
 const MIGRATION_0005: &str = include_str!("../../migrations/0005_agent_operation_protocol.sql");
+const MIGRATION_0006: &str = include_str!("../../migrations/0006_agent_operation_protocol_v2.sql");
 
 pub(crate) struct MemoryStore {
     path: PathBuf,
@@ -356,6 +362,7 @@ impl MemoryStore {
         package: &super::agent_operation::AgentOperationPackage,
     ) -> Result<(), String> {
         package.validate()?;
+        let (now, local_date, _) = super::agent_operation::local_clock();
         let mut connection = self.open_connection()?;
         let transaction = connection
             .transaction_with_behavior(TransactionBehavior::Immediate)
@@ -388,6 +395,30 @@ impl MemoryStore {
                 .map_err(|error| local_store_error("commit duplicate Agent operation", error))?;
             return Ok(());
         }
+
+        let previous_dialogues: HashMap<String, (String, String, i64, Option<String>)> = {
+            let mut statement = transaction
+                .prepare(
+                    "SELECT dialogue_id, text_en, text_zh_tw, use_count, last_used_at
+                     FROM agent_dialogue_cards",
+                )
+                .map_err(|error| local_store_error("prepare rolling dialogue state", error))?;
+            let rows = statement
+                .query_map([], |row| {
+                    Ok((
+                        row.get::<_, String>(0)?,
+                        (
+                            row.get::<_, String>(1)?,
+                            row.get::<_, String>(2)?,
+                            row.get::<_, i64>(3)?,
+                            row.get::<_, Option<String>>(4)?,
+                        ),
+                    ))
+                })
+                .map_err(|error| local_store_error("read rolling dialogue state", error))?;
+            rows.collect::<Result<HashMap<_, _>, _>>()
+                .map_err(|error| local_store_error("collect rolling dialogue state", error))?
+        };
 
         transaction
             .execute("DELETE FROM agent_operations", [])
@@ -427,16 +458,31 @@ impl MemoryStore {
                 )
                 .map_err(|error| local_store_error("save Agent operation evidence", error))?;
         }
+        let appearance_changed =
+            apply_or_queue_appearance(&transaction, package, &now, &local_date)?;
         for dialogue in &package.dialogues {
+            let retained = previous_dialogues
+                .get(&dialogue.id)
+                .filter(|(en, zh_tw, _, _)| {
+                    en == &dialogue.text.en && zh_tw == &dialogue.text.zh_tw
+                });
+            let retained_use_count = retained
+                .map(|(_, _, uses, _)| (*uses).min(i64::from(dialogue.max_uses)))
+                .unwrap_or(0);
+            let retained_last_used = retained.and_then(|(_, _, _, last)| last.clone());
             transaction
                 .execute(
                     "INSERT INTO agent_dialogue_cards
-                        (dialogue_id, operation_id, text_en, text_zh_tw, trigger_kind, priority,
-                         not_before, expires_at, cooldown_minutes, max_uses)
-                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+                        (dialogue_id, operation_id, theme_id, semantic_group, category,
+                         text_en, text_zh_tw, trigger_kind, priority, not_before, expires_at,
+                         cooldown_minutes, max_uses, use_count, last_used_at)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)",
                     params![
                         dialogue.id,
                         package.operation_id,
+                        dialogue.theme_id,
+                        dialogue.semantic_group,
+                        dialogue.category,
                         dialogue.text.en,
                         dialogue.text.zh_tw,
                         dialogue.trigger,
@@ -445,6 +491,8 @@ impl MemoryStore {
                         dialogue.expires_at,
                         dialogue.cooldown_minutes,
                         dialogue.max_uses,
+                        retained_use_count,
+                        retained_last_used,
                     ],
                 )
                 .map_err(|error| local_store_error("save Agent dialogue", error))?;
@@ -459,15 +507,22 @@ impl MemoryStore {
             }
         }
 
-        let now = super::agent_operation::local_clock().0;
         let now_value = OffsetDateTime::parse(&now, &time::format_description::well_known::Rfc3339)
             .map_err(|_| "Memoryling could not evaluate the opening dialogue clock.".to_string())?;
+        let preferred_category = if appearance_changed {
+            "appearance"
+        } else {
+            "opening"
+        };
         let first_dialogue = package
             .dialogues
             .iter()
             .filter(|dialogue| {
-                dialogue.trigger == "on-open"
+                dialogue.category == preferred_category
                     && super::agent_operation::dialogue_is_active_at(dialogue, now_value)
+                    && previous_dialogues
+                        .get(&dialogue.id)
+                        .is_none_or(|(_, _, uses, _)| *uses < i64::from(dialogue.max_uses))
             })
             .min_by(|left, right| {
                 right
@@ -475,12 +530,18 @@ impl MemoryStore {
                     .cmp(&left.priority)
                     .then_with(|| left.id.cmp(&right.id))
             })
+            .or_else(|| {
+                package.dialogues.iter().find(|dialogue| {
+                    dialogue.category == "opening"
+                        && super::agent_operation::dialogue_is_active_at(dialogue, now_value)
+                })
+            })
             .map(|dialogue| dialogue.id.clone());
         if let Some(dialogue_id) = &first_dialogue {
             transaction
                 .execute(
                     "UPDATE agent_dialogue_cards
-                     SET use_count = 1, last_used_at = ?2 WHERE dialogue_id = ?1",
+                     SET use_count = use_count + 1, last_used_at = ?2 WHERE dialogue_id = ?1",
                     params![dialogue_id, now],
                 )
                 .map_err(|error| local_store_error("activate opening Agent dialogue", error))?;
@@ -510,6 +571,21 @@ impl MemoryStore {
         transaction
             .execute("DELETE FROM agent_dialogue_daily_usage", [])
             .map_err(|error| local_store_error("clear Agent dialogue budget", error))?;
+        transaction
+            .execute("DELETE FROM agent_pending_appearance_evidence", [])
+            .map_err(|error| local_store_error("clear pending appearance lineage", error))?;
+        transaction
+            .execute("DELETE FROM agent_pending_appearance", [])
+            .map_err(|error| local_store_error("clear pending appearance", error))?;
+        transaction
+            .execute("DELETE FROM agent_pet_appearance_evidence", [])
+            .map_err(|error| local_store_error("clear appearance lineage", error))?;
+        transaction
+            .execute("DELETE FROM agent_pet_appearance", [])
+            .map_err(|error| local_store_error("clear pet appearance", error))?;
+        transaction
+            .execute("DELETE FROM agent_appearance_daily_usage", [])
+            .map_err(|error| local_store_error("clear appearance daily budget", error))?;
         transaction
             .execute(
                 "UPDATE agent_operation_runtime
@@ -544,10 +620,21 @@ impl MemoryStore {
         trigger: &str,
     ) -> Result<CreatureRenderState, String> {
         let (now_text, local_date, local_hour) = super::agent_operation::local_clock();
+        self.advance_agent_dialogue_at(trigger, &now_text, &local_date, local_hour)
+    }
+
+    fn advance_agent_dialogue_at(
+        &self,
+        trigger: &str,
+        now_text: &str,
+        local_date: &str,
+        local_hour: u8,
+    ) -> Result<CreatureRenderState, String> {
         if trigger == "ambient" && !(9..22).contains(&local_hour) {
             return self.creature_render_state();
         }
-        let now = OffsetDateTime::parse(&now_text, &time::format_description::well_known::Rfc3339)
+        let clock_format = &time::format_description::well_known::Rfc3339;
+        let now = OffsetDateTime::parse(now_text, clock_format)
             .map_err(|_| "Memoryling could not evaluate the local dialogue clock.".to_string())?;
         let mut connection = self.open_connection()?;
         let transaction = connection
@@ -563,12 +650,33 @@ impl MemoryStore {
                 .optional()
                 .map_err(|error| local_store_error("read ambient dialogue budget", error))?
                 .unwrap_or(0);
-            if used >= 2 {
+            if used >= 7 {
                 transaction
                     .commit()
                     .map_err(|error| local_store_error("commit quiet dialogue check", error))?;
                 return self.creature_render_state();
             }
+        }
+        let minimum_gap_seconds = if trigger == "ambient" { 10 * 60 } else { 2 };
+        let latest_relevant_use = transaction
+            .query_row(
+                if trigger == "ambient" {
+                    "SELECT MAX(last_used_at) FROM agent_dialogue_cards"
+                } else {
+                    "SELECT MAX(last_used_at) FROM agent_dialogue_cards WHERE trigger_kind = 'on-interact'"
+                },
+                [],
+                |row| row.get::<_, Option<String>>(0),
+            )
+            .map_err(|error| local_store_error("read recent pet dialogue activity", error))?;
+        if latest_relevant_use.as_deref().is_some_and(|value| {
+            OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
+                .is_ok_and(|used| (now - used).whole_seconds() < minimum_gap_seconds)
+        }) {
+            transaction
+                .commit()
+                .map_err(|error| local_store_error("commit dialogue spacing check", error))?;
+            return self.creature_render_state();
         }
         let latest_operation = transaction
             .query_row(
@@ -586,19 +694,30 @@ impl MemoryStore {
         };
         let current_dialogue = transaction
             .query_row(
-                "SELECT current_dialogue_id FROM agent_operation_runtime WHERE singleton_id = 1",
+                "SELECT adc.dialogue_id, adc.theme_id, adc.semantic_group
+                 FROM agent_operation_runtime aor
+                 LEFT JOIN agent_dialogue_cards adc ON adc.dialogue_id = aor.current_dialogue_id
+                 WHERE aor.singleton_id = 1",
                 [],
-                |row| row.get::<_, Option<String>>(0),
+                |row| {
+                    Ok((
+                        row.get::<_, Option<String>>(0)?,
+                        row.get::<_, Option<String>>(1)?,
+                        row.get::<_, Option<String>>(2)?,
+                    ))
+                },
             )
             .map_err(|error| local_store_error("read current Agent dialogue", error))?;
         let candidates = {
             let mut statement = transaction
                 .prepare(
-                    "SELECT dialogue_id, not_before, expires_at, cooldown_minutes, last_used_at
+                    "SELECT dialogue_id, theme_id, semantic_group, not_before, expires_at,
+                            cooldown_minutes, last_used_at, use_count, priority
                      FROM agent_dialogue_cards
                      WHERE operation_id = ?1 AND trigger_kind = ?2 AND use_count < max_uses
-                     ORDER BY priority DESC,
+                     ORDER BY use_count,
                               CASE WHEN last_used_at IS NULL THEN 0 ELSE 1 END,
+                              priority DESC,
                               last_used_at, dialogue_id",
                 )
                 .map_err(|error| local_store_error("prepare Agent dialogue selection", error))?;
@@ -606,37 +725,54 @@ impl MemoryStore {
                 .query_map(params![latest_operation, trigger], |row| {
                     Ok((
                         row.get::<_, String>(0)?,
-                        row.get::<_, Option<String>>(1)?,
-                        row.get::<_, Option<String>>(2)?,
-                        row.get::<_, i64>(3)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, String>(2)?,
+                        row.get::<_, Option<String>>(3)?,
                         row.get::<_, Option<String>>(4)?,
+                        row.get::<_, i64>(5)?,
+                        row.get::<_, Option<String>>(6)?,
+                        row.get::<_, i64>(7)?,
+                        row.get::<_, i64>(8)?,
                     ))
                 })
                 .map_err(|error| local_store_error("read Agent dialogue candidates", error))?;
             rows.collect::<Result<Vec<_>, _>>()
                 .map_err(|error| local_store_error("collect Agent dialogue candidates", error))?
         };
-        let selected =
-            candidates
-                .into_iter()
-                .find(|(id, not_before, expires_at, cooldown, last)| {
-                    if current_dialogue.as_deref() == Some(id.as_str()) {
-                        return false;
-                    }
-                    let not_before_ok = not_before.as_deref().is_none_or(|value| {
-                        OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
-                            .is_ok_and(|bound| now >= bound)
-                    });
-                    let expires_ok = expires_at.as_deref().is_none_or(|value| {
-                        OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
-                            .is_ok_and(|bound| now <= bound)
-                    });
-                    let cooldown_ok = last.as_deref().is_none_or(|value| {
-                        OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
-                            .is_ok_and(|used| now - used >= time::Duration::minutes(*cooldown))
-                    });
-                    not_before_ok && expires_ok && cooldown_ok
+        let eligible = candidates
+            .into_iter()
+            .filter(|(id, _, _, not_before, expires_at, cooldown, last, _, _)| {
+                if current_dialogue.0.as_deref() == Some(id.as_str()) {
+                    return false;
+                }
+                let not_before_ok = not_before.as_deref().is_none_or(|value| {
+                    OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
+                        .is_ok_and(|bound| now >= bound)
                 });
+                let expires_ok = expires_at.as_deref().is_none_or(|value| {
+                    OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
+                        .is_ok_and(|bound| now <= bound)
+                });
+                let cooldown_ok = last.as_deref().is_none_or(|value| {
+                    OffsetDateTime::parse(value, &time::format_description::well_known::Rfc3339)
+                        .is_ok_and(|used| now - used >= time::Duration::minutes(*cooldown))
+                });
+                not_before_ok && expires_ok && cooldown_ok
+            })
+            .collect::<Vec<_>>();
+        let selected = eligible
+            .iter()
+            .find(|(_, theme, semantic, ..)| {
+                current_dialogue.1.as_deref() != Some(theme.as_str())
+                    && current_dialogue.2.as_deref() != Some(semantic.as_str())
+            })
+            .or_else(|| {
+                eligible.iter().find(|(_, _, semantic, ..)| {
+                    current_dialogue.2.as_deref() != Some(semantic.as_str())
+                })
+            })
+            .or_else(|| eligible.first())
+            .cloned();
         if let Some((dialogue_id, ..)) = selected {
             transaction
                 .execute(
@@ -669,6 +805,116 @@ impl MemoryStore {
         self.creature_render_state()
     }
 
+    pub(crate) fn apply_pending_appearance_if_due(&self) -> Result<CreatureRenderState, String> {
+        let (now, local_date, _) = super::agent_operation::local_clock();
+        let mut connection = self.open_connection()?;
+        let transaction = connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|error| local_store_error("begin pending appearance check", error))?;
+        let already_changed = transaction
+            .query_row(
+                "SELECT 1 FROM agent_appearance_daily_usage WHERE local_date = ?1",
+                params![local_date],
+                |_| Ok(()),
+            )
+            .optional()
+            .map_err(|error| local_store_error("read appearance daily budget", error))?
+            .is_some();
+        if already_changed {
+            transaction
+                .commit()
+                .map_err(|error| local_store_error("commit appearance daily check", error))?;
+            return self.creature_render_state();
+        }
+        let pending = transaction
+            .query_row(
+                "SELECT decision, target_activity, target_journey_state, qualification, source_digest
+                 FROM agent_pending_appearance WHERE singleton_id = 1",
+                [],
+                |row| {
+                    Ok((
+                        row.get::<_, String>(0)?,
+                        row.get::<_, Option<String>>(1)?,
+                        row.get::<_, Option<String>>(2)?,
+                        row.get::<_, String>(3)?,
+                        row.get::<_, String>(4)?,
+                    ))
+                },
+            )
+            .optional()
+            .map_err(|error| local_store_error("read pending appearance", error))?;
+        let Some((decision, activity, journey, qualification, source_digest)) = pending else {
+            transaction
+                .commit()
+                .map_err(|error| local_store_error("commit empty appearance check", error))?;
+            return self.creature_render_state();
+        };
+        if decision == "change" {
+            let activity = activity
+                .ok_or_else(|| "The pending appearance activity is missing.".to_string())?;
+            let journey =
+                journey.ok_or_else(|| "The pending appearance journey is missing.".to_string())?;
+            transaction
+                .execute("DELETE FROM agent_pet_appearance_evidence", [])
+                .map_err(|error| local_store_error("replace appearance lineage", error))?;
+            transaction
+                .execute(
+                    "INSERT INTO agent_pet_appearance
+                        (singleton_id, activity, journey_state, qualification, source_digest,
+                         last_change_local_date, last_changed_at)
+                     VALUES (1, ?1, ?2, ?3, ?4, ?5, ?6)
+                     ON CONFLICT(singleton_id) DO UPDATE SET
+                         activity = excluded.activity,
+                         journey_state = excluded.journey_state,
+                         qualification = excluded.qualification,
+                         source_digest = excluded.source_digest,
+                         last_change_local_date = excluded.last_change_local_date,
+                         last_changed_at = excluded.last_changed_at",
+                    params![
+                        activity,
+                        journey,
+                        qualification,
+                        source_digest,
+                        local_date,
+                        now
+                    ],
+                )
+                .map_err(|error| local_store_error("apply pending appearance", error))?;
+            transaction
+                .execute(
+                    "INSERT INTO agent_pet_appearance_evidence
+                        (reference_hash, evidence_kind, observed_at)
+                     SELECT reference_hash, evidence_kind, observed_at
+                     FROM agent_pending_appearance_evidence",
+                    [],
+                )
+                .map_err(|error| local_store_error("apply pending appearance lineage", error))?;
+        } else {
+            transaction
+                .execute("DELETE FROM agent_pet_appearance_evidence", [])
+                .map_err(|error| local_store_error("reset appearance lineage", error))?;
+            transaction
+                .execute("DELETE FROM agent_pet_appearance", [])
+                .map_err(|error| local_store_error("reset pet appearance", error))?;
+        }
+        transaction
+            .execute(
+                "INSERT INTO agent_appearance_daily_usage (local_date, applied_at) VALUES (?1, ?2)",
+                params![local_date, now],
+            )
+            .map_err(|error| local_store_error("record appearance daily usage", error))?;
+        transaction
+            .execute("DELETE FROM agent_pending_appearance_evidence", [])
+            .map_err(|error| local_store_error("clear applied pending lineage", error))?;
+        transaction
+            .execute("DELETE FROM agent_pending_appearance", [])
+            .map_err(|error| local_store_error("clear applied pending appearance", error))?;
+        transaction
+            .commit()
+            .map_err(|error| local_store_error("commit pending appearance", error))?;
+        self.creature_render_state()
+    }
+
     pub(crate) fn open_connection(&self) -> Result<Connection, String> {
         if let Some(parent) = self.path.parent() {
             fs::create_dir_all(parent).map_err(|_| {
@@ -697,7 +943,7 @@ impl MemoryStore {
         match version {
             0 => migration
                 .execute_batch(&format!(
-                    "{MIGRATION_0001}\n{MIGRATION_0002}\n{MIGRATION_0003}\n{MIGRATION_0004}\n{MIGRATION_0005}"
+                    "{MIGRATION_0001}\n{MIGRATION_0002}\n{MIGRATION_0003}\n{MIGRATION_0004}\n{MIGRATION_0005}\n{MIGRATION_0006}"
                 ))
                 .map_err(|error| local_store_error("apply schema migrations", error))?,
             1 => {
@@ -705,17 +951,24 @@ impl MemoryStore {
                 migrate_v2_to_v3(&migration)?;
                 migrate_v3_to_v4(&migration)?;
                 migrate_v4_to_v5(&migration)?;
+                migrate_v5_to_v6(&migration)?;
             }
             2 => {
                 migrate_v2_to_v3(&migration)?;
                 migrate_v3_to_v4(&migration)?;
                 migrate_v4_to_v5(&migration)?;
+                migrate_v5_to_v6(&migration)?;
             }
             3 => {
                 migrate_v3_to_v4(&migration)?;
                 migrate_v4_to_v5(&migration)?;
+                migrate_v5_to_v6(&migration)?;
             }
-            4 => migrate_v4_to_v5(&migration)?,
+            4 => {
+                migrate_v4_to_v5(&migration)?;
+                migrate_v5_to_v6(&migration)?;
+            }
+            5 => migrate_v5_to_v6(&migration)?,
             STORE_SCHEMA_VERSION => {}
             _ => return Err("The local Memoryling database schema is not supported.".to_string()),
         }
@@ -725,6 +978,170 @@ impl MemoryStore {
 
         Ok(connection)
     }
+}
+
+fn apply_or_queue_appearance(
+    transaction: &Transaction<'_>,
+    package: &super::agent_operation::AgentOperationPackage,
+    now: &str,
+    local_date: &str,
+) -> Result<bool, String> {
+    transaction
+        .execute("DELETE FROM agent_pending_appearance_evidence", [])
+        .map_err(|error| local_store_error("replace pending appearance lineage", error))?;
+    transaction
+        .execute("DELETE FROM agent_pending_appearance", [])
+        .map_err(|error| local_store_error("replace pending appearance", error))?;
+    if package.appearance_plan.decision == "hold" {
+        return Ok(false);
+    }
+
+    let current = transaction
+        .query_row(
+            "SELECT activity, journey_state FROM agent_pet_appearance WHERE singleton_id = 1",
+            [],
+            |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?)),
+        )
+        .optional()
+        .map_err(|error| local_store_error("read current pet appearance", error))?;
+    let target_activity = package
+        .appearance_plan
+        .target_activity
+        .map(activity_to_db)
+        .map(str::to_string);
+    let target_journey = package.appearance_plan.target_journey_state.clone();
+    let visible_change = if package.appearance_plan.decision == "reset" {
+        current.is_some()
+    } else {
+        current.as_ref()
+            != target_activity
+                .as_ref()
+                .zip(target_journey.as_ref())
+                .map(|(activity, journey)| (activity.clone(), journey.clone()))
+                .as_ref()
+    };
+    if !visible_change {
+        return Ok(false);
+    }
+
+    let already_changed = transaction
+        .query_row(
+            "SELECT 1 FROM agent_appearance_daily_usage WHERE local_date = ?1",
+            params![local_date],
+            |_| Ok(()),
+        )
+        .optional()
+        .map_err(|error| local_store_error("read appearance daily gate", error))?
+        .is_some();
+    if already_changed {
+        transaction
+            .execute(
+                "INSERT INTO agent_pending_appearance
+                    (singleton_id, operation_id, decision, target_activity,
+                     target_journey_state, qualification, source_digest, queued_at)
+                 VALUES (1, ?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                params![
+                    package.operation_id,
+                    package.appearance_plan.decision,
+                    target_activity,
+                    target_journey,
+                    package.appearance_plan.qualification,
+                    package.source_digest,
+                    now,
+                ],
+            )
+            .map_err(|error| local_store_error("queue next appearance", error))?;
+        for evidence_id in &package.appearance_plan.evidence_ids {
+            let evidence = package
+                .evidence
+                .iter()
+                .find(|item| &item.id == evidence_id)
+                .ok_or_else(|| "The appearance evidence is unavailable.".to_string())?;
+            transaction
+                .execute(
+                    "INSERT INTO agent_pending_appearance_evidence
+                        (evidence_id, operation_id, reference_hash, evidence_kind, observed_at)
+                     VALUES (?1, ?2, ?3, ?4, ?5)",
+                    params![
+                        evidence.id,
+                        package.operation_id,
+                        evidence.reference_hash,
+                        evidence.kind,
+                        evidence.observed_at,
+                    ],
+                )
+                .map_err(|error| local_store_error("queue appearance lineage", error))?;
+        }
+        return Ok(false);
+    }
+
+    if package.appearance_plan.decision == "reset" {
+        transaction
+            .execute("DELETE FROM agent_pet_appearance_evidence", [])
+            .map_err(|error| local_store_error("reset appearance lineage", error))?;
+        transaction
+            .execute("DELETE FROM agent_pet_appearance", [])
+            .map_err(|error| local_store_error("reset pet appearance", error))?;
+    } else {
+        let activity = target_activity
+            .ok_or_else(|| "The appearance target activity is missing.".to_string())?;
+        let journey = target_journey
+            .ok_or_else(|| "The appearance target journey is missing.".to_string())?;
+        transaction
+            .execute("DELETE FROM agent_pet_appearance_evidence", [])
+            .map_err(|error| local_store_error("replace appearance lineage", error))?;
+        transaction
+            .execute(
+                "INSERT INTO agent_pet_appearance
+                    (singleton_id, activity, journey_state, qualification, source_digest,
+                     last_change_local_date, last_changed_at)
+                 VALUES (1, ?1, ?2, ?3, ?4, ?5, ?6)
+                 ON CONFLICT(singleton_id) DO UPDATE SET
+                     activity = excluded.activity,
+                     journey_state = excluded.journey_state,
+                     qualification = excluded.qualification,
+                     source_digest = excluded.source_digest,
+                     last_change_local_date = excluded.last_change_local_date,
+                     last_changed_at = excluded.last_changed_at",
+                params![
+                    activity,
+                    journey,
+                    package.appearance_plan.qualification,
+                    package.source_digest,
+                    local_date,
+                    now,
+                ],
+            )
+            .map_err(|error| local_store_error("apply pet appearance", error))?;
+        for evidence_id in &package.appearance_plan.evidence_ids {
+            let evidence = package
+                .evidence
+                .iter()
+                .find(|item| &item.id == evidence_id)
+                .ok_or_else(|| "The appearance evidence is unavailable.".to_string())?;
+            transaction
+                .execute(
+                    "INSERT INTO agent_pet_appearance_evidence
+                        (reference_hash, evidence_kind, observed_at)
+                     VALUES (?1, ?2, ?3)",
+                    params![evidence.reference_hash, evidence.kind, evidence.observed_at],
+                )
+                .map_err(|error| local_store_error("save appearance lineage", error))?;
+        }
+    }
+    transaction
+        .execute(
+            "INSERT INTO agent_appearance_daily_usage (local_date, applied_at) VALUES (?1, ?2)",
+            params![local_date, now],
+        )
+        .map_err(|error| local_store_error("record daily appearance change", error))?;
+    Ok(true)
+}
+
+fn migrate_v5_to_v6(transaction: &Transaction<'_>) -> Result<(), String> {
+    transaction
+        .execute_batch(MIGRATION_0006)
+        .map_err(|error| local_store_error("apply Agent operation v2 migration", error))
 }
 
 fn migrate_v4_to_v5(transaction: &Transaction<'_>) -> Result<(), String> {
@@ -1120,23 +1537,24 @@ fn creature_render_state_from_connection(
         ImportState::ThreadApproved => "thread-approved",
         ImportState::AgentMemoryApproved => "agent-memory-approved",
     };
-    let operation = connection
+    let operation_id = connection
         .query_row(
-            "SELECT operation_id, dominant_activity, journey_state
-             FROM agent_operations ORDER BY applied_at DESC LIMIT 1",
+            "SELECT operation_id FROM agent_operations ORDER BY applied_at DESC LIMIT 1",
             [],
-            |row| {
-                Ok((
-                    row.get::<_, String>(0)?,
-                    row.get::<_, String>(1)?,
-                    row.get::<_, String>(2)?,
-                ))
-            },
+            |row| row.get::<_, String>(0),
         )
         .optional()
         .map_err(|error| local_store_error("read render-safe Agent operation", error))?;
-    let (operation_revision_value, agent_operation_state, agent_activity) = match &operation {
-        Some((operation_id, activity, journey_state)) => {
+    let appearance = connection
+        .query_row(
+            "SELECT activity, journey_state FROM agent_pet_appearance WHERE singleton_id = 1",
+            [],
+            |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?)),
+        )
+        .optional()
+        .map_err(|error| local_store_error("read render-safe pet appearance", error))?;
+    let agent_activity = match &appearance {
+        Some((activity, journey_state)) => {
             if journey_state == "milestone"
                 && !marks
                     .iter()
@@ -1147,17 +1565,13 @@ fn creature_render_state_from_connection(
                     style: CreatureRenderMarkStyle::CompletionStar,
                 });
             }
-            (
-                operation_id.as_str(),
-                AgentOperationRenderState::Applied,
-                activity_from_db(activity)?,
-            )
+            activity_from_db(activity)?
         }
-        None => (
-            "empty",
-            AgentOperationRenderState::Empty,
-            AgentActivity::Off,
-        ),
+        None => AgentActivity::Off,
+    };
+    let (operation_revision_value, agent_operation_state) = match &operation_id {
+        Some(operation_id) => (operation_id.as_str(), AgentOperationRenderState::Applied),
+        None => ("empty", AgentOperationRenderState::Empty),
     };
     let dialogue = connection
         .query_row(
@@ -1651,7 +2065,7 @@ mod tests {
             .expect("Agent operation summary should be present");
         assert_eq!(operation.state, "applied");
         assert_eq!(operation.activity, AgentActivity::Building);
-        assert_eq!(operation.dialogue_count, 3);
+        assert_eq!(operation.dialogue_count, 48);
 
         let render = store
             .creature_render_state()
@@ -1661,7 +2075,7 @@ mod tests {
             AgentOperationRenderState::Applied
         );
         assert_eq!(render.agent_activity, AgentActivity::Building);
-        assert_eq!(render.dialogue.as_ref().unwrap().id, "dialogue-1");
+        assert_eq!(render.dialogue.as_ref().unwrap().id, "dialogue-45");
         assert!(render
             .marks
             .iter()
@@ -1674,7 +2088,7 @@ mod tests {
         let interacted = store
             .advance_agent_dialogue("on-interact")
             .expect("interaction dialogue should advance");
-        assert_eq!(interacted.dialogue.as_ref().unwrap().id, "dialogue-2");
+        assert_eq!(interacted.dialogue.as_ref().unwrap().id, "dialogue-10");
         assert_ne!(interacted.revision, render.revision);
 
         store
@@ -1691,17 +2105,43 @@ mod tests {
             reopened.agent_operation_state,
             AgentOperationRenderState::Applied
         );
-        assert_eq!(reopened.dialogue.as_ref().unwrap().id, "dialogue-2");
+        assert_eq!(reopened.dialogue.as_ref().unwrap().id, "dialogue-10");
 
         let mut replacement = package.clone();
         replacement.operation_id = "operation.synthetic-002".to_string();
         replacement.source_digest = "d".repeat(64);
+        replacement.appearance_plan.target_activity = Some(AgentActivity::Design);
+        replacement.appearance_plan.target_journey_state = Some("steady".to_string());
         store
             .apply_agent_operation(&replacement)
             .expect("a new authoritative operation should replace the prior package");
         let connection = Connection::open(&store.path).expect("operation store should reopen");
         assert_eq!(count(&connection, "agent_operations").unwrap(), 1);
-        assert_eq!(count(&connection, "agent_dialogue_cards").unwrap(), 3);
+        assert_eq!(count(&connection, "agent_dialogue_cards").unwrap(), 48);
+        let retained_uses = connection
+            .query_row(
+                "SELECT use_count FROM agent_dialogue_cards WHERE dialogue_id = 'dialogue-10'",
+                [],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap();
+        assert_eq!(retained_uses, 1);
+        let current_activity = connection
+            .query_row(
+                "SELECT activity FROM agent_pet_appearance WHERE singleton_id = 1",
+                [],
+                |row| row.get::<_, String>(0),
+            )
+            .unwrap();
+        assert_eq!(current_activity, "building");
+        let pending_activity = connection
+            .query_row(
+                "SELECT target_activity FROM agent_pending_appearance WHERE singleton_id = 1",
+                [],
+                |row| row.get::<_, String>(0),
+            )
+            .unwrap();
+        assert_eq!(pending_activity, "design");
         drop(connection);
 
         let cleared = store
@@ -1717,6 +2157,53 @@ mod tests {
         );
         assert!(cleared_render.dialogue.is_none());
 
+        fs::remove_dir_all(directory).expect("temporary store should be removable");
+    }
+
+    #[test]
+    fn ambient_dialogue_rotates_and_stops_at_seven_per_local_day() {
+        let (store, directory) = temporary_store();
+        store
+            .apply_agent_operation(&agent_operation::synthetic_package())
+            .expect("synthetic Agent operation should apply");
+
+        let mut seen = HashSet::new();
+        for attempt in 0..8 {
+            let connection = Connection::open(&store.path).unwrap();
+            connection
+                .execute(
+                    "UPDATE agent_dialogue_cards
+                     SET last_used_at = '2020-01-01T00:00:00Z'
+                     WHERE last_used_at IS NOT NULL",
+                    [],
+                )
+                .unwrap();
+            drop(connection);
+            let render = store
+                .advance_agent_dialogue_at("ambient", "2026-08-14T10:00:00Z", "2026-08-14", 10)
+                .expect("ambient selection should remain bounded");
+            let id = render
+                .dialogue
+                .expect("an ambient line should be visible")
+                .id;
+            if attempt < 7 {
+                assert!(seen.insert(id));
+            } else {
+                assert!(seen.contains(&id));
+            }
+        }
+
+        let connection = Connection::open(&store.path).unwrap();
+        let ambient_count = connection
+            .query_row(
+                "SELECT ambient_count FROM agent_dialogue_daily_usage",
+                [],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap();
+        assert_eq!(ambient_count, 7);
+        assert_eq!(seen.len(), 7);
+        drop(connection);
         fs::remove_dir_all(directory).expect("temporary store should be removable");
     }
 

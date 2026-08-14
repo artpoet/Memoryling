@@ -4,22 +4,22 @@
 
 Memoryling turns the memory and recent work already understood by a person's AI Agent into a small, persistent desktop life.
 
-The user does not configure another AI service. They install and open Memoryling normally; the pet offers a copy button for `寵物醒來` or `Memoryling, wake up` and tells them to use it in the current Agent project. The Agent creates a privacy-minimized update for the already-running pet, waits for local application, and reports in the same conversation.
+The user does not configure another AI service. They install and open Memoryling normally; the pet offers a copy button for `醒來吧我的寵物` or `Memoryling, wake up` and tells them to use it in the current Agent project. The Agent creates a privacy-minimized update for the already-running pet, waits for local application, and reports in the same conversation.
 
 ## The operating model
 
 Memoryling is deliberately half Agent and half app:
 
 - **Agent understands.** It uses only context it is already authorized to read: relevant durable memory, recent work, current conversation, and project SSOT.
-- **Agent compiles.** It converts that context into a bounded activity profile, hashed evidence references, and 3–12 bilingual dialogue cards.
+- **Agent compiles.** It converts that context into a bounded activity profile, an evidence-qualified appearance plan, hashed references, and exactly 48 bilingual dialogue cards.
 - **Agent delivers.** It verifies that the compatible pet is open, submits the package, and confirms bounded local application without exposing content or paths.
-- **App lives.** It persists only the current compiled state, renders appearance accents, and chooses dialogue through deterministic triggers, expiry, cooldown, quiet hours, and budgets.
+- **App lives.** It rolls forward unchanged useful dialogue counters, retires stale content, limits persistent appearance to one change per local day, and chooses dialogue through deterministic triggers, expiry, cooldown, quiet hours, and budgets.
 
 The app never needs to scan Agent memory or call an AI API for the core experience. The Agent never controls notification timing or silently expands app permissions.
 
 ## The experience
 
-The first Memoryling appears directly without a blocking setup screen and visibly teaches the activation phrase. The reminder stays available while the pet has no Agent operation. After the slogan, the already-open pet may gain an activity-colored aura, a milestone mark, and a deck of short thoughts grounded in the shape of recent work without quoting it. Clicking the pet requests another eligible line from the local rule engine. Ambient lines are rare and stay silent during quiet hours.
+The first Memoryling appears directly without a blocking setup screen and visibly teaches the activation phrase. The reminder stays available while the pet has no Agent operation. After the slogan, the already-open pet may gain an evidence-qualified activity-colored aura or milestone mark and receives a varied deck of short thoughts grounded in the shape of recent work without quoting it. Clicking the pet requests another eligible line from the local rule engine. Ambient lines arrive on a bounded local cadence and stay silent during quiet hours.
 
 Later versions can add:
 
@@ -41,7 +41,7 @@ The long-term family is biological and organic with restrained sacred-premium ma
 
 Recent work first affects expiring expression, light, pose, and dialogue. Permanent reshaping requires multiple independent, outcome-qualified evidence groups. Calendar time, tokens, record volume, and app-open duration are not XP. A finite local module catalog and deterministic recipe compiler—not runtime image generation—must render all shipped growth.
 
-This full growth system remains planned. Protocol v1 currently implements activity accents, milestone marks, bilingual dialogue, lineage hashes, and local timing rules.
+This full growth system remains planned. Protocol v2 now adds evidence-qualified activity accents, one visible change per local day, one pending plan, a rolling 48-card bilingual deck, lineage hashes, and local timing rules. Rich morphology and a growth journal remain future work.
 
 ## The product wedge
 

@@ -186,11 +186,11 @@ export function sanitizeCreatureRenderState(
         OPAQUE_MARK_ID_PATTERN.test(state.dialogue.id) &&
         typeof state.dialogue.textEn === "string" &&
         state.dialogue.textEn.length > 0 &&
-        state.dialogue.textEn.length <= 240 &&
+        state.dialogue.textEn.length <= 160 &&
         !/[\r\n]/.test(state.dialogue.textEn) &&
         typeof state.dialogue.textZhTw === "string" &&
         state.dialogue.textZhTw.length > 0 &&
-        state.dialogue.textZhTw.length <= 240 &&
+        state.dialogue.textZhTw.length <= 160 &&
         !/[\r\n]/.test(state.dialogue.textZhTw) &&
         (state.dialogue.trigger === "on-open" ||
           state.dialogue.trigger === "on-interact" ||

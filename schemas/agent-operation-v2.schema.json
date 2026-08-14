@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://memoryling.app/schemas/agent-operation-v2.schema.json",
+  "title": "Memoryling Agent Operation Protocol v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "operationId", "generatedAt", "agent", "sourceDigest", "profile", "appearancePlan", "evidence", "dialogues"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "operationId": { "$ref": "#/$defs/id" },
+    "generatedAt": { "$ref": "#/$defs/timestamp" },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family"],
+      "properties": { "family": { "enum": ["codex", "claude", "other"] } }
+    },
+    "sourceDigest": { "$ref": "#/$defs/hash" },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dominantActivity", "journeyState"],
+      "properties": {
+        "dominantActivity": { "$ref": "#/$defs/activity" },
+        "secondaryActivity": { "$ref": "#/$defs/activity" },
+        "journeyState": { "$ref": "#/$defs/journey" }
+      }
+    },
+    "appearancePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "qualification", "evidenceIds"],
+      "properties": {
+        "decision": { "enum": ["hold", "change", "reset"] },
+        "qualification": { "enum": ["insufficient-evidence", "consistent-signals", "explicit-milestone", "source-removed"] },
+        "targetActivity": { "$ref": "#/$defs/activity" },
+        "targetJourneyState": { "$ref": "#/$defs/journey" },
+        "evidenceIds": {
+          "type": "array",
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "decision": { "const": "hold" } }, "required": ["decision"] },
+          "then": {
+            "properties": { "qualification": { "const": "insufficient-evidence" } },
+            "not": { "anyOf": [{ "required": ["targetActivity"] }, { "required": ["targetJourneyState"] }] }
+          }
+        },
+        {
+          "if": { "properties": { "decision": { "const": "reset" } }, "required": ["decision"] },
+          "then": {
+            "properties": { "qualification": { "const": "source-removed" } },
+            "not": { "anyOf": [{ "required": ["targetActivity"] }, { "required": ["targetJourneyState"] }] }
+          }
+        },
+        {
+          "if": { "properties": { "decision": { "const": "change" } }, "required": ["decision"] },
+          "then": {
+            "required": ["targetActivity", "targetJourneyState"],
+            "properties": {
+              "qualification": { "enum": ["consistent-signals", "explicit-milestone"] },
+              "evidenceIds": { "minItems": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "qualification": { "const": "consistent-signals" } }, "required": ["qualification"] },
+          "then": { "properties": { "evidenceIds": { "minItems": 2 } } }
+        }
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "referenceHash", "observedAt"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "kind": { "enum": ["durable-memory", "recent-work", "repo-ssot", "current-thread"] },
+          "referenceHash": { "$ref": "#/$defs/hash" },
+          "observedAt": { "$ref": "#/$defs/timestamp" }
+        }
+      }
+    },
+    "dialogues": {
+      "type": "array",
+      "minItems": 48,
+      "maxItems": 48,
+      "allOf": [
+        { "contains": { "properties": { "category": { "const": "opening" } }, "required": ["category"] }, "minContains": 8, "maxContains": 8 },
+        { "contains": { "properties": { "category": { "const": "interaction" } }, "required": ["category"] }, "minContains": 20, "maxContains": 20 },
+        { "contains": { "properties": { "category": { "const": "ambient" } }, "required": ["category"] }, "minContains": 16, "maxContains": 16 },
+        { "contains": { "properties": { "category": { "const": "appearance" } }, "required": ["category"] }, "minContains": 4, "maxContains": 4 }
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "themeId", "semanticGroup", "category", "text", "trigger", "priority", "cooldownMinutes", "maxUses", "evidenceIds"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "themeId": { "$ref": "#/$defs/id" },
+          "semanticGroup": { "$ref": "#/$defs/id" },
+          "category": { "enum": ["opening", "interaction", "ambient", "appearance"] },
+          "text": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["en", "zhTw"],
+            "properties": {
+              "en": { "$ref": "#/$defs/dialogue" },
+              "zhTw": { "$ref": "#/$defs/dialogue" }
+            }
+          },
+          "trigger": { "enum": ["on-open", "on-interact", "ambient"] },
+          "priority": { "type": "integer", "minimum": 0, "maximum": 3 },
+          "notBefore": { "$ref": "#/$defs/timestamp" },
+          "expiresAt": { "$ref": "#/$defs/timestamp" },
+          "cooldownMinutes": { "type": "integer", "minimum": 0, "maximum": 10080 },
+          "maxUses": { "type": "integer", "minimum": 1, "maximum": 20 },
+          "evidenceIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+        },
+        "allOf": [
+          { "if": { "properties": { "category": { "enum": ["opening", "appearance"] } }, "required": ["category"] }, "then": { "properties": { "trigger": { "const": "on-open" } } } },
+          { "if": { "properties": { "category": { "const": "interaction" } }, "required": ["category"] }, "then": { "properties": { "trigger": { "const": "on-interact" } } } },
+          { "if": { "properties": { "category": { "const": "ambient" } }, "required": ["category"] }, "then": { "properties": { "trigger": { "const": "ambient" } } } }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "activity": { "enum": ["building", "research", "design", "planning", "debugging", "writing", "coordination", "shipping"] },
+    "journey": { "enum": ["steady", "exploring", "milestone", "recovering"] },
+    "dialogue": { "type": "string", "minLength": 1, "maxLength": 160, "pattern": "^[^\\r\\n]+$" }
+  }
+}

@@ -18,6 +18,7 @@ import { useCreatureRenderState } from "./useCreatureRenderState";
 import "./PetSurface.css";
 
 const DRAG_THRESHOLD_DIP = 6;
+const DIALOGUE_VISIBLE_MS = 7_000;
 
 interface ClipboardWriter {
   writeText(text: string): Promise<void>;
@@ -41,6 +42,7 @@ const petCopy = {
     copyingPhrase: "Copying…",
     copiedPhrase: "Copied “Memoryling, wake up”",
     copyFailed: "Copy failed — try again",
+    dismissDialogue: "Dismiss Memoryling's message",
     privacy: "The app never scans Agent memory or calls AI by itself.",
     skip: "Got it",
     loading: "Waking up locally",
@@ -56,12 +58,13 @@ const petCopy = {
     drag: "拖曳我來移動位置。",
     menu: "按右鍵，再選擇開啟 Memoryling。",
     recovery: "找不到我時，可以從系統匣叫我回來。",
-    activationPhrase: "寵物醒來",
-    operate: "回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。",
-    copyPhrase: "複製「寵物醒來」",
+    activationPhrase: "醒來吧我的寵物",
+    operate: "回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。",
+    copyPhrase: "複製「醒來吧我的寵物」",
     copyingPhrase: "複製中…",
-    copiedPhrase: "已複製「寵物醒來」",
+    copiedPhrase: "已複製「醒來吧我的寵物」",
     copyFailed: "複製失敗，請再試一次",
+    dismissDialogue: "關閉 Memoryling 的話",
     privacy: "App 不會自行掃描 Agent 記憶，也不會自行呼叫 AI。",
     skip: "知道了",
     loading: "正在本機醒來",
@@ -106,6 +109,7 @@ export function PetSurface({
   const { renderState, setRenderState, shellState, setShellState, ready } =
     useCreatureRenderState(client);
   const [reaction, setReaction] = useState(false);
+  const [dialogueVisible, setDialogueVisible] = useState(false);
   const [copyStatus, setCopyStatus] = useState<
     "idle" | "copying" | "copied" | "failed"
   >("idle");
@@ -113,18 +117,43 @@ export function PetSurface({
   const suppressClick = useRef(false);
   const suppressClickTimer = useRef<number | undefined>(undefined);
   const reactionTimer = useRef<number | undefined>(undefined);
+  const dialogueTimer = useRef<number | undefined>(undefined);
   const hasCompletionStar = renderState.marks.some(
     (mark) => mark.style === "completion-star",
   );
   const hasAgentOperation = renderState.agentOperationState === "applied";
+  const dialogueText = renderState.dialogue
+    ? locale === "zh-TW"
+      ? renderState.dialogue.textZhTw
+      : renderState.dialogue.textEn
+    : "";
 
   useEffect(() => {
     document.title = "Memoryling";
     return () => {
       window.clearTimeout(reactionTimer.current);
+      window.clearTimeout(dialogueTimer.current);
       window.clearTimeout(suppressClickTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    window.clearTimeout(dialogueTimer.current);
+    if (!renderState.dialogue) {
+      setDialogueVisible(false);
+      return;
+    }
+    setDialogueVisible(true);
+    dialogueTimer.current = window.setTimeout(
+      () => setDialogueVisible(false),
+      DIALOGUE_VISIBLE_MS,
+    );
+  }, [renderState.dialogue?.id]);
+
+  function dismissDialogue() {
+    window.clearTimeout(dialogueTimer.current);
+    setDialogueVisible(false);
+  }
 
   function showMenu(trigger: MenuTrigger) {
     void client.showContextMenu(trigger).catch(() => undefined);
@@ -193,6 +222,12 @@ export function PetSurface({
     }
     setReaction(true);
     if (hasAgentOperation) {
+      window.clearTimeout(dialogueTimer.current);
+      setDialogueVisible(true);
+      dialogueTimer.current = window.setTimeout(
+        () => setDialogueVisible(false),
+        DIALOGUE_VISIBLE_MS,
+      );
       void client
         .advanceDialogue("on-interact")
         .then((next) => setRenderState(sanitizeCreatureRenderState(next)))
@@ -272,14 +307,23 @@ export function PetSurface({
         {hasAgentOperation ? t.operationActive : t.accessOff}
       </p>
 
-      {!onboardingVisible && (renderState.dialogue || !hasAgentOperation) && (
-        <p className="pet-dialogue" role="status">
-          {renderState.dialogue
-            ? locale === "zh-TW"
-              ? renderState.dialogue.textZhTw
-              : renderState.dialogue.textEn
-            : t.operate}
+      {!onboardingVisible && !hasAgentOperation && (
+        <p className="pet-dialogue pet-dialogue-reminder" role="status">
+          {t.operate}
         </p>
+      )}
+
+      {!onboardingVisible && renderState.dialogue && dialogueVisible && (
+        <button
+          aria-label={`${t.dismissDialogue}: ${dialogueText}`}
+          aria-live="polite"
+          className="pet-dialogue pet-dialogue-message"
+          onClick={dismissDialogue}
+          title={t.dismissDialogue}
+          type="button"
+        >
+          {dialogueText}
+        </button>
       )}
 
       {onboardingVisible && (

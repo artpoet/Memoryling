@@ -8,7 +8,7 @@ $originalLocalAppData = $env:LOCALAPPDATA
 try {
     New-Item -ItemType Directory -Path $testRoot | Out-Null
     $env:LOCALAPPDATA = $testRoot
-    $inbox = Join-Path $testRoot 'app.memoryling.desktop\agent-inbox\operation-v1.json'
+    $inbox = Join-Path $testRoot 'app.memoryling.desktop\agent-inbox\operation-v2.json'
     $wrongExecutable = Join-Path $env:WINDIR 'System32\notepad.exe'
     if (-not (Test-Path -LiteralPath $wrongExecutable -PathType Leaf)) {
         throw 'The helper test could not find its non-Memoryling control executable.'
@@ -17,10 +17,10 @@ try {
     $failedBeforeWrite = $false
     try {
         & (Join-Path $PSScriptRoot 'Submit-MemorylingOperation.ps1') `
-            -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v1.synthetic.json') `
+            -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v2.synthetic.json') `
             -ExecutablePath $wrongExecutable
     } catch {
-        $failedBeforeWrite = $_.Exception.Message -like 'Memoryling 0.6.0*is not open*' -and
+        $failedBeforeWrite = $_.Exception.Message -like 'Memoryling 0.7.0*is not open*' -and
             -not (Test-Path -LiteralPath $inbox)
     }
     if (-not $failedBeforeWrite) {
@@ -29,7 +29,7 @@ try {
 
     $processCountBefore = @(Get-Process -Name 'Memoryling' -ErrorAction SilentlyContinue).Count
     & (Join-Path $PSScriptRoot 'Submit-MemorylingOperation.ps1') `
-        -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v1.synthetic.json') `
+        -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v2.synthetic.json') `
         -SkipAppReadyCheck -SkipConfirmation | Out-Null
     if (-not (Test-Path -LiteralPath $inbox -PathType Leaf)) {
         throw 'The isolated submission did not create the exact inbox item.'
@@ -42,7 +42,7 @@ try {
     $unconfirmedWasRemoved = $false
     try {
         & (Join-Path $PSScriptRoot 'Submit-MemorylingOperation.ps1') `
-            -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v1.synthetic.json') `
+            -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v2.synthetic.json') `
             -SkipAppReadyCheck -WaitSeconds 1 | Out-Null
     } catch {
         $unconfirmedWasRemoved = $_.Exception.Message -like '*unconfirmed inbox item was removed*' -and

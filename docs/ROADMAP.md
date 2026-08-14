@@ -1,6 +1,6 @@
 # Roadmap
 
-AS_OF: 2026-08-13. This roadmap describes intent, not a delivery promise.
+AS_OF: 2026-08-14. This roadmap describes intent, not a delivery promise.
 
 ## Phase 0 — Honest local shell
 
@@ -20,28 +20,30 @@ AS_OF: 2026-08-13. This roadmap describes intent, not a delivery promise.
 - [x] per-window Tauri capabilities, independent caller guards, render-safe DTO
 - [ ] complete mixed-DPI, monitor hot-unplug, taskbar, assistive-tech, sign-out, and shutdown UAT
 
-The verified v0.2.0 installer is a historical no-redo baseline. It does not prove v0.6.0.
+The verified v0.2.0 installer is a historical no-redo baseline. It does not prove v0.7.0.
 
 ## Phase 1 — Agent-operated Memoryling
 
 - [x] accept [ADR-0008](adr/0008-agent-operated-memoryling-protocol.md)
 - [x] supersede automatic wake with the installed-App activation flow in [ADR-0010](adr/0010-installed-app-teaches-agent-activation.md)
+- [x] accept protocol-v2 rolling dialogue and daily appearance in [ADR-0011](adr/0011-memory-grounded-daily-growth-and-dialogue-v2.md)
 - [x] add project trigger phrases and `memoryling-operation` Agent skill
 - [x] define strict JSON Schema and a synthetic example
 - [x] add a no-echo PowerShell validator and atomic local inbox submission
 - [x] require an already-running compatible pet, submit without launching, and await bounded application confirmation
 - [x] remove the blocking setup gate, keep manual cold／single-instance launch pet-first, and show a persistent bilingual activation reminder
 - [x] poll one exact non-symlink inbox file with a 64 KiB cap
-- [x] add SQLite schema v5 for operation, hashed evidence, dialogue, counters, and runtime
-- [x] apply each package as an authoritative replacement; duplicate ID＋digest is idempotent
-- [x] add activity appearance accents and milestone mark
-- [x] add bilingual `on-open`, `on-interact`, and `ambient` dialogue
-- [x] enforce expiry, cooldown, max uses, 22:00–09:00 quiet hours, and two ambient lines per day
+- [x] add SQLite schema v6 for operation, hashed evidence, rolling dialogue counters, and current／pending appearance
+- [x] apply each package as an authoritative semantic snapshot; unchanged stable dialogue keeps counters; duplicate ID＋digest is idempotent
+- [x] gate activity appearance accents and milestone marks by evidence, with one visible change per local day and one pending plan
+- [x] require exactly 48 bilingual cards: 8 opening, 20 interaction, 16 ambient, and 4 appearance
+- [x] add dismissible, three-line, seven-second speech-bubble presentation
+- [x] enforce expiry, cooldown, max uses, 22:00–09:00 quiet hours, 35–70 minute ambient cadence, ten-minute spacing, and seven ambient lines per day
 - [x] expose local clear control and render-safe state schema v6
 - [x] remove direct memory connector, API key, and Daily Scout from the primary UX
 - [x] stop direct Agent-memory and Daily Scout schedulers
 - [x] validate with synthetic Rust, frontend, package-helper, and browser evidence
-- [ ] packaged v0.6.0 Windows install／upgrade／restart／clear／uninstall UAT
+- [ ] packaged v0.7.0 Windows install／upgrade／restart／clear／uninstall UAT
 - [ ] install or discover the skill from arbitrary user projects without copying unsafe governance
 - [ ] test the slogan in one explicitly authorized non-private sandbox Agent project
 
@@ -64,9 +66,11 @@ Exit condition: the installed EXE opens a pet that teaches the activation phrase
 
 Permanent change requires multiple independent, outcome-qualified evidence groups. Time, tokens, session length, source volume, and app-open duration are not XP. Runtime model image generation is not part of shipped growth.
 
+Protocol v2 completes the small activity-accent persistence gate, not the full morphology system below.
+
 ## Phase 3 — Useful initiative
 
-- [x] protocol-v1 quiet hours, cooldowns, expiry, and ambient daily budget
+- [x] protocol-v2 quiet hours, cooldowns, expiry, randomized cadence, spacing, and ambient daily budget
 - [ ] reminder-candidate schema separated from dialogue
 - [ ] visible reason and source category for every reminder
 - [ ] urgency threshold, snooze, global off, and per-topic suppression

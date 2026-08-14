@@ -4,12 +4,13 @@ Memoryling's value depends on sensitive context. Privacy is therefore part of th
 
 ## Current core boundary
 
-Memoryling v0.6.0 is **Agent-operated and local-first**:
+Memoryling v0.7.0 is **Agent-operated and local-first**:
 
-- the user installs and opens the App normally, then invokes one update with `寵物醒來` or `Memoryling, wake up` inside an Agent project; reading a wake-up file or waking the project／Agent／self is explicitly not this authorization;
+- the user installs and opens the App normally, then invokes one update with `醒來吧我的寵物` or `Memoryling, wake up` inside an Agent project; reading a wake-up file or waking the project／Agent／self is explicitly not this authorization;
+- the Agent verifies that a compatible App is already open before reading memory for this workflow;
 - the current Agent may use only context it is already authorized to read;
 - the app receives one bounded derived package through an exact local inbox file;
-- the Agent-side helper submits only when a compatible Memoryling 0.6.0-or-newer process is already running and never starts an executable;
+- the Agent-side helper submits only when a compatible Memoryling 0.7.0-or-newer process is already running and never starts an executable;
 - the app does not scan Codex, Claude, or another Agent's files;
 - the app does not call an AI API for the core pet loop;
 - no telemetry or cloud sync is present.
@@ -24,7 +25,8 @@ Allowed package data:
 - dominant and optional secondary activity;
 - coarse journey state;
 - opaque evidence IDs, kinds, observed times, and lowercase SHA-256 reference hashes;
-- 3–12 short bilingual dialogue cards and their delivery rules.
+- one evidence-qualified `hold`, `change`, or `reset` appearance plan;
+- exactly 48 short bilingual dialogue cards, stable theme／semantic identities, and delivery rules.
 
 Forbidden package data:
 
@@ -43,7 +45,7 @@ Hashing is not permission to include a secret. Reference hashes identify stable 
 3. The submit helper accepts only an exact compatible running process, rejects a closed, stale, or differently named binary, and never prints the executable path.
 4. Rust revalidates a strict unknown-field-denying schema.
 5. The inbox accepts one exact non-symlink regular file capped at 64 KiB.
-6. SQLite stores only the newest operation.
+6. SQLite stores only the newest operation, current rolling counters, and current／pending appearance state.
 7. The pet receives a whitelisted render DTO without evidence hashes, operation digest, paths, or source text.
 8. Exact Tauri capabilities and caller-label guards keep sensitive main commands out of the pet surface.
 
@@ -53,7 +55,9 @@ Opening the App does not authorize memory or recent-work reads. The activation p
 
 ## Replacement and forgetting
 
-Each valid operation is an authoritative snapshot. Applying it transactionally deletes the prior operation and all cascaded evidence, dialogue, and counters before committing the new state. This prevents a local history of obsolete derived conversations.
+Each valid operation is an authoritative semantic snapshot. Applying it transactionally deletes prior operation content, then preserves counters only for a stable dialogue ID whose bilingual text is unchanged. Changed or absent cards and their content are deleted; new cards begin unused. This provides variety without creating a local history of retired derived conversations.
+
+Evidence-qualified appearance is separate from dialogue replacement. Only the current visible appearance, one pending plan, and their opaque lineage are retained. A visible change can apply at most once per local day; `reset` requires explicit source-removal evidence.
 
 The user can clear the current pet update from the detail window. That removes Memoryling's local derived operation; it never edits the Agent's source memory. Re-running the slogan can rebuild from current authorized context.
 
@@ -61,17 +65,18 @@ Because the app deliberately does not monitor Agent storage, it cannot notice a 
 
 ## Dialogue and initiative limits
 
-- English and Traditional Chinese lines are capped at 240 characters and one line.
+- English and Traditional Chinese lines are capped at 160 characters and three visual lines.
 - Time-sensitive dialogue should expire.
 - Repetition is limited by per-card cooldown and max uses.
 - Ambient lines are blocked during 22:00–09:00 quiet hours.
-- Ambient delivery is capped at two lines per local day.
+- Ambient opportunities use a local 35–70 minute cadence, wait at least ten minutes after any shown line, and are capped at seven lines per local day.
+- Click dialogue has a two-second anti-stack interval and does not consume the ambient budget.
 - The app never generates new semantic content by itself.
 - No line may present an unverified fact, diagnosis, confidential detail, sensitive personality label, or moral judgment.
 
 ## Legacy compatibility boundary
 
-Older direct Codex-memory, one-thread, fixture, and BYOK Daily Scout implementations remain in source for compatibility research. They are not the v0.6.0 core, are not started automatically, and are not shown in the primary UX. Daily Scout scheduling is disabled.
+Older direct Codex-memory, one-thread, fixture, and BYOK Daily Scout implementations remain in source for compatibility research. They are not the v0.7.0 core, are not started automatically, and are not shown in the primary UX. Daily Scout scheduling is disabled.
 
 Any future reactivation or network feature requires a dedicated accepted ADR, visible data-flow explanation, purpose-specific opt-in, reviewable payload where practical, cost and provider-retention disclosure, deletion behavior, and a fully local path. No old consent carries forward into the Agent-operation protocol.
 
