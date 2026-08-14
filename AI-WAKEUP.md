@@ -10,10 +10,11 @@ AS_OF: 2026-08-14 (Asia/Taipei)
 4. `README.md`
 5. `docs/ARCHITECTURE.md`
 6. `docs/PRIVACY_PRINCIPLES.md`
-7. `docs/adr/0010-installed-app-teaches-agent-activation.md`
-8. `docs/adr/0008-agent-operated-memoryling-protocol.md`
+7. `docs/adr/0011-memory-grounded-daily-growth-and-dialogue-v2.md`
+8. `docs/adr/0010-installed-app-teaches-agent-activation.md`
+9. `docs/adr/0008-agent-operated-memoryling-protocol.md`
 
-If the user says `醒來吧我的寵物` or `Memoryling, wake up`, read `skills/memoryling-operation/SKILL.md` and execute the entire bounded workflow: confirm the installed pet is already open before reading memory for this workflow, compile, submit, await local application, and report here. Never start an executable from the Agent workflow. If the App is closed, stop before memory read or inbox write and tell the user to open the installed Memoryling App before using the phrase again. Requests to read this wake-up file or wake the project／Agent／self do not trigger the pet workflow without the exact pet phrase.
+If the user says `醒來吧我的寵物` or `Memoryling, wake up`, read `skills/memoryling-operation/SKILL.md` and execute the entire bounded workflow. First run its readiness-only check; do not read memory until a compatible pet is open. If readiness fails, stop and say: `Memoryling 還沒準備好。若尚未安裝，請先安裝；接著打開寵物，再重新輸入「醒來吧我的寵物」。` Never launch an executable, inspect install locations, or write an inbox item from this failure path. Only after readiness succeeds may the Agent compile, submit, await local application, and report here. Requests to read this wake-up file or wake the project／Agent／self do not trigger the pet workflow without the exact pet phrase.
 
 ## Project identity
 
@@ -35,6 +36,7 @@ Source v0.7.0 implements the Agent-operated vertical slice from ADR-0008, ADR-00
 - strict protocol-v2 JSON Schema and 48-card synthetic example;
 - PowerShell validation／submission to one exact app-local inbox file;
 - strict running-App verification, no process launch from submission, and bounded inbox-consumption wait;
+- a fixed install／open reminder that stops before memory read when no compatible pet is running;
 - five-second exact-file polling with regular-file, symlink, UTF-8, 64 KiB, and schema guards;
 - SQLite schema v6 for the newest operation, hashed evidence, rolling bilingual dialogue counters, ambient usage, and current／pending appearance;
 - authoritative semantic replacement, unchanged-card counter retention, duplicate idempotency, conflicting-ID rejection, and complete local clear;

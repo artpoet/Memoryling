@@ -46,6 +46,7 @@ The core requires no app-side AI API and no direct app scan of Agent memory. The
 - protocol-v2 reference and JSON Schema require one appearance plan and exactly 48 cards in the 8／20／16／4 category split
 - committed synthetic package demonstrates the full structure without user content
 - submit helper has a readiness-only mode used before memory read, validates without echoing content, requires a running Memoryling 0.7.0+, atomically renames a UTF-8 file inside the exact inbox, never launches a process, and waits for consumption
+- missing／closed／stale／mismatched App states return one content-free readiness code; the Agent presents a fixed locale-appropriate install／open reminder and stops before memory read or inbox write
 
 ### App side
 
@@ -92,6 +93,7 @@ Automated checks and submit-helper smoke use synthetic data only. No private Age
 - PASS — targeted Agent-operation Rust tests prove strict v2 validation, idempotency, conflicting-ID rejection, rolling usage retention, seven-line ambient cap, daily appearance queue, persistence, render minimization, replacement, and clear
 - PASS — frontend tests prove exact activation copy, immediate Agent-operated detail, activity appearance, dismissible speech bubble, dialogue interaction, browser honesty, bilingual parity, revision refresh, clear, pet menu／drag／onboarding, safe DTO sanitization, and race handling
 - PASS — submit helper rejects a mismatched executable and fails before inbox write when the App is closed; the isolated harness changes no Memoryling process count and removes an unconfirmed inbox item after the bounded wait
+- PASS — readiness-only helper failure returns `MEMORYLING_APP_NOT_READY` with install／open guidance, accepts no package path, and creates no inbox item; the Agent skill maps it to the fixed Traditional Chinese／English reminder before any memory read
 - PASS — `npm run build:windows` produced the content-free unsigned v0.7.0 NSIS artifact recorded above; the release binary reports product／file version 0.7.0 and product name `Memoryling`
 - PASS — the freshly built release pet consumed `operation.synthetic-v2-001` with all 48 cards, removed `operation-v2.json`, and preserved one process with the same PID before／after
 - PASS — Computer Use observed the idle Traditional Chinese pet show `醒來吧我的寵物`, then observed the evidence-qualified accent／completion mark, two distinct click dialogues in styled speech bubbles, accessible dismiss labels, and seven-second auto-hide

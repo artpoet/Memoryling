@@ -53,6 +53,8 @@ Automated tests and committed examples use synthetic data only. Real Agent memor
 
 Opening the App does not authorize memory or recent-work reads. The activation phrase authorizes the bounded update. App-readiness validation may inspect only exact running-process executable metadata; it is not permission for install-location, disk, or `PATH` search.
 
+If readiness fails, the Agent must stop before memory read and show only the locale-appropriate install／open reminder. The helper does not distinguish uninstalled from installed-but-closed by scanning disk; both remain outside the memory boundary and require the user to open a compatible pet before trying again.
+
 ## Replacement and forgetting
 
 Each valid operation is an authoritative semantic snapshot. Applying it transactionally deletes prior operation content, then preserves counters only for a stable dialogue ID whose bilingual text is unchanged. Changed or absent cards and their content are deleted; new cards begin unused. This provides variety without creating a local history of retired derived conversations.

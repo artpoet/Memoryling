@@ -6,6 +6,18 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ## [Unreleased]
 
+### Changed
+
+- when the activation phrase finds no compatible open pet, the Agent now stops before memory read and gives a fixed install／open／retry reminder instead of assuming Memoryling is already installed
+
+### Security and privacy
+
+- uninstalled, installed-but-closed, stale, and mismatched states share one content-free `MEMORYLING_APP_NOT_READY` result; readiness still performs no install-location scan, process launch, memory read, or inbox write
+
+### Validated
+
+- helper regression tests prove the readiness-only failure needs no package path, returns the bounded reminder code, and leaves the inbox absent; the official skill validator passes
+
 ## [0.7.0] - 2026-08-14
 
 > Source implementation, release-binary smoke, and unsigned package build. The v0.2.0 installer remains the last installed-UAT baseline until the v0.7.0 package is installed and accepted.

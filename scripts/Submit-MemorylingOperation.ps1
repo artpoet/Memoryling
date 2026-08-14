@@ -10,6 +10,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$AppNotReadyMessage = 'MEMORYLING_APP_NOT_READY: No compatible open Memoryling was found. Install it if needed, open the pet, then use the activation phrase again.'
 
 function Stop-InvalidPackage {
     throw "Memoryling operation validation failed. No package was submitted."
@@ -54,7 +55,7 @@ function Assert-MemorylingIsOpen {
     if (-not [string]::IsNullOrWhiteSpace($ExecutablePath)) {
         $expected = Test-CompatibleMemorylingExecutable $ExecutablePath
         if ($null -eq $expected) {
-            throw 'Memoryling 0.7.0 or newer is not open. Open the installed desktop app, then use the activation phrase again.'
+            throw $script:AppNotReadyMessage
         }
     }
 
@@ -69,7 +70,7 @@ function Assert-MemorylingIsOpen {
         }
     }
 
-    throw 'Memoryling 0.7.0 or newer is not open. Open the installed desktop app, then use the activation phrase again.'
+    throw $script:AppNotReadyMessage
 }
 
 function Test-ExactProperties([object]$Value, [string[]]$Required, [string[]]$Optional = @()) {

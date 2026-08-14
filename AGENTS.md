@@ -15,12 +15,12 @@ Read, in order:
 When the user says `醒來吧我的寵物` or `Memoryling, wake up` in this repository:
 
 1. Read `skills/memoryling-operation/SKILL.md` completely.
-2. Follow that skill using only context the current Agent is already authorized to read.
-3. Compile and submit one protocol-v2 operation package to the local Memoryling app.
-4. Submit only when a compatible installed pet is already open, then wait for local application confirmation.
-5. Report the bounded result in this conversation. Do not ask the user to run the helper manually.
+2. Run the skill's readiness-only check before reading memory or recent work.
+3. If no compatible pet is open, stop and remind the user to install Memoryling if needed, open the pet, and use the phrase again.
+4. Only after readiness succeeds, follow the skill using authorized context and compile one protocol-v2 package.
+5. Submit to the already-open pet, wait for local confirmation, and report the bounded result here. Do not ask the user to run the helper manually.
 
-Do not launch Memoryling from the Agent workflow. The user installs and opens the App through its EXE or Start menu, then follows the visible activation-phrase reminder. If the App is closed, stop before inbox write and ask the user to open it before using the phrase again.
+Do not launch Memoryling from the Agent workflow. The user installs and opens the App through its EXE or Start menu, then follows the visible activation-phrase reminder. If no compatible App is open, stop before memory read or inbox write and say: `Memoryling 還沒準備好。若尚未安裝，請先安裝；接著打開寵物，再重新輸入「醒來吧我的寵物」。`
 
 Do not trigger the pet workflow when the user asks to read `AI-WAKEUP.md`, wake the project／Agent／self, or inspect wake-up documents. Those requests only load project context unless the user also says the exact pet activation phrase.
 

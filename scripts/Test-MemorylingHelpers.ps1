@@ -14,13 +14,28 @@ try {
         throw 'The helper test could not find its non-Memoryling control executable.'
     }
 
+    $readinessReminderWasSafe = $false
+    try {
+        & (Join-Path $PSScriptRoot 'Submit-MemorylingOperation.ps1') `
+            -CheckAppReadyOnly -ExecutablePath $wrongExecutable
+    } catch {
+        $message = $_.Exception.Message
+        $readinessReminderWasSafe = $message -like 'MEMORYLING_APP_NOT_READY:*' -and
+            $message -like '*Install it if needed*' -and
+            $message -like '*activation phrase again*' -and
+            -not (Test-Path -LiteralPath $inbox)
+    }
+    if (-not $readinessReminderWasSafe) {
+        throw 'Readiness-only failure did not provide the safe install/open reminder before inbox write.'
+    }
+
     $failedBeforeWrite = $false
     try {
         & (Join-Path $PSScriptRoot 'Submit-MemorylingOperation.ps1') `
             -Path (Join-Path $PSScriptRoot '..\examples\agent-operation-v2.synthetic.json') `
             -ExecutablePath $wrongExecutable
     } catch {
-        $failedBeforeWrite = $_.Exception.Message -like 'Memoryling 0.7.0*is not open*' -and
+        $failedBeforeWrite = $_.Exception.Message -like 'MEMORYLING_APP_NOT_READY:*' -and
             -not (Test-Path -LiteralPath $inbox)
     }
     if (-not $failedBeforeWrite) {

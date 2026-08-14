@@ -36,6 +36,8 @@ Install and open Memoryling
 
 The project entrypoint recognizes `Memoryling, wake up` and `醒來吧我的寵物`. Requests to read `AI-WAKEUP.md` or wake the project do not activate the pet. The reusable workflow is in [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md); the strict contract is [`schemas/agent-operation-v2.schema.json`](schemas/agent-operation-v2.schema.json).
 
+If no compatible pet is open, the Agent stops before reading memory or creating a package and reminds the user to install Memoryling if needed, open the pet, and enter the phrase again. The readiness check does not scan install locations and never starts the App.
+
 ## Current v0.7.0 source
 
 - Tauri 2 pet-first Windows shell with transparent pet and detail window

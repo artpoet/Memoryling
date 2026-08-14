@@ -36,6 +36,8 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並�
 
 專案入口會辨識 `醒來吧我的寵物` 與 `Memoryling, wake up`；要求讀取 `AI-WAKEUP.md` 或喚醒專案時不會誤啟動寵物。可重複執行的流程在 [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md)，嚴格格式在 [`schemas/agent-operation-v2.schema.json`](schemas/agent-operation-v2.schema.json)。
 
+如果找不到已開啟的相容寵物，Agent 會在讀取記憶或建立更新包之前停止，提醒使用者「若尚未安裝，請先安裝；接著打開寵物，再重新輸入口號」。這個就緒檢查不會掃描安裝位置，也不會自行啟動 App。
+
 ## v0.7.0 原始碼目前有什麼
 
 - Tauri 2 pet-first Windows 外殼、透明寵物與詳細視窗

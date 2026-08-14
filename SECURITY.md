@@ -23,6 +23,7 @@ Never attach real Agent memories, prompts, credentials, tokens, operation packag
 - The core Agent-operated loop has no telemetry, cloud sync, API key, model request, or source write.
 - Automated and browser verification uses synthetic data only.
 - The submit helper never launches a process, searches `PATH`, scans install locations, or prints the resolved executable path.
+- A missing, closed, stale, or mismatched App returns the same content-free readiness code; the Agent stops before memory read and shows the install／open reminder.
 
 The app cannot observe an Agent-memory deletion because it deliberately does not scan Agent storage. The next successful operation must be compiled from current context and replaces prior derived state. Immediate local removal uses Clear. Neither path edits Agent-owned memory.
 

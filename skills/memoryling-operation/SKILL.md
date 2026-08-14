@@ -13,7 +13,12 @@ The installed App is the visible entry surface; the Agent conversation is the up
 
 ## App readiness
 
-Before reading memory or recent work, run the readiness-only helper command below. It requires a compatible Memoryling process to already be running and does not read or write package content. If it reports that Memoryling is not open, do not read memory, write a package, or start the App. Tell the user to open the installed Memoryling App and use the activation phrase again.
+Before reading memory or recent work, run the readiness-only helper command below. It requires a compatible Memoryling process to already be running and does not read or write package content. If it reports `MEMORYLING_APP_NOT_READY`, do not read memory, write a package, inspect install locations, or start the App. Give one locale-appropriate reminder and stop:
+
+- Traditional Chinese: `Memoryling 還沒準備好。若尚未安裝，請先安裝；接著打開寵物，再重新輸入「醒來吧我的寵物」。`
+- English: `Memoryling is not ready. Install it if needed, open the pet, then enter “Memoryling, wake up” again.`
+
+Do not ask the user to run the helper manually. Do not continue the operation in the same turn after this reminder.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOperation.ps1 -CheckAppReadyOnly
@@ -21,7 +26,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOpe
 
 ## Workflow
 
-1. Confirm App readiness with the readiness-only helper. Then read the current thread, the repository wake-up/SSOT chain, recent work available to this Agent, and this Agent's own durable memory when available and relevant.
+1. Confirm App readiness with the readiness-only helper. If it fails, give the fixed reminder above and stop. Only after it succeeds, read the current thread, the repository wake-up/SSOT chain, recent work available to this Agent, and this Agent's own durable memory when available and relevant.
 2. Do not open unrelated private files, another Agent's storage, credentials, prompts, databases, mail, cloud apps, or external services. Never write to Agent memory.
 3. Reduce the authorized context to:
    - one dominant activity and optional secondary activity;
@@ -38,7 +43,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Submit-MemorylingOpe
 
 7. Delete the temporary package if it contains any user-derived dialogue. Report only the operation ID, activity, dialogue count, and whether the open pet applied the operation. Never echo the package or a local executable path.
 
-The helper fails before submission unless a running `Memoryling.exe` has product identity `Memoryling` and version 0.7.0 or newer. It never searches `PATH`, starts a process, or treats an installed-but-closed App as ready.
+The helper fails before memory read or submission unless a running `Memoryling.exe` has product identity `Memoryling` and version 0.7.0 or newer. It deliberately does not scan install locations, so not installed, installed-but-closed, stale, and mismatched states share the same safe install／open reminder. It never searches `PATH`, starts a process, or treats an installed-but-closed App as ready.
 
 ## Appearance rules
 

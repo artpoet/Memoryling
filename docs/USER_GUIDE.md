@@ -43,6 +43,10 @@ The phrase authorizes one bounded pet update only. It does not authorize new pri
 
 口號只授權一份有限的寵物更新，不代表授權新的私人來源、雲端 connector、外部 AI 呼叫、信箱、瀏覽器帳號、憑證或 Agent 記憶寫入。
 
+If Memoryling is not installed or no compatible pet is open, the Agent stops before reading memory and asks you to install it if needed, open the pet, and enter the phrase again. It does not launch the App automatically.
+
+如果尚未安裝 Memoryling，或沒有相容寵物正在執行，Agent 會在讀取記憶之前停止，提醒你先安裝（若需要）、打開寵物，再重新輸入口號；它不會自行啟動 App。
+
 ## Expected result／預期結果
 
 - Detail status changes from waiting to **Agent operation applied**.

@@ -45,6 +45,7 @@ The semantic boundary ends at the package. Memoryling does not discover tool hom
 | Produce activity, journey, appearance plan, evidence hashes, and 48-card dialogue deck | Agent skill |
 | Validate size, schema, enums, IDs, timestamps, and bounds | Submit helper and Rust |
 | Verify a trusted compatible pet is already running and await inbox consumption | Agent-side local helper |
+| Stop before memory read and present the install／open reminder when readiness fails | Agent skill |
 | Persist current pet state, rolling dialogue counters, and current／pending appearance | Rust + SQLite |
 | Choose eligible dialogue | Local deterministic rule engine |
 | Enforce quiet hours, cooldowns, expiry, and daily budget | Local deterministic rule engine |
@@ -71,6 +72,8 @@ The package is a lossy derived artifact. Dialogue may evoke recognizable work th
 ## Inbox, launch, and failure semantics
 
 Before any pet-workflow memory read, the Agent runs the helper's readiness-only check for an already-running Memoryling 0.7.0 or newer process. Submission repeats the same check before writing. The helper accepts only `Memoryling.exe` with product identity `Memoryling`; a development-only explicit path must also match a running process. It rejects another filename, product identity, stale version, a closed App, and arbitrary `PATH` resolution.
+
+The helper deliberately does not scan installation locations, so uninstalled, installed-but-closed, stale, and mismatched states produce the same content-free `MEMORYLING_APP_NOT_READY` result. The Agent converts that result into a locale-appropriate reminder to install if needed, open the pet, and use the phrase again, then ends the workflow without reading memory or writing an inbox item.
 
 The submit helper validates without printing package content, serializes UTF-8 without BOM, and renames a temporary file inside the inbox directory. It never starts a process. The helper waits at most 15 seconds for the exact inbox item to be consumed, then reports a bounded outcome to the Agent conversation. If the App is not open, it fails before inbox write; if consumption is not confirmed in time, it removes the exact unconfirmed item so no update can apply unexpectedly on a later launch.
 
