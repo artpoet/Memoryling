@@ -6,6 +6,10 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ## [Unreleased]
 
+### Added
+
+- added and activated a custom 1280×640 GitHub social preview that presents Memoryling as a local-first, Agent-operated, privacy-minimized companion layer
+
 ### Changed
 
 - reframed the English and Traditional Chinese public introduction around Memoryling as a local-first Agent companion layer, with the creature as its emotional interface rather than the entire product

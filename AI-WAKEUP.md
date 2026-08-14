@@ -91,6 +91,7 @@ The Agent owns semantics. Rust owns trust checks, persistence, clocks, eligibili
 | Render DTO | `src-tauri/src/memory/model.rs`, `src/creatureClient.ts` |
 | Detail operation UX | `src/AgentOperationPanel.tsx` |
 | Pet dialogue UX | `src/PetSurface.tsx` |
+| Public social preview | `docs/assets/memoryling-social-preview.jpg` |
 | Current ADR | `docs/adr/0011-memory-grounded-daily-growth-and-dialogue-v2.md` |
 
 ## Hard boundaries
