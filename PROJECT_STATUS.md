@@ -4,7 +4,7 @@ AS_OF: 2026-08-14 (Asia/Taipei)
 
 ## Current milestone
 
-Source v0.7.0 now implements the user-confirmed **memory-grounded daily growth and rolling dialogue** model end to end with synthetic data:
+Memoryling is publicly positioned as an open-source, local-first **Agent companion layer**: the creature is the emotional interface for traceable growth, dialogue, and bounded reflection, rather than the whole product. Source v0.7.0 implements the user-confirmed **memory-grounded daily growth and rolling dialogue** model end to end with synthetic data:
 
 ```text
 install and open Memoryling EXE
@@ -31,6 +31,7 @@ The core requires no app-side AI API and no direct app scan of Agent memory. The
 - Appearance: evidence-qualified; at most one visible persistent change per local day and one pending plan
 - User control: speech bubble dismisses locally; clear removes operation, counters, and current／pending appearance; rerunning the slogan rebuilds from current Agent context
 - Core network behavior: none; no API key and no model request
+- Future utility positioning: the opt-in Daily Memory Scout roadmap may use user-reviewed, minimized signals for cited, task-relevant suggestions; it remains inactive compatibility／research code in v0.7.0
 - Legacy compatibility: fixture, one-thread, direct Codex-memory, and Daily Scout code retained but not started or shown as core
 - Installed baseline: unsigned v0.2.0 current-user installer; v0.7.0 package not yet accepted
 - Current build: `Memoryling_0.7.0_x64-setup.exe`, 4,966,744 bytes, SHA-256 `5EB39108F3468FB6DB383C70C055F8B3B11D0958F3EB904EEA991FB98FEA741B`, `NotSigned`; built but not installed／accepted

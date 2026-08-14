@@ -18,7 +18,9 @@ If the user says `醒來吧我的寵物` or `Memoryling, wake up`, read `skills/
 
 ## Project identity
 
-Memoryling is a local-first Windows desktop pet for Agent users. The user installs and opens the App normally; the pet itself teaches the phrase to enter in the current Agent project. The current Agent interprets already-authorized memory and recent work, submits a privacy-minimized result to the already-running pet, and waits for local application; the app turns that result into continuing appearance and dialogue through deterministic local rules.
+Memoryling is an open-source, local-first companion layer for Agent users. The creature is its emotional interface, not the whole product: the current Agent turns already-authorized memory and recent work into traceable growth, varied dialogue, and bounded reflection, while the Windows App provides deterministic persistence, timing, user controls, and deletion. The user installs and opens the App normally; the pet itself teaches the phrase to enter in the current Agent project.
+
+The future opt-in Daily Memory Scout may use user-reviewed, minimized work signals for cited, task-relevant suggestions. It is not active in v0.7.0, and the core product remains fully local with no API key or model request.
 
 Core formula:
 

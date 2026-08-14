@@ -2,16 +2,21 @@
 
 **Your Agent remembers. Your Memoryling lives.**
 
-Memoryling is a local-first desktop pet for people who already work with AI Agents. Install and open the Windows app, then return to a configured project and say:
+Memoryling is an open-source, local-first companion layer for people who work with AI Agents. The creature is its emotional interface, not the whole product: Memoryling turns context already authorized to the current Agent into traceable growth, varied bilingual dialogue, and bounded reflection, while a deterministic Windows runtime manages persistence, timing, user controls, and deletion.
+
+Install and open the Windows app, then return to a configured project and say:
 
 > **Memoryling, wake up**
 
 The open pet shows this activation reminder itself. The current Agent then uses only context it is already authorized to read, compiles a small pet update, submits it to the running App, and waits for local application. Memoryling carries that update forward through appearance, bilingual dialogue, cooldowns, expiry, quiet hours, and daily limits.
 
+Beyond companionship, the opt-in Daily Memory Scout roadmap is designed to use user-reviewed, minimized work signals to retrieve cited, task-relevant updates and offer practical suggestions. It is not active in v0.7.0, and the core pet remains fully local without an API key.
+
 [繁體中文](README.zh-TW.md) · [Product vision](docs/PRODUCT_VISION.md) · [Architecture](docs/ARCHITECTURE.md) · [Privacy](docs/PRIVACY_PRINCIPLES.md)
 
 ## Why it is different
 
+- **A companion layer, not another chatbot:** the pet makes Agent continuity visible and approachable through growth, dialogue, and reflection.
 - **Agent-operated:** semantic understanding happens in the Agent the user already chose.
 - **Clear installed-App entry:** the user opens the EXE normally; the pet teaches the Agent activation phrase on first run, offers a one-click copy button, and keeps reminding while idle.
 - **No app-side AI API:** the ordinary pet needs no API key and makes no model request.
@@ -19,6 +24,7 @@ The open pet shows this activation reminder itself. The current Agent then uses 
 - **Privacy-minimized handoff:** packages contain generated pet state and hashed references, never raw memories, prompts, paths, secrets, or reasoning.
 - **Bounded initiative:** ambient dialogue uses a local 35–70 minute cadence, respects 22:00–09:00 quiet hours, and stops at seven lines per day.
 - **Rolling and clearable:** useful unchanged lines keep their local usage counters, retired lines disappear, and the user can clear all derived pet state locally.
+- **Useful beyond companionship:** an explicit opt-in roadmap adds cited, task-relevant suggestions from minimized signals without making cloud AI mandatory.
 
 ## How it works
 

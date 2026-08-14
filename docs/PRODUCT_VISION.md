@@ -2,7 +2,9 @@
 
 ## The promise
 
-Memoryling turns the memory and recent work already understood by a person's AI Agent into a small, persistent desktop life.
+Memoryling is an open-source, local-first companion layer for people who work with AI Agents. It turns memory and recent work already understood by the current Agent into a small, persistent desktop life with traceable growth, varied dialogue, and bounded reflection.
+
+The creature is the emotional interface, not the whole product. The broader purpose is to make Agent continuity understandable and useful over time without turning raw private context into a cloud service.
 
 The user does not configure another AI service. They install and open Memoryling normally; the pet offers a copy button for `醒來吧我的寵物` or `Memoryling, wake up` and tells them to use it in the current Agent project. The Agent creates a privacy-minimized update for the already-running pet, waits for local application, and reports in the same conversation.
 
@@ -27,6 +29,7 @@ Later versions can add:
 - growth marks tied to meaningful milestones;
 - multi-day stories and habitat changes;
 - bounded reminders derived from current, authorized context;
+- an explicit opt-in Daily Memory Scout that uses user-reviewed, minimized signals to retrieve cited, task-relevant updates and offer practical suggestions;
 - richer conversation through an explicit future provider decision.
 
 Every lasting change must remain explainable and removable.
@@ -55,7 +58,7 @@ installed EXE launch and visible phrase reminder
   → appearance, dialogue, story, or reminder
 ```
 
-The differentiator is not a chat widget or memory dashboard. It is a companion whose life is authored by the Agent relationship the user already has, while the desktop app supplies continuity and boundaries.
+The differentiator is not a chat widget, memory dashboard, or decorative pet. Memoryling is a companion layer whose life is authored by the Agent relationship the user already has, while the desktop app supplies continuity, practical boundaries, and a future path toward source-grounded advice.
 
 ## Design principles
 

@@ -8,6 +8,8 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 ### Changed
 
+- reframed the English and Traditional Chinese public introduction around Memoryling as a local-first Agent companion layer, with the creature as its emotional interface rather than the entire product
+- documented source-grounded practical suggestions as an explicit opt-in Daily Memory Scout roadmap while keeping its inactive v0.7.0 status clear
 - when the activation phrase finds no compatible open pet, the Agent now stops before memory read and gives a fixed install／open／retry reminder instead of assuming Memoryling is already installed
 
 ### Security and privacy
