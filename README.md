@@ -4,7 +4,7 @@
 
 Memoryling is a local-first desktop pet for people who already work with AI Agents. Install and open the Windows app, then return to a configured project and say:
 
-> **Wake up, my pet**
+> **Memoryling, wake up**
 
 The open pet shows this activation reminder itself. The current Agent then uses only context it is already authorized to read, compiles a small pet update, submits it to the running App, and waits for local application. Memoryling carries that update forward through appearance, bilingual dialogue, cooldowns, expiry, quiet hours, and daily limits.
 
@@ -13,7 +13,7 @@ The open pet shows this activation reminder itself. The current Agent then uses 
 ## Why it is different
 
 - **Agent-operated:** semantic understanding happens in the Agent the user already chose.
-- **Clear installed-App entry:** the user opens the EXE normally; the pet teaches the Agent activation phrase on first run and while idle.
+- **Clear installed-App entry:** the user opens the EXE normally; the pet teaches the Agent activation phrase on first run, offers a one-click copy button, and keeps reminding while idle.
 - **No app-side AI API:** the ordinary pet needs no API key and makes no model request.
 - **Local persistent life:** the app owns state, timing, rendering, and user controls.
 - **Privacy-minimized handoff:** packages contain generated pet state and hashed references, never raw memories, prompts, paths, secrets, or reasoning.
@@ -24,8 +24,8 @@ The open pet shows this activation reminder itself. The current Agent then uses 
 
 ```text
 Install and open Memoryling
-  → pet shows “Wake up, my pet” activation reminder
-  → user says “Wake up, my pet” in the current Agent project
+  → pet shows “Memoryling, wake up” with a copy button
+  → user pastes or says “Memoryling, wake up” in the current Agent project
   → Agent reads already-authorized memory + recent work + project context
   → Agent skill compiles protocol-v1 JSON
   → local helper verifies the compatible pet is already running
@@ -34,7 +34,7 @@ Install and open Memoryling
   → pet appearance and dialogue follow deterministic local rules
 ```
 
-The project entrypoint recognizes `Wake up, my pet` and `醒來吧我的寵物`. The reusable workflow is in [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md); the strict contract is [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json).
+The project entrypoint recognizes `Memoryling, wake up` and `寵物醒來`. Requests to read `AI-WAKEUP.md` or wake the project do not activate the pet. The reusable workflow is in [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md); the strict contract is [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json).
 
 ## Current v0.6.0 source
 
@@ -44,7 +44,7 @@ The project entrypoint recognizes `Wake up, my pet` and `醒來吧我的寵物`.
 - 3–12 English／Traditional Chinese dialogue cards per operation
 - on-open, click, and bounded ambient triggers
 - exact-file inbox polling with strict size, symlink, schema, and identity checks
-- pet-first manual launch, persistent bilingual activation reminder, and single-instance recovery
+- pet-first manual launch, copyable bilingual activation reminder, persistent idle reminder, and single-instance recovery
 - local clear control and authoritative replacement semantics
 - synthetic Rust, React, and submit-helper coverage
 

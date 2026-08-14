@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Memoryling
 
-AS_OF: 2026-08-13 (Asia/Taipei)
+AS_OF: 2026-08-14 (Asia/Taipei)
 
 ## Current milestone
 
@@ -8,7 +8,7 @@ Source v0.6.0 now implements the user-confirmed **Agent-operated Memoryling** mo
 
 ```text
 install and open Memoryling EXE
-  → pet visibly teaches “醒來吧我的寵物”／“Wake up, my pet”
+  → pet visibly teaches and copies “寵物醒來”／“Memoryling, wake up”
   → user enters the phrase in the current Agent project
   → current Agent reads already-authorized context
   → Agent compiles one bounded operation package
@@ -32,14 +32,14 @@ The core requires no app-side AI API and no direct app scan of Agent memory. The
 - Core network behavior: none; no API key and no model request
 - Legacy compatibility: fixture, one-thread, direct Codex-memory, and Daily Scout code retained but not started or shown as core
 - Installed baseline: unsigned v0.2.0 current-user installer; v0.6.0 package not yet accepted
-- Current build: `Memoryling_0.6.0_x64-setup.exe`, 4,940,888 bytes, SHA-256 `D0CB52780FEED79A8522DD7D656F60B7CEFA65C3721F02F26B38C1356109A2F0`, `NotSigned`; built but not installed／accepted
+- Current build: `Memoryling_0.6.0_x64-setup.exe`, 4,942,530 bytes, SHA-256 `D8BA580B6F1F78E4F6999B1A7B5DF79CF7808A8DEB679C8AAA95D6DB011B577C`, `NotSigned`; built but not installed／accepted
 - Repository: public `main` at https://github.com/artpoet/Memoryling
 
 ## Implemented v0.6.0 vertical slice
 
 ### Agent side
 
-- `AGENTS.md` recognizes `醒來吧我的寵物` and `Wake up, my pet`
+- `AGENTS.md` recognizes the exact pet phrases `寵物醒來` and `Memoryling, wake up`, while project／Agent wake-up requests remain context-only
 - `skills/memoryling-operation/SKILL.md` defines the authorization, minimization, compilation, submission, and reporting workflow
 - skill metadata passes the official `skill-creator` validator
 - protocol reference and JSON Schema define exact fields, counts, enums, IDs, timestamps, hash format, dialogue length, and delivery bounds
@@ -63,7 +63,7 @@ The core requires no app-side AI API and no direct app scan of Agent memory. The
 
 - manual cold launch shows the pet immediately; OS locale selects initial language and no setup page blocks the flow
 - resident relaunch returns to the existing pet rather than opening detail or creating another instance
-- first-run guide, idle pet dialogue, and primary detail panel show the exact bilingual activation phrase
+- first-run guide shows the exact bilingual activation phrase with a local copy button and visible result feedback; idle pet dialogue and the primary detail panel keep showing the phrase
 - primary UI no longer asks for a memory connector or API key
 - activity changes the pet aura color; milestone state adds a star
 - floating pet displays localized dialogue and advances through the local rule engine
@@ -81,7 +81,7 @@ Automated checks, browser smoke, and submit-helper smoke used synthetic data onl
 ## Verification evidence
 
 - PASS — `npm run check`
-  - 28／28 frontend tests
+  - 30／30 frontend tests
   - production TypeScript／Vite build
   - 52／52 runnable Rust tests; one private-source live smoke remains intentionally ignored
   - `cargo check`
@@ -92,9 +92,9 @@ Automated checks, browser smoke, and submit-helper smoke used synthetic data onl
 - PASS — submit helper rejects a mismatched executable and fails before inbox write when the App is closed; the isolated harness changes no Memoryling process count and removes an unconfirmed inbox item after the bounded wait
 - PASS — `npm run build:windows` produced the content-free unsigned v0.6.0 NSIS artifact recorded above
 - PASS — submission to the already-running freshly built release binary consumed the four-card synthetic inbox, left no inbox item, and preserved the same one process／PID before and after
-- PASS — Computer Use observed the Traditional Chinese first-run guide explicitly say `回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。`; the detailed native surface also showed the three-step installed-App flow
+- PASS — Computer Use observed the Traditional Chinese first-run guide show `回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。`, clicked `複製「寵物醒來」`, saw `已複製「寵物醒來」`, and Windows returned an exact clipboard match for `寵物醒來`
 - PASS — official skill validator reported `Skill is valid!` under an isolated temporary PyYAML dependency and UTF-8 mode; system Python was not modified
-- PASS — in-app browser smoke observed the new installed-App／activation-phrase copy in Traditional Chinese and English, verified the memory-off boundary, and found no horizontal overflow (`scrollWidth` 1265 = `clientWidth` 1265)
+- PASS — in-app browser smoke observed `寵物醒來`／`Memoryling, wake up` throughout the detail surface, verified the memory-off boundary, and found no horizontal overflow (`scrollWidth` 1265 = `clientWidth` 1265)
 - PASS — `git diff --check`
 
 Installed NSIS launch and running-process handoff remain a separate packaged acceptance gate. Current native proof used the freshly built trusted release binary; it does not claim installer execution or installed-App acceptance.
@@ -124,7 +124,7 @@ Installed NSIS launch and running-process handoff remain a separate packaged acc
 **Install and accept the current v0.6.0 Windows artifact using synthetic data only.**
 
 1. Verify clean install or upgrade from the retained v0.2.0 baseline using the recorded NSIS artifact.
-2. Confirm the installed App opens pet-first and displays the exact bilingual activation reminder.
+2. Confirm the installed App opens pet-first, displays the exact bilingual activation reminder, and copies the locale-specific phrase.
 3. Submit only `examples/agent-operation-v1.synthetic.json`.
 4. Check no-setup cold launch, idle phrase reminder, running-process submission without auto-launch, inbox pickup, activity appearance, opening dialogue, click dialogue, restart persistence, replacement, clear, manual single-instance pet recovery, and uninstall data choices.
 5. Record content-free version／size／checksum／signature evidence and remaining release gaps.

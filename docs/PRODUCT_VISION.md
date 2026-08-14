@@ -4,7 +4,7 @@
 
 Memoryling turns the memory and recent work already understood by a person's AI Agent into a small, persistent desktop life.
 
-The user does not configure another AI service. They install and open Memoryling normally; the pet tells them to return to the current Agent project and say `醒來吧我的寵物` or `Wake up, my pet`. The Agent creates a privacy-minimized update for the already-running pet, waits for local application, and reports in the same conversation.
+The user does not configure another AI service. They install and open Memoryling normally; the pet offers a copy button for `寵物醒來` or `Memoryling, wake up` and tells them to use it in the current Agent project. The Agent creates a privacy-minimized update for the already-running pet, waits for local application, and reports in the same conversation.
 
 ## The operating model
 

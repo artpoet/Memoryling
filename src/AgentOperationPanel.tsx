@@ -6,7 +6,7 @@ import "./AgentOperationPanel.css";
 const copy = {
   en: {
     eyebrow: "INSTALLED APP + AGENT PHRASE · NO APP-SIDE AI API",
-    title: "Open Memoryling, then say “Wake up, my pet” in your agent project",
+    title: "Open Memoryling, then say “Memoryling, wake up” in your agent project",
     intro:
       "Install and open the Windows app first. Memoryling stays local and waits while your Agent prepares the update.",
     agent: "1 · Open the installed pet",
@@ -16,7 +16,7 @@ const copy = {
     pet: "3 · Memoryling updates",
     petBody: "The already-open pet applies the package locally, then speaks by trigger, expiry, cooldown, quiet hours, and daily budget.",
     waiting: "Memoryling is open and waiting",
-    waitingBody: "Return to your Agent project and say “Wake up, my pet” to begin the next update.",
+    waitingBody: "Return to your Agent project and say “Memoryling, wake up” to begin the next update.",
     applied: "Latest Agent operation applied",
     appliedBody: (count: number, activity: string) =>
       `${count} dialogue cards are ready · dominant activity: ${activity}`,
@@ -28,7 +28,7 @@ const copy = {
   },
   "zh-TW": {
     eyebrow: "安裝版 APP＋AGENT 發動語 · APP 不自行呼叫 AI API",
-    title: "先打開 Memoryling，再回 Agent 專案說：「醒來吧我的寵物」",
+    title: "先打開 Memoryling，再回 Agent 專案說：「寵物醒來」",
     intro:
       "請先安裝並打開 Windows App；Memoryling 會留在本機等待，由你的 Agent 準備更新。",
     agent: "1 · 打開安裝版寵物",
@@ -38,7 +38,7 @@ const copy = {
     pet: "3 · Memoryling 更新",
     petBody: "已開啟的寵物會在本機套用更新，再依觸發條件、期限、冷卻、安靜時段與每日額度說話。",
     waiting: "Memoryling 已開啟，正在等待",
-    waitingBody: "回到你的 Agent 專案，輸入「醒來吧我的寵物」即可開始下一次更新。",
+    waitingBody: "回到你的 Agent 專案，輸入「寵物醒來」即可開始下一次更新。",
     applied: "最新 Agent 更新已套用",
     appliedBody: (count: number, activity: string) =>
       `${count} 組對話已就緒 · 主要活動：${activity}`,

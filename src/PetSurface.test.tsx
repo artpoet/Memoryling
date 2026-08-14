@@ -145,7 +145,7 @@ describe("pet surface", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/enter the activation phrase: “Wake up, my pet”/i),
+      screen.getByText(/enter the activation phrase: “Memoryling, wake up”/i),
     ).toBeInTheDocument();
   });
 
@@ -472,21 +472,29 @@ describe("pet surface", () => {
     ).toBeInTheDocument();
   });
 
-  test("persists onboarding dismissal, supports Chinese, and honors reduced motion", async () => {
+  test("copies the Chinese activation phrase, persists onboarding dismissal, and honors reduced motion", async () => {
     window.localStorage.setItem("memoryling:locale", "zh-TW");
     setReducedMotionForTest(true);
+    const clipboard = { writeText: vi.fn(async () => undefined) };
     const fixture = createClient(emptyState, {
       ...dismissedShell,
       onboardingDismissed: false,
     });
-    render(<PetSurface client={fixture.client} />);
+    render(<PetSurface client={fixture.client} clipboard={clipboard} />);
 
     expect(await screen.findByText("等待 Agent 運作 · 記憶存取關閉")).toBeInTheDocument();
     expect(
       await screen.findByText("按右鍵，再選擇開啟 Memoryling。"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。"),
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。"),
+    ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: "複製「寵物醒來」" }),
+    );
+    expect(clipboard.writeText).toHaveBeenCalledWith("寵物醒來");
+    expect(
+      screen.getByRole("button", { name: "已複製「寵物醒來」" }),
     ).toBeInTheDocument();
     expect(screen.getByTestId("pet-surface")).toHaveAttribute(
       "data-motion",
@@ -498,7 +506,47 @@ describe("pet surface", () => {
       expect(screen.queryByText("Memoryling 已打開")).not.toBeInTheDocument(),
     );
     expect(
-      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。"),
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。"),
+    ).toBeInTheDocument();
+  });
+
+  test("copies the English activation phrase from the first-run guide", async () => {
+    const clipboard = { writeText: vi.fn(async () => undefined) };
+    const fixture = createClient(emptyState, {
+      ...dismissedShell,
+      onboardingDismissed: false,
+    });
+    render(<PetSurface client={fixture.client} clipboard={clipboard} />);
+
+    await userEvent.click(
+      await screen.findByRole("button", {
+        name: "Copy “Memoryling, wake up”",
+      }),
+    );
+    expect(clipboard.writeText).toHaveBeenCalledWith("Memoryling, wake up");
+    expect(
+      screen.getByRole("button", {
+        name: "Copied “Memoryling, wake up”",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test("keeps the activation phrase visible when clipboard copy fails", async () => {
+    window.localStorage.setItem("memoryling:locale", "zh-TW");
+    const fixture = createClient(emptyState, {
+      ...dismissedShell,
+      onboardingDismissed: false,
+    });
+    render(<PetSurface client={fixture.client} clipboard={null} />);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "複製「寵物醒來」" }),
+    );
+    expect(
+      screen.getByRole("button", { name: "複製失敗，請再試一次" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。"),
     ).toBeInTheDocument();
   });
 

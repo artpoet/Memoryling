@@ -13,7 +13,7 @@ The Agent already has the semantic ability and authorization model needed to und
 
 ## Decision
 
-1. The primary trigger is `醒來吧我的寵物` or `Wake up, my pet` in an Agent project.
+1. The primary trigger is the exact pet-specific phrase `寵物醒來` or `Memoryling, wake up` in an Agent project. Reading a wake-up file or waking the project／Agent／self does not trigger the pet workflow.
 2. The project Agent skill reads only context the current Agent is already authorized to use. The slogan does not grant new connector, account, file, or external-service access.
 3. The Agent compiles a protocol-v1 package with one activity profile, one journey state, 1–12 opaque evidence references, and 3–12 bilingual dialogue cards.
 4. Raw memories, prompts, reasoning, paths, names, secrets, and source text are forbidden in the package. Evidence is represented only by lowercase SHA-256 reference hashes.

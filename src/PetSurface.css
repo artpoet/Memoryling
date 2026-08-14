@@ -158,17 +158,43 @@ html[data-surface="pet"] *::after {
   line-height: 1.35;
 }
 
-.pet-onboarding button {
-  width: 100%;
+.pet-onboarding-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+}
+
+.pet-onboarding-actions button {
   min-height: 31px;
   border: 0;
   border-radius: 9px;
-  color: #171120;
-  background: linear-gradient(135deg, #b6a2ff, #82e7c5);
   cursor: pointer;
   font: inherit;
   font-size: 11px;
   font-weight: 800;
+}
+
+.pet-copy-button {
+  min-width: 0;
+  padding: 5px 10px;
+  color: #171120;
+  background: linear-gradient(135deg, #b6a2ff, #82e7c5);
+}
+
+.pet-copy-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.pet-dismiss-button {
+  padding: 5px 13px;
+  color: #ded5ef;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.pet-onboarding-actions button:focus-visible {
+  outline: 2px solid #82e7c5;
+  outline-offset: 2px;
 }
 
 .pet-announcer {
@@ -203,5 +229,11 @@ html[data-surface="pet"] *::after {
 
   .pet-button:focus-visible {
     outline-color: Highlight;
+  }
+
+  .pet-onboarding-actions button {
+    border: 1px solid ButtonText;
+    color: ButtonText;
+    background: ButtonFace;
   }
 }

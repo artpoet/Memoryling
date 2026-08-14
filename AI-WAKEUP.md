@@ -1,6 +1,6 @@
 # AI-WAKEUP — Memoryling
 
-AS_OF: 2026-08-13 (Asia/Taipei)
+AS_OF: 2026-08-14 (Asia/Taipei)
 
 ## Read order
 
@@ -13,7 +13,7 @@ AS_OF: 2026-08-13 (Asia/Taipei)
 7. `docs/adr/0010-installed-app-teaches-agent-activation.md`
 8. `docs/adr/0008-agent-operated-memoryling-protocol.md`
 
-If the user says `醒來吧我的寵物` or `Wake up, my pet`, read `skills/memoryling-operation/SKILL.md` and execute the entire bounded workflow: confirm the installed pet is already open, compile, submit, await local application, and report here. Never start an executable from the Agent workflow. If the App is closed, stop before inbox write and tell the user to open the installed Memoryling App before using the phrase again.
+If the user says `寵物醒來` or `Memoryling, wake up`, read `skills/memoryling-operation/SKILL.md` and execute the entire bounded workflow: confirm the installed pet is already open, compile, submit, await local application, and report here. Never start an executable from the Agent workflow. If the App is closed, stop before inbox write and tell the user to open the installed Memoryling App before using the phrase again. Requests to read this wake-up file or wake the project／Agent／self do not trigger the pet workflow without the exact pet phrase.
 
 ## Project identity
 
@@ -40,7 +40,7 @@ Source v0.6.0 implements the Agent-operated vertical slice from ADR-0008:
 - authoritative replacement, duplicate idempotency, conflicting-ID rejection, and local clear;
 - render-state schema v6 with coarse activity accent, milestone mark, and current dialogue;
 - `on-open`, `on-interact`, and `ambient` rules with expiry, cooldown, max uses, 22:00–09:00 quiet hours, and two ambient lines per day;
-- manual cold launch that shows the pet and bilingual activation reminder directly with OS-locale selection and no blocking setup screen;
+- manual cold launch that shows the pet and bilingual activation reminder with a locale-specific copy button, OS-locale selection, and no blocking setup screen;
 - browser preview that performs no memory read or native operation.
 
 The app does **not** scan Agent storage and does **not** call an AI API for the core loop. The operation package must not contain raw memory, prompts, paths, secrets, names, tool output, or reasoning.
@@ -144,7 +144,7 @@ Report, in this order:
 **Install and accept the current v0.6.0 artifact on Windows without private data.**
 
 1. Test clean install or upgrade from the retained v0.2.0 baseline using `src-tauri/target/release/bundle/nsis/Memoryling_0.6.0_x64-setup.exe`.
-2. Confirm the installed App opens pet-first and shows the bilingual activation reminder before any operation.
+2. Confirm the installed App opens pet-first, shows the bilingual activation reminder before any operation, and copies the exact locale-specific phrase.
 3. Use only the committed synthetic operation package.
 4. Verify no-setup cold launch, idle phrase reminder, running-process submission without auto-launch, inbox pickup, appearance, opening dialogue, click dialogue, restart persistence, replacement, clear, manual single-instance pet recovery, and uninstall data choices.
 5. Record content-free evidence, version, size, checksum, signature state, and remaining WebView2／accessibility／mixed-DPI gaps.

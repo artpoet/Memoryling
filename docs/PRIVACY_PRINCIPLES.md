@@ -6,7 +6,7 @@ Memoryling's value depends on sensitive context. Privacy is therefore part of th
 
 Memoryling v0.6.0 is **Agent-operated and local-first**:
 
-- the user installs and opens the App normally, then invokes one update with `醒來吧我的寵物` or `Wake up, my pet` inside an Agent project;
+- the user installs and opens the App normally, then invokes one update with `寵物醒來` or `Memoryling, wake up` inside an Agent project; reading a wake-up file or waking the project／Agent／self is explicitly not this authorization;
 - the current Agent may use only context it is already authorized to read;
 - the app receives one bounded derived package through an exact local inbox file;
 - the Agent-side helper submits only when a compatible Memoryling 0.6.0-or-newer process is already running and never starts an executable;

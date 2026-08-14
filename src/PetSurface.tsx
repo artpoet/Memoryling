@@ -19,6 +19,10 @@ import "./PetSurface.css";
 
 const DRAG_THRESHOLD_DIP = 6;
 
+interface ClipboardWriter {
+  writeText(text: string): Promise<void>;
+}
+
 const petCopy = {
   en: {
     label:
@@ -31,7 +35,12 @@ const petCopy = {
     drag: "Drag me to move me.",
     menu: "Right-click me, then choose Open Memoryling.",
     recovery: "If I hide, find me from the system tray.",
-    operate: "Return to your Agent project and enter the activation phrase: “Wake up, my pet”.",
+    activationPhrase: "Memoryling, wake up",
+    operate: "Return to your Agent project and enter the activation phrase: “Memoryling, wake up”.",
+    copyPhrase: "Copy “Memoryling, wake up”",
+    copyingPhrase: "Copying…",
+    copiedPhrase: "Copied “Memoryling, wake up”",
+    copyFailed: "Copy failed — try again",
     privacy: "The app never scans Agent memory or calls AI by itself.",
     skip: "Got it",
     loading: "Waking up locally",
@@ -47,7 +56,12 @@ const petCopy = {
     drag: "拖曳我來移動位置。",
     menu: "按右鍵，再選擇開啟 Memoryling。",
     recovery: "找不到我時，可以從系統匣叫我回來。",
-    operate: "回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。",
+    activationPhrase: "寵物醒來",
+    operate: "回到你目前工作的 Agent 專案，輸入發動語：「寵物醒來」。",
+    copyPhrase: "複製「寵物醒來」",
+    copyingPhrase: "複製中…",
+    copiedPhrase: "已複製「寵物醒來」",
+    copyFailed: "複製失敗，請再試一次",
     privacy: "App 不會自行掃描 Agent 記憶，也不會自行呼叫 AI。",
     skip: "知道了",
     loading: "正在本機醒來",
@@ -64,6 +78,7 @@ interface DragGesture {
 
 export interface PetSurfaceProps {
   client?: CreatureClient;
+  clipboard?: ClipboardWriter | null;
 }
 
 function useReducedMotion() {
@@ -81,13 +96,19 @@ function useReducedMotion() {
   return reduced;
 }
 
-export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
+export function PetSurface({
+  client = nativeCreatureClient,
+  clipboard,
+}: PetSurfaceProps) {
   const [locale] = useStoredLocale();
   const t = petCopy[locale];
   const reducedMotion = useReducedMotion();
   const { renderState, setRenderState, shellState, setShellState, ready } =
     useCreatureRenderState(client);
   const [reaction, setReaction] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<
+    "idle" | "copying" | "copied" | "failed"
+  >("idle");
   const dragGesture = useRef<DragGesture | null>(null);
   const suppressClick = useRef(false);
   const suppressClickTimer = useRef<number | undefined>(undefined);
@@ -201,6 +222,19 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
     }
   }
 
+  async function copyActivationPhrase() {
+    setCopyStatus("copying");
+    try {
+      const writer =
+        clipboard === undefined ? window.navigator.clipboard : clipboard;
+      if (!writer) throw new Error("Clipboard unavailable");
+      await writer.writeText(t.activationPhrase);
+      setCopyStatus("copied");
+    } catch {
+      setCopyStatus("failed");
+    }
+  }
+
   const onboardingVisible = ready && !shellState.onboardingDismissed;
 
   return (
@@ -261,9 +295,29 @@ export function PetSurface({ client = nativeCreatureClient }: PetSurfaceProps) {
             <li>{t.operate}</li>
             <li>{t.privacy}</li>
           </ul>
-          <button onClick={() => void dismissOnboarding()} type="button">
-            {t.skip}
-          </button>
+          <div className="pet-onboarding-actions">
+            <button
+              className="pet-copy-button"
+              disabled={copyStatus === "copying"}
+              onClick={() => void copyActivationPhrase()}
+              type="button"
+            >
+              {copyStatus === "copying"
+                ? t.copyingPhrase
+                : copyStatus === "copied"
+                  ? t.copiedPhrase
+                  : copyStatus === "failed"
+                    ? t.copyFailed
+                    : t.copyPhrase}
+            </button>
+            <button
+              className="pet-dismiss-button"
+              onClick={() => void dismissOnboarding()}
+              type="button"
+            >
+              {t.skip}
+            </button>
+          </div>
         </section>
       )}
 

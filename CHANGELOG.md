@@ -9,10 +9,12 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 ### Added
 
 - accepted ADR-0010 for an installed-App entry that visibly teaches the Agent activation phrase
-- first-run and persistent idle-pet reminders for `Wake up, my pet`／`醒來吧我的寵物`
+- first-run and persistent idle-pet reminders for `Memoryling, wake up`／`寵物醒來`
+- a first-run copy button with visible copied／failed feedback for the locale-specific activation phrase
 
 ### Changed
 
+- shortened the exact pet activation phrase to `Memoryling, wake up`／`寵物醒來` and explicitly separated it from project／Agent wake-up requests
 - replaced the earlier technical trigger wording with the simpler official phrase `Wake up, my pet`／`醒來吧我的寵物` across the App, Agent skill, tests, and current documentation
 - normal Agent operation now requires the compatible pet to be open, submits without launching any process, and reports completion in the same conversation
 - cold launch goes directly to the pet with OS-locale selection; the blocking first-run setup screen and its Tauri commands were removed

@@ -1,11 +1,13 @@
 ---
 name: memoryling-operation
-description: Update an already-open Memoryling from the Agent conversation. Compile authorized context into a bounded bilingual pet update, submit it to the local app, and await application without launching an executable. Use when the user says "醒來吧我的寵物" or "Wake up, my pet", asks to update their open pet, or explicitly invokes $memoryling-operation.
+description: Update an already-open Memoryling from the Agent conversation. Compile authorized context into a bounded bilingual pet update, submit it to the local app, and await application without launching an executable. Use when the user says "寵物醒來" or "Memoryling, wake up", asks to update their open pet, or explicitly invokes $memoryling-operation.
 ---
 
 # Operate Memoryling
 
 Treat the slogan as permission to derive one pet update from sources the current Agent can already read. Do not treat it as permission to add connectors or widen access.
+
+Do not run this workflow merely because the user asks to read a wake-up file, wake the project／Agent／self, or inspect project context. Require the exact pet phrase or an explicit request to update the already-open Memoryling.
 
 The installed App is the visible entry surface; the Agent conversation is the update surface. The user installs and opens Memoryling through its EXE or Start menu, then follows the App's activation-phrase reminder. Never launch an executable on the user's behalf.
 

@@ -28,14 +28,14 @@ The ordinary user installs and opens Memoryling first. The pet appears without a
 1. Install and open Memoryling through the Windows EXE, shortcut, or Start menu; keep the pet running.
 2. Open the project you want to use in Codex, Claude Code, or another AGENTS-compatible environment.
 3. Let the Agent read `AGENTS.md` and the wake-up chain.
-4. Enter the phrase shown by the pet: **`Wake up, my pet`** or **`醒來吧我的寵物`**.
+4. Use the pet's copy button, then paste the phrase into the Agent project: **`Memoryling, wake up`** or **`寵物醒來`**.
 5. The Agent reads `skills/memoryling-operation/SKILL.md`, uses only already-authorized context, creates a temporary protocol-v1 package, and runs the local helper itself.
 6. The helper verifies that Memoryling 0.6.0 or newer is already running, submits without launching a process, waits for local application, and reports in the same conversation.
 
 1. 透過 Windows EXE、捷徑或開始功能表安裝並打開 Memoryling，讓寵物保持執行。
 2. 在 Codex、Claude Code 或其他支援 AGENTS 的環境開啟想使用的專案。
 3. 讓 Agent 先讀 `AGENTS.md` 與喚醒文件鏈。
-4. 輸入寵物畫面顯示的發動語：**`醒來吧我的寵物`** 或 **`Wake up, my pet`**。
+4. 按寵物畫面的複製按鈕，再把發動語貼到 Agent 專案：**`寵物醒來`** 或 **`Memoryling, wake up`**。
 5. Agent 會讀 `skills/memoryling-operation/SKILL.md`，只使用原本已授權的脈絡，建立暫存 protocol-v1 更新包，並自行執行本機工具。
 6. 工具確認 Memoryling 0.6.0 以上版本已開啟、不啟動任何程式，提交更新並等待本機套用，最後在同一段對話回報。
 

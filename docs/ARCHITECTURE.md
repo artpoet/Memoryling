@@ -2,7 +2,7 @@
 
 ## Status
 
-AS_OF: 2026-08-13. Source version 0.6.0 implements the Agent-operated vertical slice in [ADR-0008](adr/0008-agent-operated-memoryling-protocol.md) plus the installed-App activation contract in [ADR-0010](adr/0010-installed-app-teaches-agent-activation.md). The last installed-UAT artifact remains v0.2.0; no v0.6.0 packaged acceptance is claimed.
+AS_OF: 2026-08-14. Source version 0.6.0 implements the Agent-operated vertical slice in [ADR-0008](adr/0008-agent-operated-memoryling-protocol.md) plus the installed-App activation contract in [ADR-0010](adr/0010-installed-app-teaches-agent-activation.md). The last installed-UAT artifact remains v0.2.0; no v0.6.0 packaged acceptance is claimed.
 
 ## System shape
 
@@ -10,7 +10,7 @@ AS_OF: 2026-08-13. Source version 0.6.0 implements the Agent-operated vertical s
 User installs and opens Memoryling through the Windows EXE
   │ pet shows the activation phrase while idle
   ▼
-User says “Wake up, my pet” in the current Agent project
+User says “Memoryling, wake up” in the current Agent project
   │
   ▼
 Project Agent skill
@@ -99,7 +99,7 @@ Only the newest operation is retained. `clear_agent_operation` deletes the curre
 
 ## Desktop trust boundary
 
-Rust owns the `pet` and `main` windows, tray, context menu, position persistence, single-instance recovery, and Quit. Manual cold launch and resident relaunch both end pet-first; no blocking setup window is required. The first-run guide and idle pet visibly teach the activation phrase. Exact Tauri capabilities and independent caller guards protect sensitive main commands. The pet can fetch only its render DTO, advance dialogue, move, dismiss onboarding, and open native UI. Revision events contain only an opaque hash.
+Rust owns the `pet` and `main` windows, tray, context menu, position persistence, single-instance recovery, and Quit. Manual cold launch and resident relaunch both end pet-first; no blocking setup window is required. The first-run guide teaches the activation phrase with a local clipboard-copy control, and the idle pet keeps showing the phrase. Exact Tauri capabilities and independent caller guards protect sensitive main commands. The pet can fetch only its render DTO, advance dialogue, move, dismiss onboarding, and open native UI. Revision events contain only an opaque hash.
 
 Browser preview has no native inbox or persistence. It always states that memory access is off and performs no Agent operation.
 

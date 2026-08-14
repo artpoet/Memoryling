@@ -12,7 +12,7 @@ Read, in order:
 
 ## Operate Memoryling
 
-When the user says `醒來吧我的寵物` or `Wake up, my pet` in this repository:
+When the user says `寵物醒來` or `Memoryling, wake up` in this repository:
 
 1. Read `skills/memoryling-operation/SKILL.md` completely.
 2. Follow that skill using only context the current Agent is already authorized to read.
@@ -21,6 +21,8 @@ When the user says `醒來吧我的寵物` or `Wake up, my pet` in this reposito
 5. Report the bounded result in this conversation. Do not ask the user to run the helper manually.
 
 Do not launch Memoryling from the Agent workflow. The user installs and opens the App through its EXE or Start menu, then follows the visible activation-phrase reminder. If the App is closed, stop before inbox write and ask the user to open it before using the phrase again.
+
+Do not trigger the pet workflow when the user asks to read `AI-WAKEUP.md`, wake the project／Agent／self, or inspect wake-up documents. Those requests only load project context unless the user also says the exact pet activation phrase.
 
 The slogan authorizes this bounded pet update. It does not authorize new connectors, broader private-data access, external AI calls, or writes to Agent memory.
 

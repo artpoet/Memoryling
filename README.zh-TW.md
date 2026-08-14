@@ -4,7 +4,7 @@
 
 Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並打開 Windows App，再回到已設定的專案說：
 
-> **醒來吧我的寵物**
+> **寵物醒來**
 
 寵物打開後會自己顯示這句發動提醒。目前的 Agent 只使用它原本獲准讀取的脈絡，編譯成一份小型寵物更新，提交給已開啟的 App，並等待本機套用完成；接著由 Memoryling 持續管理外觀、雙語對話、冷卻、期限、安靜時段與每日額度。
 
@@ -13,7 +13,7 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並�
 ## 它有什麼不同
 
 - **由 Agent 運作：** 語意理解留在使用者原本選擇的 Agent。
-- **清楚的安裝版入口：** 使用者正常打開 EXE；寵物會在首次啟動與待機時教你 Agent 發動語。
+- **清楚的安裝版入口：** 使用者正常打開 EXE；寵物會在首次啟動顯示 Agent 發動語與一鍵複製按鈕，待機時也會繼續提醒。
 - **App 不自行呼叫 AI API：** 普通寵物不需要 API key，也不會自行發出模型請求。
 - **本機持續生活：** App 負責狀態、時機、呈現與使用者控制。
 - **最小化交接：** 更新包只有生成後的寵物狀態與雜湊引用，不含原始記憶、prompt、路徑、祕密或 reasoning。
@@ -24,8 +24,8 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並�
 
 ```text
 安裝並打開 Memoryling
-  → 寵物顯示「醒來吧我的寵物」發動提醒
-  → 使用者在目前 Agent 專案說「醒來吧我的寵物」
+  → 寵物顯示「寵物醒來」與複製按鈕
+  → 使用者在目前 Agent 專案貼上或說「寵物醒來」
   → Agent 讀取原本已授權的記憶＋近期工作＋專案脈絡
   → Agent skill 編譯 protocol-v1 JSON
   → 本機工具確認相容寵物已開啟
@@ -34,7 +34,7 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並�
   → 寵物依本機確定性規則改變外觀與說話
 ```
 
-專案入口會辨識 `醒來吧我的寵物` 與 `Wake up, my pet`。可重複執行的流程在 [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md)，嚴格格式在 [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json)。
+專案入口會辨識 `寵物醒來` 與 `Memoryling, wake up`；要求讀取 `AI-WAKEUP.md` 或喚醒專案時不會誤啟動寵物。可重複執行的流程在 [`skills/memoryling-operation/SKILL.md`](skills/memoryling-operation/SKILL.md)，嚴格格式在 [`schemas/agent-operation-v1.schema.json`](schemas/agent-operation-v1.schema.json)。
 
 ## v0.6.0 原始碼目前有什麼
 
@@ -44,7 +44,7 @@ Memoryling 是給 AI Agent 使用者的 local-first 桌面寵物。先安裝並�
 - 每次操作 3–12 組英文／繁體中文對話卡
 - 開啟、點擊與有限環境觸發
 - 唯一檔案收件匣輪詢，以及大小、symlink、schema、ID 嚴格檢查
-- pet-first 手動啟動、持續顯示的雙語發動提醒與 single-instance recovery
+- pet-first 手動啟動、可複製的雙語發動提醒、持續顯示的待機提醒與 single-instance recovery
 - 本機清除控制與權威快照替換語意
 - 合成資料 Rust、React 與提交工具測試
 
