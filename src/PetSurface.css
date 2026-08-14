@@ -205,6 +205,14 @@ html[data-surface="pet"] *::after {
   line-height: 1.35;
 }
 
+.pet-copy-destination {
+  margin: 0 0 7px;
+  color: #efeaff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 .pet-onboarding-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

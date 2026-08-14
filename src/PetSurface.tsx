@@ -38,6 +38,7 @@ const petCopy = {
     recovery: "If I hide, find me from the system tray.",
     activationPhrase: "Memoryling, wake up",
     operate: "Return to your Agent project and enter the activation phrase: “Memoryling, wake up”.",
+    copyDestination: "After copying, paste it into your Agent chat for the current project.",
     copyPhrase: "Copy “Memoryling, wake up”",
     copyingPhrase: "Copying…",
     copiedPhrase: "Copied “Memoryling, wake up”",
@@ -60,6 +61,7 @@ const petCopy = {
     recovery: "找不到我時，可以從系統匣叫我回來。",
     activationPhrase: "醒來吧我的寵物",
     operate: "回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。",
+    copyDestination: "複製後，請貼到目前工作專案的 Agent 對話中。",
     copyPhrase: "複製「醒來吧我的寵物」",
     copyingPhrase: "複製中…",
     copiedPhrase: "已複製「醒來吧我的寵物」",
@@ -339,8 +341,12 @@ export function PetSurface({
             <li>{t.operate}</li>
             <li>{t.privacy}</li>
           </ul>
+          <p className="pet-copy-destination" id="pet-copy-destination">
+            {t.copyDestination}
+          </p>
           <div className="pet-onboarding-actions">
             <button
+              aria-describedby="pet-copy-destination"
               className="pet-copy-button"
               disabled={copyStatus === "copying"}
               onClick={() => void copyActivationPhrase()}

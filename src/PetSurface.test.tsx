@@ -501,6 +501,9 @@ describe("pet surface", () => {
     expect(
       screen.getByText("回到你目前工作的 Agent 專案，輸入發動語：「醒來吧我的寵物」。"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText("複製後，請貼到目前工作專案的 Agent 對話中。"),
+    ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("button", { name: "複製「醒來吧我的寵物」" }),
     );
@@ -530,8 +533,16 @@ describe("pet surface", () => {
     });
     render(<PetSurface client={fixture.client} clipboard={clipboard} />);
 
+    expect(
+      await screen.findByText(
+        "After copying, paste it into your Agent chat for the current project.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Copy “Memoryling, wake up”" }),
+    ).toHaveAttribute("aria-describedby", "pet-copy-destination");
     await userEvent.click(
-      await screen.findByRole("button", {
+      screen.getByRole("button", {
         name: "Copy “Memoryling, wake up”",
       }),
     );

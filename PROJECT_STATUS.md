@@ -68,7 +68,7 @@ The core requires no app-side AI API and no direct app scan of Agent memory. The
 
 - manual cold launch shows the pet immediately; OS locale selects initial language and no setup page blocks the flow
 - resident relaunch returns to the existing pet rather than opening detail or creating another instance
-- first-run guide shows the exact bilingual activation phrase with a local copy button and visible result feedback; idle pet dialogue and the primary detail panel keep showing the phrase
+- first-run guide shows the exact bilingual activation phrase with a local copy button, visible result feedback, and an explicit instruction to paste it into the Agent chat for the current project; idle pet dialogue and the primary detail panel keep showing the phrase
 - primary UI no longer asks for a memory connector or API key
 - activity changes the pet aura color; milestone state adds a star
 - floating pet displays localized operation dialogue in a styled three-line speech bubble that can be dismissed and auto-hides after seven seconds
@@ -101,6 +101,7 @@ Automated checks and submit-helper smoke use synthetic data only. No private Age
 - PASS — Computer Use observed the idle Traditional Chinese pet show `醒來吧我的寵物`, then observed the evidence-qualified accent／completion mark, two distinct click dialogues in styled speech bubbles, accessible dismiss labels, and seven-second auto-hide
 - PASS — official skill validator reported `Skill is valid!` under an isolated temporary PyYAML dependency and UTF-8 mode; system Python was not modified
 - PASS — refreshed v0.7.0 native desktop visible smoke; automated frontend coverage separately proves exact clipboard text and click dismissal
+- PASS — GitHub Issue #1 first-use feedback is implemented: targeted onboarding coverage proves the bilingual paste destination and accessible copy-button description, while native 360×430 desktop smoke shows the complete Traditional Chinese and English guides without clipping either action
 - PASS — GitHub Settings visibly shows the custom social preview; the public repository `og:image` resolves to `repository-images.githubusercontent.com` and downloads as the exact 1280×640, 133,310-byte asset with SHA-256 `FE71469D205B2A14C0199A2D56415E51343C0520C8FB4F8BC0B943A76505CFBA`
 - PASS — `git diff --check`
 
