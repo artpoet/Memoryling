@@ -16,6 +16,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - documented source-grounded practical suggestions as an explicit opt-in Daily Memory Scout roadmap while keeping its inactive v0.7.0 status clear
 - when the activation phrase finds no compatible open pet, the Agent now stops before memory read and gives a fixed install／open／retry reminder instead of assuming Memoryling is already installed
 - clarified beside the first-run copy button that the activation phrase belongs in the Agent chat for the current project, with English／Traditional Chinese parity and an accessible description link
+- refreshed the fresh-session handoff so later Agents preserve the completed social-preview and Issue #1 feedback baselines, then continue with packaged v0.7.0 synthetic acceptance
 
 ### Security and privacy
 
@@ -25,6 +26,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 - helper regression tests prove the readiness-only failure needs no package path, returns the bounded reminder code, and leaves the inbox absent; the official skill validator passes
 - targeted onboarding tests and native 360×430 desktop smoke prove the full phrase, new paste destination, copy action, and dismissal action remain visible in both languages
+- functional commit `899258e` is synchronized to public `main`; GitHub Actions run `31803437123` passed and Issue #1 is closed as completed with the verification evidence linked in its final comment
 
 ## [0.7.0] - 2026-08-14
 

@@ -1,6 +1,6 @@
 # AI-WAKEUP — Memoryling
 
-AS_OF: 2026-08-14 (Asia/Taipei)
+AS_OF: 2026-08-15 (Asia/Taipei)
 
 ## Read order
 
@@ -47,7 +47,7 @@ Source v0.7.0 implements the Agent-operated vertical slice from ADR-0008, ADR-00
 - evidence-qualified appearance, at most one visible change per local day, and one pending plan;
 - `on-open`, `on-interact`, and `ambient` rules with expiry, cooldown, max uses, 22:00–09:00 quiet hours, 35–70 minute ambient cadence, ten-minute spacing, and seven ambient lines per day;
 - a dismissible, three-line, seven-second speech bubble on the floating pet;
-- manual cold launch that shows the pet and bilingual activation reminder with a locale-specific copy button, OS-locale selection, and no blocking setup screen;
+- manual cold launch that shows the pet and bilingual activation reminder with a locale-specific copy button, an explicit instruction to paste into the current project's Agent chat, OS-locale selection, and no blocking setup screen;
 - browser preview that performs no memory read or native operation.
 
 The app does **not** scan Agent storage and does **not** call an AI API for the core loop. The operation package must not contain raw memory, prompts, paths, secrets, names, tool output, or reasoning.
@@ -144,8 +144,12 @@ Report, in this order:
 1. Memoryling is now Agent-operated: slogan → Agent compilation → local rule-driven pet.
 2. The user opens the installed App first; the pet teaches the phrase, and Agent submission never launches a process.
 3. v0.7.0 source implements the protocol-v2 synthetic vertical slice; the app does not scan memories or call AI.
-4. v0.2.0 remains the installed-UAT baseline; v0.7.0 packaging is still open.
+4. v0.2.0 remains the installed-UAT baseline; v0.7.0 packaging is still open. GitHub Issue #1's first-use instruction feedback is already fixed and closed; do not redo it.
 5. Name one coherent next bundle and do it end to end.
+
+## Latest completed bundle
+
+GitHub Issue #1's real first-use feedback is implemented and closed. Functional baseline `899258e` adds a bilingual instruction beside the copy button telling users to paste the phrase into the current project's Agent chat, preserves the full phrase on copy failure, and links the control to the instruction for assistive technology. Native 360×430 English／Traditional Chinese smoke, full local checks, GitHub Actions run `31803437123`, and Final Gate passed.
 
 ## Current coherent next bundle
 

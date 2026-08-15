@@ -1,6 +1,6 @@
 # PROJECT_STATUS — Memoryling
 
-AS_OF: 2026-08-14 (Asia/Taipei)
+AS_OF: 2026-08-15 (Asia/Taipei)
 
 ## Current milestone
 
@@ -36,7 +36,7 @@ The core requires no app-side AI API and no direct app scan of Agent memory. The
 - Public presentation: GitHub uses `docs/assets/memoryling-social-preview.jpg` as the repository social preview; the 1280×640, 133,310-byte image presents the Agent-operated, local-first, privacy-minimized positioning without claiming inactive features
 - Installed baseline: unsigned v0.2.0 current-user installer; v0.7.0 package not yet accepted
 - Current build: `Memoryling_0.7.0_x64-setup.exe`, 4,966,744 bytes, SHA-256 `5EB39108F3468FB6DB383C70C055F8B3B11D0958F3EB904EEA991FB98FEA741B`, `NotSigned`; built but not installed／accepted
-- Repository: public `main` at https://github.com/artpoet/Memoryling
+- Repository: public `main` at https://github.com/artpoet/Memoryling; completed functional baseline `899258e` with CI run `31803437123` successful
 
 ## Implemented v0.7.0 vertical slice
 
@@ -101,7 +101,7 @@ Automated checks and submit-helper smoke use synthetic data only. No private Age
 - PASS — Computer Use observed the idle Traditional Chinese pet show `醒來吧我的寵物`, then observed the evidence-qualified accent／completion mark, two distinct click dialogues in styled speech bubbles, accessible dismiss labels, and seven-second auto-hide
 - PASS — official skill validator reported `Skill is valid!` under an isolated temporary PyYAML dependency and UTF-8 mode; system Python was not modified
 - PASS — refreshed v0.7.0 native desktop visible smoke; automated frontend coverage separately proves exact clipboard text and click dismissal
-- PASS — GitHub Issue #1 first-use feedback is implemented: targeted onboarding coverage proves the bilingual paste destination and accessible copy-button description, while native 360×430 desktop smoke shows the complete Traditional Chinese and English guides without clipping either action
+- PASS — GitHub Issue #1 first-use feedback is implemented and closed as completed at functional commit `899258e`: targeted onboarding coverage proves the bilingual paste destination and accessible copy-button description, while native 360×430 desktop smoke shows the complete Traditional Chinese and English guides without clipping either action
 - PASS — GitHub Settings visibly shows the custom social preview; the public repository `og:image` resolves to `repository-images.githubusercontent.com` and downloads as the exact 1280×640, 133,310-byte asset with SHA-256 `FE71469D205B2A14C0199A2D56415E51343C0520C8FB4F8BC0B943A76505CFBA`
 - PASS — `git diff --check`
 
@@ -141,4 +141,4 @@ Stop before private-memory UAT, global skill installation, code signing purchase
 
 ## Fresh-chat handoff
 
-Read `AGENTS.md` → `AI-WAKEUP.md` → this file → `docs/adr/0011-memory-grounded-daily-growth-and-dialogue-v2.md` → `docs/adr/0010-installed-app-teaches-agent-activation.md`. State that the installed App owns launch and visible phrase teaching; the Agent owns authorized compilation; the App owns rolling dialogue, daily appearance gating, and local life with no app-side AI API. Then execute the packaged synthetic acceptance bundle above end to end, or ask before crossing its explicit stop gates.
+Read `AGENTS.md` → `AI-WAKEUP.md` → this file → `docs/adr/0011-memory-grounded-daily-growth-and-dialogue-v2.md` → `docs/adr/0010-installed-app-teaches-agent-activation.md`. Treat functional commit `899258e`, successful CI run `31803437123`, the active social preview, and closed Issue #1 as completed baselines—do not redo them. State that the installed App owns launch and visible phrase teaching; the Agent owns authorized compilation; the App owns rolling dialogue, daily appearance gating, and local life with no app-side AI API. Then execute the packaged synthetic acceptance bundle above end to end, or ask before crossing its explicit stop gates.
