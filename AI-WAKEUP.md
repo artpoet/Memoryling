@@ -145,7 +145,7 @@ Report, in this order:
 2. The user opens the installed App first; the pet teaches the phrase, and Agent submission never launches a process.
 3. v0.7.0 source implements the protocol-v2 synthetic vertical slice; the app does not scan memories or call AI.
 4. v0.2.0 remains the installed-UAT baseline; v0.7.0 packaging is still open. GitHub Issue #1's first-use instruction feedback is already fixed and closed; do not redo it.
-5. Name one coherent next bundle and do it end to end.
+5. Name one coherent next bundle, state its private-data／API-key／cost implications, and wait for the user's explicit start instruction; once approved, do it end to end.
 
 ## Latest completed bundle
 
